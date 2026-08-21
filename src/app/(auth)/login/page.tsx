@@ -1,50 +1,28 @@
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+// ui components
+import { FieldDescription } from '@/components/ui/field';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+// module components
+import LoginForm from '@/modules/authentication/login.form';
 
 export default function Page() {
     return (
         <>
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
-                    <CardDescription>
-                        Enter your email below to login to your account
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form>
-                        <FieldGroup>
-                            <Field>
-                                <FieldLabel htmlFor="email">Email</FieldLabel>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="user@gmail.com"
-                                    required
-                                    className="h-10"
-                                />
-                            </Field>
-                            <Field>
-                                <FieldLabel htmlFor="password">Password</FieldLabel>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="********"
-                                    required
-                                    className="h-10"
-                                />
-                            </Field>
-                            <Field>
-                                <Button type="submit" className="h-10">
-                                    Login
-                                </Button>
-                            </Field>
-                        </FieldGroup>
-                    </form>
-                </CardContent>
-            </Card>
+            <div className="flex flex-col gap-6">
+                <Card>
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-xl">Welcome back</CardTitle>
+                        <CardDescription>Please enter your email and password</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <LoginForm />
+                    </CardContent>
+                </Card>
+                <FieldDescription className="px-6 text-center">
+                    By clicking continue, you agree to our <a href="#">Terms of Service</a> and{' '}
+                    <a href="#">Privacy Policy</a>.
+                </FieldDescription>
+            </div>
         </>
     );
 }
