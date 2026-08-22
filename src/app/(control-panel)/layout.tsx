@@ -16,6 +16,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
+// components
+import { ThemeToggle } from '@/components/theme-toggle';
+
 // icons
 import { GraduationCap, LayoutDashboard, Moon } from 'lucide-react';
 
@@ -77,9 +80,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <div className="flex  items-center gap-2 px-4">
                             <SidebarTrigger />
                         </div>
-                        <Button variant="outline" size="icon" aria-label="Submit">
+                        <ThemeToggle />
+                        {/* <Button variant="outline" size="icon" aria-label="Submit">
                             <Moon />
-                        </Button>
+                        </Button> */}
                     </header>
                     <div className="w-full flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
                 </SidebarInset>
