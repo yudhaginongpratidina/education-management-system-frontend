@@ -1,3 +1,7 @@
+// dependencies
+import Link from 'next/link';
+import { Icon } from '@iconify/react';
+
 // ui components
 import {
     Sidebar,
@@ -5,6 +9,7 @@ import {
     SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarHeader,
     SidebarInset,
     SidebarMenu,
@@ -13,14 +18,14 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // components
 import { ThemeToggle } from '@/components/theme-toggle';
 
 // icons
-import { GraduationCap, LayoutDashboard, Moon } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
@@ -45,15 +50,88 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         </SidebarMenu>
                     </SidebarHeader>
                     <SidebarContent>
+                        {/* ================================================== */}
+                        {/* DASHBOARD */}
+                        {/* ================================================== */}
                         <SidebarGroup>
                             <SidebarGroupContent className="flex flex-col gap-2">
                                 <SidebarMenu>
-                                    <SidebarMenuItem className="flex items-center gap-2">
-                                        <SidebarMenuButton tooltip="Dashboard">
-                                            <LayoutDashboard />
-                                            <span>Dashboard</span>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
+                                    <Link href="/dashboard">
+                                        <SidebarMenuItem className="flex items-center gap-2">
+                                            <SidebarMenuButton tooltip="Dashboard">
+                                                <Icon icon="material-symbols-light:dashboard" />
+                                                <span>Dashboard</span>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    </Link>
+                                </SidebarMenu>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
+
+                        {/* ================================================== */}
+                        {/* ACCESS CONTROL */}
+                        {/* ================================================== */}
+                        <SidebarGroup>
+                            <SidebarGroupLabel>Kontrol Akses</SidebarGroupLabel>
+                            <SidebarGroupContent className="flex flex-col gap-2">
+                                <SidebarMenu>
+                                    <Link href="/access-control/role">
+                                        <SidebarMenuItem className="flex items-center gap-2">
+                                            <SidebarMenuButton tooltip="Role">
+                                                <Icon icon="material-symbols:key" />
+                                                <span>Role</span>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    </Link>
+                                </SidebarMenu>
+                                <SidebarMenu>
+                                    <Link href="/access-control/menu">
+                                        <SidebarMenuItem className="flex items-center gap-2">
+                                            <SidebarMenuButton tooltip="Menu">
+                                                <Icon icon="material-symbols:menu-rounded" />
+                                                <span>Menu</span>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    </Link>
+                                </SidebarMenu>
+                                <SidebarMenu>
+                                    <Link href="/access-control/role-menu">
+                                        <SidebarMenuItem className="flex items-center gap-2">
+                                            <SidebarMenuButton tooltip="Role Menu">
+                                                <Icon icon="hugeicons:access" />
+                                                <span>Role Menu</span>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    </Link>
+                                </SidebarMenu>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
+
+                        {/* ================================================== */}
+                        {/* SECURITY */}
+                        {/* ================================================== */}
+                        <SidebarGroup>
+                            <SidebarGroupLabel>Akun</SidebarGroupLabel>
+                            <SidebarGroupContent className="flex flex-col gap-2">
+                                <SidebarMenu>
+                                    <Link href="/profile">
+                                        <SidebarMenuItem className="flex items-center gap-2">
+                                            <SidebarMenuButton tooltip="Profile">
+                                                <Icon icon="tabler:user-filled" />
+                                                <span>Profile</span>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    </Link>
+                                </SidebarMenu>
+                                <SidebarMenu>
+                                    <Link href="/security">
+                                        <SidebarMenuItem className="flex items-center gap-2">
+                                            <SidebarMenuButton tooltip="Security">
+                                                <Icon icon="mdi:password" />
+                                                <span>Security</span>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    </Link>
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>
@@ -80,7 +158,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <div className="flex  items-center gap-2 px-4">
                             <SidebarTrigger />
                         </div>
-                        <ThemeToggle />
+                        <div className="flex items-center gap-2 pr-4">
+                            <ThemeToggle />
+                            <Button variant="outline" size="icon">
+                                <Icon icon="humbleicons:logout" />
+                            </Button>
+                        </div>
                     </header>
                     <div className="w-full flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
                 </SidebarInset>
