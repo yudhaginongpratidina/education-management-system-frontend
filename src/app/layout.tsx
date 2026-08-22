@@ -4,7 +4,6 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 
 const robotoSlab = Roboto_Slab({ subsets: ['latin'], variable: '--font-serif' });
-
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 const geistSans = Geist({

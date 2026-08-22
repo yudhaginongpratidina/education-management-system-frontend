@@ -73,7 +73,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     </SidebarFooter>
                 </Sidebar>
                 <SidebarInset>
-                    <header className="px-4 flex h-12 border-b shrink-0 justify-between items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                    <header className="w-full px-4 flex h-12 border-b shrink-0 justify-between items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                         <div className="flex  items-center gap-2 px-4">
                             <SidebarTrigger />
                         </div>
@@ -81,7 +81,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             <Moon />
                         </Button>
                     </header>
-                    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+                    <div className="w-full flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
                 </SidebarInset>
             </SidebarProvider>
         </>
