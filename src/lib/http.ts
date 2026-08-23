@@ -9,7 +9,7 @@ type ErrorResponse = {
 };
 
 export const http = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: '',
     timeout: 30000,
     withCredentials: true,
     headers: {
@@ -28,6 +28,14 @@ function logout() {
 }
 
 http.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+    // Dynamically set baseURL if running in browser
+    if (typeof window !== 'undefined') {
+        const apiUrl = (window as any).API_URL;
+        if (apiUrl) {
+            config.baseURL = apiUrl;
+        }
+    }
+
     if (typeof window === 'undefined') {
         return config;
     }
