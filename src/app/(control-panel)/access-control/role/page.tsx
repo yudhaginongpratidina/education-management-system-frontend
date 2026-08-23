@@ -145,7 +145,9 @@ export default function Page() {
                     {Array.isArray(roles) &&
                         roles.map((role: any) => (
                             <TableRow key={role.id}>
-                                <TableCell className="font-medium capitalize">{role.name}</TableCell>
+                                <TableCell className="font-medium capitalize">
+                                    {role.name}
+                                </TableCell>
                                 <TableCell>{role.description}</TableCell>
                                 <TableCell className="flex gap-2">
                                     <Dialog
