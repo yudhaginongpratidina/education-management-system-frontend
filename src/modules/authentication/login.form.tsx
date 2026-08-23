@@ -41,10 +41,8 @@ export default function LoginForm() {
             localStorage.setItem('token', access_token);
             localStorage.setItem('role', decoded?.role || '');
 
-            // console.log(access_token);
-            // console.log(user);
-            // console.log(decoded);
-            // console.log(decoded?.role);
+            const roleMenu = await http.get(`/role-menus/${decoded?.role}`);
+            localStorage.setItem('menu', JSON.stringify(roleMenu.data.data));
 
             toast.add({
                 title: 'Success',
