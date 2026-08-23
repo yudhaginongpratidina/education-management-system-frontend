@@ -1,6 +1,13 @@
+'use client';
+
 // dependencies
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
+import { useRouter } from 'next/navigation';
+
+// utils
+import { http } from '@/lib/http';
+import { parseAxiosError } from '@/lib/parse-axios-error';
 
 // ui components
 import {
@@ -18,6 +25,7 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { toast } from '@/components/ui/toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // components
@@ -28,6 +36,34 @@ import { GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+    const router = useRouter();
+
+    const logout = async () => {
+        try {
+            const response = await http.post('/auth/logout');
+
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+
+            toast.add({
+                title: 'Success',
+                type: 'success',
+                description: response.data.message,
+            });
+
+            setTimeout(() => {
+                router.push('/login');
+            }, 1000);
+        } catch (error) {
+            const { message } = parseAxiosError(error);
+            toast.add({
+                title: 'Error',
+                type: 'error',
+                description: message,
+            });
+        }
+    };
+
     return (
         <>
             <SidebarProvider>
@@ -160,7 +196,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         </div>
                         <div className="flex items-center gap-2 pr-4">
                             <ThemeToggle />
-                            <Button variant="outline" size="icon">
+                            <Button variant="outline" size="icon" onClick={() => logout()}>
                                 <Icon icon="humbleicons:logout" />
                             </Button>
                         </div>
