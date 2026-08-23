@@ -18,7 +18,6 @@ import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
     SelectTrigger,
     SelectValue,
