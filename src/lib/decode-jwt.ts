@@ -5,6 +5,7 @@ export type JwtPayload = {
     sid: string;
     iss: string;
     aud: string;
+    role: string;
     iat: number;
     exp: number;
 };
