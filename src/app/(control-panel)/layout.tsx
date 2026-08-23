@@ -3,6 +3,7 @@
 // dependencies
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 // utils
@@ -37,6 +38,31 @@ import { Button } from '@/components/ui/button';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
+    const [menuTree, setMenuTree] = useState<any[]>([]);
+
+    const getMenu = async () => {
+        const menuData = localStorage.getItem('menu');
+        if (menuData) {
+            const rawMenu = JSON.parse(menuData);
+
+            const tree: any[] = [];
+            const menuMap: Record<number, any> = {};
+
+            rawMenu.forEach((item: any) => {
+                menuMap[item.id] = { ...item, children: [] };
+            });
+
+            rawMenu.forEach((item: any) => {
+                if (item.parent_id && menuMap[item.parent_id]) {
+                    menuMap[item.parent_id].children.push(menuMap[item.id]);
+                } else {
+                    tree.push(menuMap[item.id]);
+                }
+            });
+
+            setMenuTree(tree.sort((a: any, b: any) => a.sort_order - b.sort_order));
+        }
+    };
 
     const logout = async () => {
         try {
@@ -64,6 +90,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }
     };
 
+    useEffect(() => {
+        getMenu();
+    }, []);
+
     return (
         <>
             <SidebarProvider>
@@ -86,91 +116,71 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         </SidebarMenu>
                     </SidebarHeader>
                     <SidebarContent>
-                        {/* ================================================== */}
-                        {/* DASHBOARD */}
-                        {/* ================================================== */}
-                        <SidebarGroup>
-                            <SidebarGroupContent className="flex flex-col gap-2">
-                                <SidebarMenu>
-                                    <Link href="/dashboard">
-                                        <SidebarMenuItem className="flex items-center gap-2">
-                                            <SidebarMenuButton tooltip="Dashboard">
-                                                <Icon icon="material-symbols-light:dashboard" />
-                                                <span>Dashboard</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    </Link>
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-
-                        {/* ================================================== */}
-                        {/* ACCESS CONTROL */}
-                        {/* ================================================== */}
-                        <SidebarGroup>
-                            <SidebarGroupLabel>Kontrol Akses</SidebarGroupLabel>
-                            <SidebarGroupContent className="flex flex-col gap-2">
-                                <SidebarMenu>
-                                    <Link href="/access-control/role">
-                                        <SidebarMenuItem className="flex items-center gap-2">
-                                            <SidebarMenuButton tooltip="Role">
-                                                <Icon icon="material-symbols:key" />
-                                                <span>Role</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    </Link>
-                                </SidebarMenu>
-                                <SidebarMenu>
-                                    <Link href="/access-control/menu">
-                                        <SidebarMenuItem className="flex items-center gap-2">
-                                            <SidebarMenuButton tooltip="Menu">
-                                                <Icon icon="material-symbols:menu-rounded" />
-                                                <span>Menu</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    </Link>
-                                </SidebarMenu>
-                                <SidebarMenu>
-                                    <Link href="/access-control/role-menu">
-                                        <SidebarMenuItem className="flex items-center gap-2">
-                                            <SidebarMenuButton tooltip="Role Menu">
-                                                <Icon icon="hugeicons:access" />
-                                                <span>Role Menu</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    </Link>
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-
-                        {/* ================================================== */}
-                        {/* SECURITY */}
-                        {/* ================================================== */}
-                        <SidebarGroup>
-                            <SidebarGroupLabel>Akun</SidebarGroupLabel>
-                            <SidebarGroupContent className="flex flex-col gap-2">
-                                <SidebarMenu>
-                                    <Link href="/profile">
-                                        <SidebarMenuItem className="flex items-center gap-2">
-                                            <SidebarMenuButton tooltip="Profile">
-                                                <Icon icon="tabler:user-filled" />
-                                                <span>Profile</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    </Link>
-                                </SidebarMenu>
-                                <SidebarMenu>
-                                    <Link href="/security">
-                                        <SidebarMenuItem className="flex items-center gap-2">
-                                            <SidebarMenuButton tooltip="Security">
-                                                <Icon icon="mdi:password" />
-                                                <span>Security</span>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    </Link>
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
+                        {menuTree.map((item: any) => {
+                            if (item.type === 'GROUP') {
+                                return (
+                                    <SidebarGroup key={item.id}>
+                                        <SidebarGroupLabel className="capitalize">
+                                            {item.name}
+                                        </SidebarGroupLabel>
+                                        <SidebarGroupContent>
+                                            <SidebarMenu>
+                                                {item.children
+                                                    .sort(
+                                                        (a: any, b: any) =>
+                                                            a.sort_order - b.sort_order,
+                                                    )
+                                                    .map((child: any) => (
+                                                        <SidebarMenuItem key={child.id}>
+                                                            <Link href={child.url || '#'}>
+                                                                <SidebarMenuButton
+                                                                    tooltip={child.name}
+                                                                >
+                                                                    <Icon
+                                                                        icon={
+                                                                            child.icon ||
+                                                                            'material-symbols:menu-rounded'
+                                                                        }
+                                                                    />
+                                                                    <span className="capitalize">
+                                                                        {child.name}
+                                                                    </span>
+                                                                </SidebarMenuButton>
+                                                            </Link>
+                                                        </SidebarMenuItem>
+                                                    ))}
+                                            </SidebarMenu>
+                                        </SidebarGroupContent>
+                                    </SidebarGroup>
+                                );
+                            }
+                            if (item.type === 'ITEM') {
+                                return (
+                                    <SidebarGroup key={item.id}>
+                                        <SidebarGroupContent>
+                                            <SidebarMenu key={item.id}>
+                                                <Link href={item.url || '#'}>
+                                                    <SidebarMenuItem>
+                                                        <SidebarMenuButton tooltip={item.name}>
+                                                            <Icon
+                                                                icon={
+                                                                    item.icon ||
+                                                                    'material-symbols:menu-rounded'
+                                                                }
+                                                            />
+                                                            <span className="capitalize">
+                                                                {item.name}
+                                                            </span>
+                                                        </SidebarMenuButton>
+                                                    </SidebarMenuItem>
+                                                </Link>
+                                            </SidebarMenu>
+                                        </SidebarGroupContent>
+                                    </SidebarGroup>
+                                );
+                            }
+                            return null;
+                        })}
                     </SidebarContent>
                     <SidebarFooter>
                         <div className="border-t flex items-center gap-2 px-1 py-1.5 text-left text-sm">
