@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 // utils
 import { http } from '@/lib/http';
@@ -38,6 +38,7 @@ import { Button } from '@/components/ui/button';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
+    const pathname = usePathname();
     const [menuTree, setMenuTree] = useState<any[]>([]);
 
     const getMenu = async () => {
@@ -91,8 +92,37 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
-        getMenu();
-    }, []);
+        const menuData = localStorage.getItem('menu');
+        if (menuData) {
+            const rawMenu = JSON.parse(menuData);
+
+            // Authorization check
+            const isAuthorized = rawMenu.some(
+                (item: any) => item.url === pathname || pathname === '/dashboard',
+            );
+            if (!isAuthorized && pathname !== '/unauthorized') {
+                router.push('/unauthorized');
+            }
+
+            // Build tree structure
+            const tree: any[] = [];
+            const menuMap: Record<number, any> = {};
+
+            rawMenu.forEach((item: any) => {
+                menuMap[item.id] = { ...item, children: [] };
+            });
+
+            rawMenu.forEach((item: any) => {
+                if (item.parent_id && menuMap[item.parent_id]) {
+                    menuMap[item.parent_id].children.push(menuMap[item.id]);
+                } else {
+                    tree.push(menuMap[item.id]);
+                }
+            });
+
+            setMenuTree(tree.sort((a: any, b: any) => a.sort_order - b.sort_order));
+        }
+    }, [pathname, router]);
 
     return (
         <>
@@ -200,7 +230,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     </SidebarFooter>
                 </Sidebar>
                 <SidebarInset>
-                    <header className="w-full px-4 flex h-14 border-b shrink-0 justify-between items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                    <header className="w-full sticky top-0 px-4 flex h-14 border-b shrink-0 justify-between items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                         <div className="flex  items-center gap-2 px-4">
                             <SidebarTrigger />
                         </div>
