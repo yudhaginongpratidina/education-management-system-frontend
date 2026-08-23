@@ -24,7 +24,7 @@ import {
 export default function Page() {
     const [roles, setRoles] = useState<any[]>([]);
     const [menus, setMenus] = useState<any[]>([]);
-    const [permissions, setPermissions] = useState<Record<string, string[]>>({}); // roleSlug: menuSlugs[]
+    const [permissions, setPermissions] = useState<Record<string, string[]>>({});
     const [editingRoles, setEditingRoles] = useState<Record<string, boolean>>({});
 
     const fetchData = async () => {
