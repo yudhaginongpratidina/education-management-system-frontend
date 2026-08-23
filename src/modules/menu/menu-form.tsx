@@ -99,11 +99,13 @@ export default function MenuForm({ type, slug, onSuccess }: MenuFormProps) {
         try {
             const response = await http.get(`menus?slug=${slug}`);
             const { data } = response.data;
-            form.setValue('name', data.name);
-            form.setValue('type', data.type);
-            form.setValue('icon', data.icon);
-            form.setValue('description', data.description);
-            form.setValue('is_active', data.is_active);
+            form.setValue('name', data.name || '');
+            form.setValue('type', data.type || 'GROUP');
+            form.setValue('icon', data.icon || '');
+            form.setValue('url', data.url || '');
+            form.setValue('description', data.description || '');
+            form.setValue('sort_order', data.sort_order || 0);
+            form.setValue('is_active', data.is_active ?? true);
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({
