@@ -24,9 +24,10 @@ const formSchema = z.object({
 type RoleFormProps = {
     type: 'create' | 'update';
     slug?: string;
+    onSuccess: () => void;
 };
 
-export default function RoleForm({ type, slug }: RoleFormProps) {
+export default function RoleForm({ type, slug, onSuccess }: RoleFormProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -44,6 +45,7 @@ export default function RoleForm({ type, slug }: RoleFormProps) {
                 type: 'success',
                 description: response.data.message,
             });
+            onSuccess();
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({
@@ -62,6 +64,7 @@ export default function RoleForm({ type, slug }: RoleFormProps) {
                 type: 'success',
                 description: response.data.message,
             });
+            onSuccess();
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({

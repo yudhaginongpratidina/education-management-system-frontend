@@ -22,7 +22,6 @@ import {
     Pagination,
     PaginationContent,
     PaginationItem,
-    PaginationLink,
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
@@ -44,7 +43,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from '@/components/ui/alert-dialog';
 import { toast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 
@@ -54,6 +53,8 @@ import RoleForm from '@/modules/role/role-form';
 export default function Page() {
     const [roles, setRoles] = useState([]);
     const [offset, setOffset] = useState(0);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [openEditId, setOpenEditId] = useState<number | null>(null);
     const limit = 5;
 
     const getRoles = async (currentOffset = 0) => {
@@ -64,7 +65,7 @@ export default function Page() {
                     offset: currentOffset,
                 },
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                 },
             });
             setRoles(response.data.data || []);
@@ -86,7 +87,8 @@ export default function Page() {
                 title: 'Success',
                 type: 'success',
                 description: response.data.message,
-            })
+            });
+            getRoles(offset);
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({
@@ -95,6 +97,12 @@ export default function Page() {
                 description: message,
             });
         }
+    };
+
+    const handleSuccess = () => {
+        setIsCreateOpen(false);
+        setOpenEditId(null);
+        getRoles(offset);
     };
 
     useEffect(() => {
@@ -108,7 +116,7 @@ export default function Page() {
     return (
         <>
             <div className="w-full justify-between flex items-center">
-                <Dialog>
+                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger
                         render={
                             <Button variant="default" className="h-10">
@@ -121,7 +129,7 @@ export default function Page() {
                             <DialogTitle>FORM TAMBAH ROLE</DialogTitle>
                             <DialogDescription>Ini adalah form tambah role</DialogDescription>
                         </DialogHeader>
-                        <RoleForm type="create" />
+                        <RoleForm type="create" onSuccess={handleSuccess} />
                     </DialogContent>
                 </Dialog>
             </div>
@@ -134,49 +142,77 @@ export default function Page() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {Array.isArray(roles) && roles.map((role: any) => (
-                        <TableRow key={role.id}>
-                            <TableCell className="font-medium">{role.name}</TableCell>
-                            <TableCell>{role.description}</TableCell>
-                            <TableCell className="flex gap-2">
-                                <Dialog>
-                                    <DialogTrigger
-                                        render={
-                                            <Button size="icon" variant="outline" className="h-10">
-                                                <Icon icon="mingcute:edit-line" />
-                                            </Button>
+                    {Array.isArray(roles) &&
+                        roles.map((role: any) => (
+                            <TableRow key={role.id}>
+                                <TableCell className="font-medium">{role.name}</TableCell>
+                                <TableCell>{role.description}</TableCell>
+                                <TableCell className="flex gap-2">
+                                    <Dialog
+                                        open={openEditId === role.id}
+                                        onOpenChange={(open) =>
+                                            setOpenEditId(open ? role.id : null)
                                         }
-                                    />
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>FORM EDIT ROLE</DialogTitle>
-                                            <DialogDescription>Ini adalah form edit role</DialogDescription>
-                                        </DialogHeader>
-                                        <RoleForm type="update" slug={role.slug} />
-                                    </DialogContent>
-                                </Dialog>
-                                <AlertDialog>
-                                    <AlertDialogTrigger render={
-                                        <Button size="icon" variant="outline" className="h-10">
-                                            <Icon icon="mdi:trash" />
-                                        </Button>
-                                    } />
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>KONFIRMASI HAPUS</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                Yakin ingin melanjutkan proses ini?
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Batal</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => deleteRole(role.slug)}>Ya</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                                    >
+                                        <DialogTrigger
+                                            render={
+                                                <Button
+                                                    size="icon"
+                                                    variant="outline"
+                                                    className="h-10"
+                                                >
+                                                    <Icon icon="mingcute:edit-line" />
+                                                </Button>
+                                            }
+                                        />
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>FORM EDIT ROLE</DialogTitle>
+                                                <DialogDescription>
+                                                    Ini adalah form edit role
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <RoleForm
+                                                type="update"
+                                                slug={role.slug}
+                                                onSuccess={handleSuccess}
+                                            />
+                                        </DialogContent>
+                                    </Dialog>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger
+                                            render={
+                                                <Button
+                                                    size="icon"
+                                                    variant="outline"
+                                                    className="h-10"
+                                                >
+                                                    <Icon icon="mdi:trash" />
+                                                </Button>
+                                            }
+                                        />
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                    KONFIRMASI HAPUS
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Yakin ingin melanjutkan proses ini?
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Batal</AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={() => deleteRole(role.slug)}
+                                                >
+                                                    Ya
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </TableCell>
+                            </TableRow>
+                        ))}
                 </TableBody>
                 <TableFooter></TableFooter>
             </Table>
@@ -187,40 +223,16 @@ export default function Page() {
                             href="#"
                             onClick={(e) => {
                                 e.preventDefault();
-                                if (offset > 0) handlePageChange(offset - limit);
+                                if (offset >= limit) handlePageChange(offset - limit);
                             }}
                         />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink
-                            href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handlePageChange(0);
-                            }}
-                            isActive={offset === 0}
-                        >
-                            1
-                        </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationLink
-                            href="#"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handlePageChange(limit);
-                            }}
-                            isActive={offset === limit}
-                        >
-                            2
-                        </PaginationLink>
                     </PaginationItem>
                     <PaginationItem>
                         <PaginationNext
                             href="#"
                             onClick={(e) => {
                                 e.preventDefault();
-                                handlePageChange(offset + limit);
+                                if (roles.length === limit) handlePageChange(offset + limit);
                             }}
                         />
                     </PaginationItem>
