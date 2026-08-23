@@ -1,13 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { decodeJWT } from './decode-jwt';
 
-type ErrorResponse = {
-    error?: {
-        code: string;
-        message: string;
-    };
-};
-
 export const http = axios.create({
     baseURL: '',
     timeout: 30000,
@@ -18,22 +11,38 @@ export const http = axios.create({
 });
 
 function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('menu');
-    document.cookie = 'authenticated=; Max-Age=0; path=/;';
-    document.cookie = 'refresh_token=; Max-Age=0; path=/;';
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('menu');
+        document.cookie = 'authenticated=; Max-Age=0; path=/;';
+        document.cookie = 'refresh_token=; Max-Age=0; path=/;';
 
-    window.location.href = '/login';
+        window.location.href = '/login';
+    }
+}
+
+let cachedApiUrl: string | null = null;
+
+async function getApiUrl() {
+    if (cachedApiUrl) return cachedApiUrl;
+
+    try {
+        const res = await fetch('/api/config');
+        const data = await res.json();
+        cachedApiUrl = data.apiUrl;
+        return cachedApiUrl;
+    } catch (e) {
+        console.error('Failed to fetch API config, falling back to default');
+        return 'http://localhost:4000';
+    }
 }
 
 http.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
-    // Dynamically set baseURL if running in browser
     if (typeof window !== 'undefined') {
-        const apiUrl = (window as any).API_URL;
-        if (apiUrl) {
-            config.baseURL = apiUrl;
-        }
+        const apiUrl = await getApiUrl();
+        // Convert string | null to string | undefined
+        config.baseURL = apiUrl || undefined;
     }
 
     if (typeof window === 'undefined') {

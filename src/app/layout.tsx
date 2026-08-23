@@ -25,8 +25,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-    const apiUrl = process.env.API_URL || 'http://localhost:4000';
-
     return (
         <html
             lang="en"
@@ -42,13 +40,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             )}
             suppressHydrationWarning
         >
-            <head>
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `window.API_URL = "${apiUrl}";`,
-                    }}
-                />
-            </head>
             <body className="min-h-full flex flex-col">
                 <ThemeProvider>
                     {children}
