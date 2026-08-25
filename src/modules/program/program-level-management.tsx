@@ -19,10 +19,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { toast } from '@/components/ui/toast';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field';
 import {
     Table,
     TableBody,
@@ -31,6 +27,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { toast } from '@/components/ui/toast';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field';
 
 const formSchema = z.object({
     level: z.coerce.number().min(1, 'Level is required'),
