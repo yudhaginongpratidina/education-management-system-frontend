@@ -1,10 +1,14 @@
 'use client';
 
+// dependencies
+import { Icon } from '@iconify/react';
 import { useState, useEffect } from 'react';
+
+// utils
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
-import { toast } from '@/components/ui/toast';
-import { Button } from '@/components/ui/button';
+
+// components
 import {
     Select,
     SelectContent,
@@ -27,6 +31,21 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { toast } from '@/components/ui/toast';
+import { Button } from '@/components/ui/button';
+
+// modules components
 import ProgramPackageForm from '@/modules/program/program-package-form';
 
 export default function Page() {
@@ -158,21 +177,43 @@ export default function Page() {
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="flex items-center gap-2">
                                         <Button
+                                            size="icon"
                                             onClick={() => {
                                                 setEditingPackage(p);
                                                 setIsDialogOpen(true);
                                             }}
                                         >
-                                            Edit
+                                            <Icon icon="mingcute:edit-line" />
                                         </Button>
-                                        <Button
-                                            variant="destructive"
-                                            onClick={() => onDelete(p.slug)}
-                                        >
-                                            Hapus
-                                        </Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger
+                                                render={
+                                                    <Button size="icon" variant="outline">
+                                                        <Icon icon="mdi:trash" />
+                                                    </Button>
+                                                }
+                                            />
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>
+                                                        KONFIRMASI HAPUS
+                                                    </AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        Yakin ingin melanjutkan proses ini?
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                                                    <AlertDialogAction
+                                                        onClick={() => onDelete(p.slug)}
+                                                    >
+                                                        Ya
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </TableCell>
                                 </TableRow>
                             ))}
