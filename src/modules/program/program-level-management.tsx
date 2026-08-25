@@ -178,7 +178,7 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                             </Field>
                         )}
                     />
-                    <div className="w-full flex flex-col gap-2">
+                    <div className=" flex flex-col gap-2">
                         <Button type="submit" className="w-full h-10">
                             {editingLevel ? 'Update' : 'Simpan'}
                         </Button>

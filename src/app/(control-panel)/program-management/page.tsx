@@ -181,7 +181,7 @@ export default function Page() {
                                                 </Button>
                                             }
                                         />
-                                        <DialogContent className="min-w-xl">
+                                        <DialogContent className="min-w-md">
                                             <DialogHeader>
                                                 <DialogTitle>LEVEL</DialogTitle>
                                                 <DialogDescription>
