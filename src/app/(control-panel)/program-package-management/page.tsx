@@ -115,6 +115,7 @@ export default function Page() {
                             <ProgramPackageForm
                                 type={editingPackage ? 'update' : 'create'}
                                 slug={editingPackage ? editingPackage.slug : selectedProgram}
+                                initialData={editingPackage}
                                 onSuccess={() => {
                                     setIsDialogOpen(false);
                                     fetchPackages();
@@ -127,7 +128,9 @@ export default function Page() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Nama</TableHead>
-                                <TableHead>Harga Jual</TableHead>
+                                <TableHead>Durasi</TableHead>
+                                <TableHead>Intensitas</TableHead>
+                                <TableHead>Harga</TableHead>
                                 <TableHead>Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -135,7 +138,26 @@ export default function Page() {
                             {packages.map((p) => (
                                 <TableRow key={p.slug}>
                                     <TableCell>{p.name}</TableCell>
-                                    <TableCell>{p.selling_price}</TableCell>
+                                    <TableCell>
+                                        {p.duration_months} {p.session_period}
+                                    </TableCell>
+                                    <TableCell>{p.sessions_per_period}</TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col gap-1">
+                                            {Number(p.selling_price) !== 0 ? (
+                                                <>
+                                                    <del className="text-muted-foreground text-xs">
+                                                        {p.normal_price}
+                                                    </del>
+                                                    <span className="font-bold">
+                                                        {p.selling_price}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span>{p.normal_price}</span>
+                                            )}
+                                        </div>
+                                    </TableCell>
                                     <TableCell>
                                         <Button
                                             onClick={() => {

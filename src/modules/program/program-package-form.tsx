@@ -28,8 +28,8 @@ const formSchema = z.object({
     duration_months: z.number().int().min(1, 'Duration must be 1 or greater'),
     sessions_per_period: z.number().int().min(1, 'Sessions per period must be 1 or greater'),
     session_period: z.enum(['WEEK', 'MONTH', 'DURATION']),
-    normal_price: z.number().min(0, 'Normal price must be 0 or greater'),
-    selling_price: z.number().min(0, 'Selling price must be 0 or greater'),
+    normal_price: z.number().int().min(0, 'Normal price must be 0 or greater'),
+    selling_price: z.number().int().min(0, 'Selling price must be 0 or greater'),
     bonus_duration_months: z
         .number()
         .int()
@@ -40,13 +40,19 @@ const formSchema = z.object({
 type ProgramPackageFormProps = {
     type: 'create' | 'update';
     slug?: string;
+    initialData?: z.infer<typeof formSchema>;
     onSuccess: () => void;
 };
 
-export default function ProgramPackageForm({ type, slug, onSuccess }: ProgramPackageFormProps) {
+export default function ProgramPackageForm({
+    type,
+    slug,
+    initialData,
+    onSuccess,
+}: ProgramPackageFormProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
+        defaultValues: initialData || {
             name: '',
             duration_months: 1,
             sessions_per_period: 1,
@@ -57,6 +63,21 @@ export default function ProgramPackageForm({ type, slug, onSuccess }: ProgramPac
             status: 'ACTIVE',
         },
     });
+
+    useEffect(() => {
+        if (initialData) {
+            form.reset({
+                ...initialData,
+                normal_price: Math.floor(initialData.normal_price),
+                selling_price: Math.floor(initialData.selling_price),
+                duration_months: Math.floor(initialData.duration_months),
+                sessions_per_period: Math.floor(initialData.sessions_per_period),
+                bonus_duration_months: initialData.bonus_duration_months
+                    ? Math.floor(initialData.bonus_duration_months)
+                    : 0,
+            });
+        }
+    }, [initialData, form]);
 
     const onCreate = async (values: z.infer<typeof formSchema>) => {
         try {
@@ -130,9 +151,10 @@ export default function ProgramPackageForm({ type, slug, onSuccess }: ProgramPac
                             <FieldLabel>Durasi</FieldLabel>
                             <Input
                                 {...field}
+                                value={field.value ?? ''}
                                 type="number"
                                 className="h-10"
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                             />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
@@ -146,9 +168,10 @@ export default function ProgramPackageForm({ type, slug, onSuccess }: ProgramPac
                             <FieldLabel>Jumlah Pertemuan Per Periode</FieldLabel>
                             <Input
                                 {...field}
+                                value={field.value ?? ''}
                                 type="number"
                                 className="h-10"
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                             />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
@@ -182,9 +205,10 @@ export default function ProgramPackageForm({ type, slug, onSuccess }: ProgramPac
                             <FieldLabel>Harga Normal</FieldLabel>
                             <Input
                                 {...field}
+                                value={field.value ?? ''}
                                 type="number"
                                 className="h-10"
-                                onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                             />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
@@ -198,9 +222,10 @@ export default function ProgramPackageForm({ type, slug, onSuccess }: ProgramPac
                             <FieldLabel>Harga Diskon</FieldLabel>
                             <Input
                                 {...field}
+                                value={field.value ?? ''}
                                 type="number"
                                 className="h-10"
-                                onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                             />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
@@ -214,9 +239,10 @@ export default function ProgramPackageForm({ type, slug, onSuccess }: ProgramPac
                             <FieldLabel>Bonus Durasi (bulan)</FieldLabel>
                             <Input
                                 {...field}
+                                value={field.value ?? ''}
                                 type="number"
                                 className="h-10"
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                             />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
