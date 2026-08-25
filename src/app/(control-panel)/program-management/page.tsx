@@ -42,6 +42,7 @@ import { Button } from '@/components/ui/button';
 
 // module components
 import ProgramForm from '@/modules/program/program-form';
+import ProgramLevelManagement from '@/modules/program/program-level-management';
 
 export default function Page() {
     const [programs, setPrograms] = useState([]);
@@ -166,6 +167,28 @@ export default function Page() {
                                                 slug={program.slug}
                                                 onSuccess={handleSuccess}
                                             />
+                                        </DialogContent>
+                                    </Dialog>
+                                    <Dialog>
+                                        <DialogTrigger
+                                            render={
+                                                <Button
+                                                    size="icon"
+                                                    variant="outline"
+                                                    className="h-10"
+                                                >
+                                                    <Icon icon="carbon:skill-level-advanced" />
+                                                </Button>
+                                            }
+                                        />
+                                        <DialogContent className="min-w-xl">
+                                            <DialogHeader>
+                                                <DialogTitle>LEVEL</DialogTitle>
+                                                <DialogDescription>
+                                                    Ini adalah daftar level
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <ProgramLevelManagement program_slug={program.slug} />
                                         </DialogContent>
                                     </Dialog>
                                     <AlertDialog>
