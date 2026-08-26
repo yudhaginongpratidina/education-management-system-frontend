@@ -158,7 +158,8 @@ export default function Page() {
                                 <TableRow key={p.slug}>
                                     <TableCell>{p.name}</TableCell>
                                     <TableCell>
-                                        {p.duration_months} {p.session_period}
+                                        {p.duration_months}{' '}
+                                        {p.session_period === 'MONTH' ? 'Bulan' : 'Minggu'}
                                     </TableCell>
                                     <TableCell>{p.sessions_per_period}</TableCell>
                                     <TableCell>

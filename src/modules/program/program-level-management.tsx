@@ -30,6 +30,7 @@ import {
 import { toast } from '@/components/ui/toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field';
 
 const formSchema = z.object({
@@ -148,10 +149,9 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="description">Deskripsi</FieldLabel>
-                                <Input
+                                <Textarea
                                     {...field}
                                     id="description"
-                                    type="text"
                                     placeholder="Masukan Deskripsi"
                                     className="h-10"
                                 />
@@ -215,7 +215,9 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                                 <TableCell className="text-center">{item.level}</TableCell>
                                 <TableCell>{item.name}</TableCell>
                                 <TableCell>{item.description}</TableCell>
-                                <TableCell>{item.status}</TableCell>
+                                <TableCell>
+                                    {item.status === 'ACTIVE' ? 'Aktif' : 'Tidak Aktif'}
+                                </TableCell>
                                 <TableCell className="flex gap-2">
                                     <Button
                                         size="icon"

@@ -190,7 +190,6 @@ export default function ProgramPackageForm({
                                 <SelectContent>
                                     <SelectItem value="WEEK">Minggu</SelectItem>
                                     <SelectItem value="MONTH">Bulan</SelectItem>
-                                    <SelectItem value="DURATION">Durasi</SelectItem>
                                 </SelectContent>
                             </Select>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
