@@ -19,6 +19,13 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
     Dialog,
     DialogContent,
     DialogDescription,
@@ -42,17 +49,33 @@ import { Button } from '@/components/ui/button';
 
 // module components
 import TeacherForm from '@/modules/teacher/teacher-form';
+import TeacherProgramForm from '@/modules/teacher/teacher-program-form';
 
 export default function Page() {
     const [teachers, setTeachers] = useState([]);
+    const [programs, setPrograms] = useState([]);
+    const [selectedProgramName, setSelectedProgramName] = useState<string>('all');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [openEditId, setOpenEditId] = useState<number | null>(null);
 
     const getTeachers = async () => {
         try {
-            const response = await http.get(`/teachers`);
+            let url = '/teachers';
+            if (selectedProgramName !== 'all') {
+                // Find program ID by name to call the API
+                const selectedProgram = programs.find((p: any) => p.name === selectedProgramName);
+                if (selectedProgram) {
+                    const programId = (selectedProgram as any).id;
+                    const res = await http.get(`/teacher-programs?program_id=${programId}`);
+                    const teacherIds = res.data.data.map((item: any) => item.teacher_id);
+                    const allTeachersRes = await http.get('/teachers');
+                    const allTeachers = allTeachersRes.data.data || [];
+                    setTeachers(allTeachers.filter((t: any) => teacherIds.includes(t.id)));
+                    return;
+                }
+            }
+            const response = await http.get(url);
             setTeachers(response.data.data || []);
-            // console.log(response.data);
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({
@@ -60,6 +83,15 @@ export default function Page() {
                 type: 'error',
                 description: message,
             });
+        }
+    };
+
+    const getPrograms = async () => {
+        try {
+            const response = await http.get('/programs');
+            setPrograms(response.data.data || []);
+        } catch (error) {
+            console.error('Error fetching programs', error);
         }
     };
 
@@ -90,11 +122,30 @@ export default function Page() {
 
     useEffect(() => {
         getTeachers();
-    }, []);
+        getPrograms();
+    }, [selectedProgramName]);
 
     return (
         <>
-            <div className="w-full justify-between flex items-center">
+            <div className="w-full justify-between flex items-center mb-4">
+                <div className="flex gap-2">
+                    <Select
+                        onValueChange={(value) => setSelectedProgramName(value ?? 'all')}
+                        defaultValue="all"
+                    >
+                        <SelectTrigger className="w-45">
+                            <SelectValue placeholder="Pilih Program" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Semua Program</SelectItem>
+                            {programs.map((p: any) => (
+                                <SelectItem key={p.id} value={p.name}>
+                                    <span className="uppercase">{p.name}</span>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger
                         render={
@@ -164,6 +215,28 @@ export default function Page() {
                                                 slug={teacher.slug}
                                                 onSuccess={handleSuccess}
                                             />
+                                        </DialogContent>
+                                    </Dialog>
+                                    <Dialog>
+                                        <DialogTrigger
+                                            render={
+                                                <Button
+                                                    size="icon"
+                                                    variant="outline"
+                                                    className="h-10"
+                                                >
+                                                    <Icon icon="healthicons:i-training-class-outline-24px" />
+                                                </Button>
+                                            }
+                                        />
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>PROGRAM YANG DIAMPU</DialogTitle>
+                                                <DialogDescription>
+                                                    Ini adalah form edit program guru
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <TeacherProgramForm teacherId={teacher.id} />
                                         </DialogContent>
                                     </Dialog>
                                     <AlertDialog>
