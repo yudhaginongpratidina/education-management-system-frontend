@@ -50,6 +50,7 @@ import { Button } from '@/components/ui/button';
 // module components
 import TeacherForm from '@/modules/teacher/teacher-form';
 import TeacherProgramForm from '@/modules/teacher/teacher-program-form';
+import TeacherAvailabilityForm from '@/modules/teacher/teacher-availability-form';
 
 export default function Page() {
     const [teachers, setTeachers] = useState([]);
@@ -57,6 +58,7 @@ export default function Page() {
     const [selectedProgramName, setSelectedProgramName] = useState<string>('all');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [openEditId, setOpenEditId] = useState<number | null>(null);
+    const [openAvailabilityId, setOpenAvailabilityId] = useState<number | null>(null);
 
     const getTeachers = async () => {
         try {
@@ -117,6 +119,7 @@ export default function Page() {
     const handleSuccess = () => {
         setIsCreateOpen(false);
         setOpenEditId(null);
+        setOpenAvailabilityId(null);
         getTeachers();
     };
 
@@ -217,6 +220,36 @@ export default function Page() {
                                             <TeacherForm
                                                 type="update"
                                                 slug={teacher.slug}
+                                                onSuccess={handleSuccess}
+                                            />
+                                        </DialogContent>
+                                    </Dialog>
+                                    <Dialog
+                                        open={openAvailabilityId === teacher.id}
+                                        onOpenChange={(open) =>
+                                            setOpenAvailabilityId(open ? teacher.id : null)
+                                        }
+                                    >
+                                        <DialogTrigger
+                                            render={
+                                                <Button
+                                                    size="icon"
+                                                    variant="outline"
+                                                    className="h-10"
+                                                >
+                                                    <Icon icon="akar-icons:calendar" />
+                                                </Button>
+                                            }
+                                        />
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>FORM KETERSEDIAAN GURU</DialogTitle>
+                                                <DialogDescription>
+                                                    Guru tersedia pada hari
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <TeacherAvailabilityForm
+                                                teacherId={teacher.id}
                                                 onSuccess={handleSuccess}
                                             />
                                         </DialogContent>
