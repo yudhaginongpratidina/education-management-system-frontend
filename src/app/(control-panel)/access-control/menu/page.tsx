@@ -88,6 +88,8 @@ export default function Page() {
             await http.patch(`/menus/${menu.slug}`, {
                 parent_id: menu.parent_id || undefined,
                 name: menu.name,
+                icon: menu.icon,
+                url: menu.url,
                 type: menu.type,
                 description: menu.description,
                 sort_order: newSortOrder,

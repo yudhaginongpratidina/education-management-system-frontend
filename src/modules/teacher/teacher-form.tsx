@@ -15,6 +15,7 @@ import { toast } from '@/components/ui/toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field';
 
 const formSchema = z.object({
@@ -26,7 +27,11 @@ const formSchema = z.object({
     place_and_dob: z.string().optional(),
     last_education: z.string().optional(),
     photo: z.string().optional(),
+    position: z.string().optional(),
+    still_actively_working: z.boolean(),
 });
+
+type TeacherFormValues = z.infer<typeof formSchema>;
 
 type TeacherFormProps = {
     type: 'create' | 'update';
@@ -35,7 +40,7 @@ type TeacherFormProps = {
 };
 
 export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps) {
-    const form = useForm<z.infer<typeof formSchema>>({
+    const form = useForm<TeacherFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             full_name: '',
@@ -46,10 +51,12 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
             place_and_dob: '',
             last_education: '',
             photo: '-',
+            position: '',
+            still_actively_working: true,
         },
     });
 
-    const onCreate = async (values: z.infer<typeof formSchema>) => {
+    const onCreate = async (values: TeacherFormValues) => {
         try {
             const response = await http.post('/teachers ', values);
             // console.log(response.data);
@@ -69,7 +76,7 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
         }
     };
 
-    const onUpdate = async (values: z.infer<typeof formSchema>) => {
+    const onUpdate = async (values: TeacherFormValues) => {
         try {
             const response = await http.patch(`teachers/${slug}`, values);
             // console.log(response.data);
@@ -101,6 +108,8 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
                 last_education,
                 photo,
                 user_id,
+                position,
+                still_actively_working,
             } = response.data.data[0];
             console.log(response.data.data[0]);
             form.setValue('full_name', full_name);
@@ -111,6 +120,8 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
             form.setValue('last_education', last_education);
             form.setValue('photo', photo);
             form.setValue('user_id', String(user_id));
+            form.setValue('position', position);
+            form.setValue('still_actively_working', Boolean(still_actively_working));
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({
@@ -278,6 +289,46 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
                                 />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
+                        )}
+                    />
+                    <Controller
+                        name="position"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor="position">Posisi</FieldLabel>
+                                <Input
+                                    {...field}
+                                    value={field.value ?? ''}
+                                    id="position"
+                                    type="text"
+                                    placeholder="Masukan Posisi"
+                                    className="h-10"
+                                />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="still_actively_working"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                            <FieldGroup className="w-56">
+                                <Field orientation="horizontal">
+                                    <Checkbox
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        id="still_actively_working"
+                                        name="still_actively_working"
+                                    />
+                                    <FieldLabel htmlFor="still_actively_working">
+                                        Masih Aktif Bekerja
+                                    </FieldLabel>
+                                    {fieldState.invalid && (
+                                        <FieldError errors={[fieldState.error]} />
+                                    )}
+                                </Field>
+                            </FieldGroup>
                         )}
                     />
                     <Button type="submit" className="h-10">

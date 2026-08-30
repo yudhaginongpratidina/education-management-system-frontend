@@ -167,6 +167,7 @@ export default function Page() {
                 <TableHeader>
                     <TableRow>
                         <TableHead>Nama</TableHead>
+                        <TableHead>Posisi</TableHead>
                         <TableHead>Pendidikan Terakhir</TableHead>
                         <TableHead>Nomor Telepon</TableHead>
                         <TableHead>Aksi</TableHead>
@@ -178,6 +179,9 @@ export default function Page() {
                             <TableRow key={teacher.id}>
                                 <TableCell className="font-medium capitalize">
                                     {teacher.full_name}
+                                </TableCell>
+                                <TableCell className="font-medium capitalize">
+                                    {teacher.position}
                                 </TableCell>
                                 <TableCell className="font-medium capitalize">
                                     {teacher.last_education}
