@@ -2,7 +2,7 @@
 
 // dependencies
 import * as z from 'zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -40,6 +40,7 @@ type TeacherFormProps = {
 };
 
 export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps) {
+    const [file, setFile] = useState<File | null>(null);
     const form = useForm<TeacherFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -56,10 +57,28 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
         },
     });
 
+    const uploadFile = async (file: File): Promise<string | null> => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await http.post('/storage', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return response.data.data.slug;
+        } catch (error) {
+            console.error('File upload failed', error);
+            return null;
+        }
+    };
+
     const onCreate = async (values: TeacherFormValues) => {
         try {
-            const response = await http.post('/teachers ', values);
-            // console.log(response.data);
+            let photoSlug = values.photo;
+            if (file) {
+                const uploadedSlug = await uploadFile(file);
+                if (uploadedSlug) photoSlug = uploadedSlug;
+            }
+            const response = await http.post('/teachers', { ...values, photo: photoSlug });
             toast.add({
                 title: 'Success',
                 type: 'success',
@@ -78,8 +97,12 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
 
     const onUpdate = async (values: TeacherFormValues) => {
         try {
-            const response = await http.patch(`teachers/${slug}`, values);
-            // console.log(response.data);
+            let photoSlug = values.photo;
+            if (file) {
+                const uploadedSlug = await uploadFile(file);
+                if (uploadedSlug) photoSlug = uploadedSlug;
+            }
+            const response = await http.patch(`teachers/${slug}`, { ...values, photo: photoSlug });
             toast.add({
                 title: 'Success',
                 type: 'success',
@@ -111,7 +134,6 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
                 position,
                 still_actively_working,
             } = response.data.data[0];
-            console.log(response.data.data[0]);
             form.setValue('full_name', full_name);
             form.setValue('email', email);
             form.setValue('phone_number', phone_number);
@@ -165,6 +187,17 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
                             </Field>
                         )}
                     />
+
+                    <Field>
+                        <FieldLabel htmlFor="photo">Foto</FieldLabel>
+                        <Input
+                            id="photo"
+                            type="file"
+                            className="h-10"
+                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                        />
+                    </Field>
+
                     <Controller
                         name="last_education"
                         control={form.control}
