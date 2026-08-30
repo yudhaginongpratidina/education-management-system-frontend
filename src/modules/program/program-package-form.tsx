@@ -9,6 +9,7 @@ import { Controller, useForm } from 'react-hook-form';
 // utils
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
+import { formatCurrency, parseCurrency } from '@/lib/currency';
 
 // components
 import { toast } from '@/components/ui/toast';
@@ -204,10 +205,10 @@ export default function ProgramPackageForm({
                             <FieldLabel>Harga Normal</FieldLabel>
                             <Input
                                 {...field}
-                                value={field.value ?? ''}
-                                type="number"
+                                value={field.value ? formatCurrency(field.value) : ''}
+                                type="text"
                                 className="h-10"
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
                             />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
@@ -221,10 +222,10 @@ export default function ProgramPackageForm({
                             <FieldLabel>Harga Diskon</FieldLabel>
                             <Input
                                 {...field}
-                                value={field.value ?? ''}
-                                type="number"
+                                value={field.value ? formatCurrency(field.value) : ''}
+                                type="text"
                                 className="h-10"
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                onChange={(e) => field.onChange(parseCurrency(e.target.value))}
                             />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
