@@ -48,6 +48,7 @@ import { toast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 
 // module components
+import TeacherInfo from '@/modules/teacher/teacher-info';
 import TeacherForm from '@/modules/teacher/teacher-form';
 import TeacherProgramForm from '@/modules/teacher/teacher-program-form';
 import TeacherAvailabilityForm from '@/modules/teacher/teacher-availability-form';
@@ -166,9 +167,11 @@ export default function Page() {
                     </DialogContent>
                 </Dialog>
             </div>
+            <TeacherInfo />
             <Table className="border">
                 <TableHeader>
                     <TableRow>
+                        <TableHead>Foto</TableHead>
                         <TableHead>Nama</TableHead>
                         <TableHead>Posisi</TableHead>
                         <TableHead>Pendidikan Terakhir</TableHead>
@@ -180,6 +183,9 @@ export default function Page() {
                     {Array.isArray(teachers) &&
                         teachers.map((teacher: any) => (
                             <TableRow key={teacher.id}>
+                                <TableCell className="font-medium capitalize">
+                                    {teacher.photo}
+                                </TableCell>
                                 <TableCell className="font-medium capitalize">
                                     {teacher.full_name}
                                 </TableCell>
