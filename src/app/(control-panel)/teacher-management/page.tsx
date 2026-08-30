@@ -52,6 +52,7 @@ import TeacherInfo from '@/modules/teacher/teacher-info';
 import TeacherForm from '@/modules/teacher/teacher-form';
 import TeacherProgramForm from '@/modules/teacher/teacher-program-form';
 import TeacherAvailabilityForm from '@/modules/teacher/teacher-availability-form';
+import TeacherPhoto from '@/components/teacher-photo';
 
 export default function Page() {
     const [teachers, setTeachers] = useState([]);
@@ -184,7 +185,7 @@ export default function Page() {
                         teachers.map((teacher: any) => (
                             <TableRow key={teacher.id}>
                                 <TableCell className="font-medium capitalize">
-                                    {teacher.photo}
+                                    <TeacherPhoto slug={teacher.photo} />
                                 </TableCell>
                                 <TableCell className="font-medium capitalize">
                                     {teacher.full_name}
