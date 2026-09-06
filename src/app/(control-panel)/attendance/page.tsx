@@ -13,10 +13,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { http } from '@/lib/http';
-
-const OFFICE_COORDS = { lat: -6.317564948814179, lng: 106.6872056153437 };
-const MAX_ALLOWED_DISTANCE_METERS = 3000;
-
 // Haversine formula
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371e3;
@@ -32,14 +28,25 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
     return R * c;
 }
 
+function getLocalISOTimestamp() {
+    const now = new Date();
+    // Returns format: YYYY-MM-DDTHH:MM:SSZ
+    return now.toISOString().split('.')[0] + 'Z';
+}
+
 type AttendanceTab = 'masuk' | 'pulang' | 'ijin';
 
-export default function Page() {
+export default function AttendancePage() {
     const [attendanceType, setAttendanceType] = useState<AttendanceTab>('masuk');
-    const [todayRecord, setTodayRecord] = useState<any | null>(null);
     const [photoFile, setPhotoFile] = useState<File | null>(null);
+    const [todayRecord, setTodayRecord] = useState<any | null>(null);
     const [loading, setLoading] = useState(false);
     const [successResult, setSuccessResult] = useState<any | null>(null);
+    const [noAttendanceMessage, setNoAttendanceMessage] = useState<string | null>(null);
+
+    // Branch selection state
+    const [assignedBranches, setAssignedBranches] = useState<any[]>([]);
+    const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
 
     // Location state
     const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -51,30 +58,40 @@ export default function Page() {
     const [ijinType, setIjinType] = useState<string>('');
     const [ijinReason, setIjinReason] = useState<string>('');
 
-    const isInRange = useMemo(
-        () => distance !== null && distance <= MAX_ALLOWED_DISTANCE_METERS,
-        [distance],
+    const selectedBranch = useMemo(
+        () => assignedBranches.find((b) => b.branch_id.toString() === selectedBranchId),
+        [assignedBranches, selectedBranchId],
     );
+
+    const isInRange = useMemo(() => {
+        if (!selectedBranch || distance === null) return false;
+        const radius = parseFloat(selectedBranch.radius);
+        return distance <= radius;
+    }, [distance, selectedBranch]);
+
+    const fetchBranches = useCallback(async () => {
+        try {
+            const res = await http.get('/teacher-branches/2');
+            setAssignedBranches(res.data.data);
+        } catch (e) {
+            console.error('Failed to fetch branches', e);
+        }
+    }, []);
 
     const fetchTodayAttendance = useCallback(async () => {
         const user_id = localStorage.getItem('user_id');
-        const teacher_id = user_id ? parseInt(user_id) : 1;
+        const teacher_id = user_id ? parseInt(user_id) : 2;
 
         try {
+            setNoAttendanceMessage(null);
             const res = await http.get(`/teacher-attendances?teacher_id=${teacher_id}`);
-            // Log structure to verify
-            console.log('API Response:', res.data);
+            const dataList = Array.isArray(res.data) ? res.data : (res.data.data || []);
 
-            const dataList = Array.isArray(res.data) ? res.data : res.data.data || [];
-
-            // Debug: Log the list to be searched
-            console.log('Data list to search:', dataList);
-
-            // Match record. Try matching based on date, if that fails, try matching the most recent record.
             const now = new Date();
             const todayStr = now.toISOString().split('T')[0];
 
-            let record = dataList.find((d: any) => {
+            // Filter all records for today
+            const todayRecords = dataList.filter((d: any) => {
                 const dateToCompare = d.check_in_at || d.created_at || d.attendance_date;
                 const recordDate = dateToCompare
                     ? new Date(dateToCompare).toISOString().split('T')[0]
@@ -82,18 +99,14 @@ export default function Page() {
                 return recordDate === todayStr;
             });
 
-            // Fallback: If no date match, take the most recent record if it exists
-            if (!record && dataList.length > 0) {
-                console.log('No date match, falling back to most recent record');
-                record = dataList.sort(
-                    (a: any, b: any) =>
-                        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-                )[0];
+            setTodayRecord(todayRecords.length > 0 ? todayRecords : null);
+            setNoAttendanceMessage(null); // Reset message
+        } catch (e: any) {
+            if (e.response?.data?.error?.code === 'ATTENDANCE_NOT_FOUND') {
+                setNoAttendanceMessage('Hari ini Anda belum melakukan absen masuk.');
+            } else {
+                console.error("Failed to fetch today's attendance", e);
             }
-
-            setTodayRecord(record || null);
-        } catch (e) {
-            console.error("Failed to fetch today's attendance", e);
         }
     }, []);
 
@@ -104,13 +117,20 @@ export default function Page() {
             return;
         }
 
+        if (!selectedBranch) return;
+
         setLoadingLocation(true);
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const { latitude, longitude } = position.coords;
                 setCoords({ latitude, longitude });
                 setDistance(
-                    calculateDistance(latitude, longitude, OFFICE_COORDS.lat, OFFICE_COORDS.lng),
+                    calculateDistance(
+                        latitude,
+                        longitude,
+                        parseFloat(selectedBranch.latitude),
+                        parseFloat(selectedBranch.longitude),
+                    ),
                 );
                 setLoadingLocation(false);
             },
@@ -120,31 +140,43 @@ export default function Page() {
             },
             { enableHighAccuracy: true },
         );
-    }, []);
+    }, [selectedBranch]);
 
     useEffect(() => {
-        fetchLocation();
+        fetchBranches();
         fetchTodayAttendance();
-    }, [fetchLocation, fetchTodayAttendance]);
+    }, [fetchBranches, fetchTodayAttendance]);
+
+    useEffect(() => {
+        if (selectedBranch) {
+            fetchLocation();
+        }
+    }, [selectedBranch, fetchLocation]);
 
     const handleCapture = useCallback((file: File, preview: string) => {
         setPhotoFile(file);
     }, []);
 
     const handleSubmit = async () => {
+        if (!selectedBranchId) {
+            alert('Pilih cabang terlebih dahulu');
+            return;
+        }
         setLoading(true);
         const user_id = localStorage.getItem('user_id');
-        const teacher_id = user_id ? parseInt(user_id) : 1;
+        const teacher_id = user_id ? parseInt(user_id) : 2;
 
         const dateStr = new Date().toISOString().split('T')[0];
 
         try {
             if (attendanceType === 'ijin') {
                 const payload: any = {
-                    teacher_id,
+                    teacher_id: Number(teacher_id),
+                    branch_id: Number(selectedBranchId),
                     attendance_date: dateStr,
                     status: ijinType.toUpperCase(),
                     notes: ijinReason || null,
+                    is_approved: false,
                 };
                 await http.post('/teacher-attendances', payload);
                 setSuccessResult({
@@ -152,24 +184,23 @@ export default function Page() {
                     time: new Date().toLocaleTimeString('id-ID'),
                 });
             } else if (attendanceType === 'masuk') {
-                // Check if already checked in
-                if (todayRecord && todayRecord.check_in_at) {
-                    alert('Anda sudah melakukan check-in hari ini.');
-                    return;
-                }
-                // Check if allowed to check in
-                if (todayRecord && todayRecord.status !== 'PRESENT') {
-                    alert('Tidak dapat melakukan check-in.');
+                const existingRecord = todayRecord ? (Array.isArray(todayRecord) ? todayRecord.find((r: any) => r.branch_id.toString() === selectedBranchId) : (todayRecord.branch_id.toString() === selectedBranchId ? todayRecord : null)) : null;
+                
+                if (existingRecord && existingRecord.check_in_at) {
+                    alert('Anda sudah melakukan check-in di cabang ini hari ini.');
                     return;
                 }
 
                 const payload: any = {
-                    teacher_id,
-                    attendance_date: dateStr,
+                    teacher_id: Number(teacher_id),
+                    branch_id: Number(selectedBranchId),
                     status: 'PRESENT',
-                    check_in_at: new Date().toISOString(),
-                    check_in_latitude: coords?.latitude || null,
-                    check_in_longitude: coords?.longitude || null,
+                    attendance_date: dateStr,
+                    check_in_at: getLocalISOTimestamp(),
+                    check_in_photo: null,
+                    check_in_latitude: coords?.latitude.toString() || null,
+                    check_in_longitude: coords?.longitude.toString() || null,
+                    is_approved: true,
                 };
                 await http.post('/teacher-attendances', payload);
                 setSuccessResult({
@@ -177,37 +208,35 @@ export default function Page() {
                     time: new Date().toLocaleTimeString('id-ID'),
                 });
             } else if (attendanceType === 'pulang') {
-                // Check if can check out
-                console.log('Today record check for checkout:', todayRecord);
+                const existingRecord = todayRecord ? (Array.isArray(todayRecord) ? todayRecord.find((r: any) => r.branch_id.toString() === selectedBranchId) : (todayRecord.branch_id.toString() === selectedBranchId ? todayRecord : null)) : null;
 
-                if (!todayRecord || !todayRecord.id) {
-                    alert('Data absen tidak ditemukan atau ID tidak valid.');
+                if (!existingRecord || !existingRecord.id) {
+                    alert('Data absen tidak ditemukan untuk cabang ini.');
                     return;
                 }
 
-                if (todayRecord.status !== 'PRESENT' || !todayRecord.check_in_at) {
-                    alert(
-                        `Tidak dapat melakukan check-out. Status: ${todayRecord.status}, Check-in: ${todayRecord.check_in_at ? 'Ada' : 'Tidak Ada'}`,
-                    );
-                    return;
-                }
-                if (todayRecord.check_out_at) {
-                    alert('Anda sudah melakukan check-out hari ini.');
+                if (existingRecord.check_out_at) {
+                    alert('Anda sudah melakukan check-out di cabang ini hari ini.');
                     return;
                 }
 
                 const payload: any = {
-                    id: todayRecord.id,
-                    teacher_id: Number(teacher_id),
+                    teacher_id: Number(existingRecord.teacher_id),
+                    branch_id: Number(existingRecord.branch_id),
                     status: 'PRESENT',
-                    attendance_date: dateStr,
-                    check_out_at: new Date().toISOString(),
-                    check_out_latitude: coords?.latitude || null,
-                    check_out_longitude: coords?.longitude || null,
+                    attendance_date: existingRecord.attendance_date,
+                    check_in_at: existingRecord.check_in_at,
+                    check_in_photo: null,
+                    check_out_at: getLocalISOTimestamp(),
+                    check_out_photo: null,
+                    check_in_latitude: existingRecord.check_in_latitude,
+                    check_in_longitude: existingRecord.check_in_longitude,
+                    check_out_latitude: coords?.latitude.toString() || null,
+                    check_out_longitude: coords?.longitude.toString() || null,
+                    is_approved: true,
                 };
 
-                console.log(`Patching attendance with payload:`, payload);
-                await http.patch(`/teacher-attendances/${todayRecord.id}`, payload);
+                await http.patch(`/teacher-attendances/${existingRecord.id}`, payload);
                 setSuccessResult({
                     status: 'Berhasil Check-out',
                     time: new Date().toLocaleTimeString('id-ID'),
@@ -225,79 +254,124 @@ export default function Page() {
     return (
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-2">
             <div className="w-full space-y-4">
-                <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-sm">
-                    {(['masuk', 'pulang', 'ijin'] as AttendanceTab[]).map((tab) => (
-                        <button
-                            key={tab}
-                            type="button"
-                            onClick={() => {
-                                setAttendanceType(tab);
-                                setSuccessResult(null);
-                            }}
-                            className={cn(
-                                'py-2 text-sm font-semibold rounded-sm transition-all cursor-pointer capitalize',
-                                attendanceType === tab
-                                    ? 'bg-white text-indigo-700 shadow-sm'
-                                    : 'text-slate-600 hover:text-slate-900',
+                <Select value={selectedBranchId || ''} onValueChange={setSelectedBranchId}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Pilih Cabang">
+                            {selectedBranch ? selectedBranch.branch_name : 'Pilih Cabang'}
+                        </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                        {assignedBranches.map((branch) => (
+                            <SelectItem key={branch.branch_id} value={branch.branch_id.toString()}>
+                                {branch.branch_name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                {selectedBranchId && (
+                    <>
+                        <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-sm">
+                            {(['masuk', 'pulang', 'ijin'] as AttendanceTab[]).map((tab) => (
+                                <button
+                                    key={tab}
+                                    type="button"
+                                    onClick={() => {
+                                        setAttendanceType(tab);
+                                        setSuccessResult(null);
+                                    }}
+                                    className={cn(
+                                        'py-2 text-sm font-semibold rounded-sm transition-all cursor-pointer capitalize',
+                                        attendanceType === tab
+                                            ? 'bg-white text-indigo-700 shadow-sm'
+                                            : 'text-slate-600 hover:text-slate-900',
+                                    )}
+                                >
+                                    {tab === 'ijin' ? 'Ijin' : `Absen ${tab}`}
+                                </button>
+                            ))}
+                        </div>
+
+                        {attendanceType === 'ijin' ? (
+                            <div className="space-y-4 p-4 border border-slate-200 rounded-sm">
+                                <Select
+                                    onValueChange={(v: string | null) => {
+                                        if (v) setIjinType(v);
+                                    }}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih Tipe Ijin" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="sick">Sakit</SelectItem>
+                                        <SelectItem value="leave">Izin</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Textarea
+                                    placeholder="Alasan Ijin..."
+                                    onChange={(e) => setIjinReason(e.target.value)}
+                                />
+                            </div>
+                        ) : (
+                            <Camera
+                                facingMode="environment"
+                                onCapture={handleCapture}
+                                onReset={() => setPhotoFile(null)}
+                            />
+                        )}
+
+                        {(photoFile || attendanceType === 'ijin') && (
+                            <Button
+                                onClick={handleSubmit}
+                                disabled={loading || (attendanceType !== 'ijin' && !isInRange)}
+                            >
+                                {loading ? 'Mengirim...' : 'Submit'}
+                            </Button>
+                        )}
+
+                        {attendanceType !== 'ijin' && (
+                            <div className="p-4 bg-slate-50 rounded-sm border border-slate-200 text-sm">
+                                <p>
+                                    Status Lokasi:{' '}
+                                    {loadingLocation
+                                        ? 'Mengecek...'
+                                        : locationError ||
+                                          (isInRange ? 'Dalam jangkauan' : 'Di luar jangkauan')}
+                                </p>
+                                <p>Jarak: {distance ? `${Math.round(distance)}m` : '-'}</p>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {todayRecord && (() => {
+                    const branchRecord = Array.isArray(todayRecord) ? todayRecord.find((r: any) => r.branch_id.toString() === selectedBranchId) : (todayRecord.branch_id.toString() === selectedBranchId ? todayRecord : null);
+                    return branchRecord && branchRecord.check_in_at ? (
+                        <div className="p-4 bg-blue-50 text-blue-800 rounded-sm text-sm border border-blue-200 space-y-1">
+                            <p className="font-semibold">Status Absen Hari Ini:</p>
+                            <p>Cabang: {branchRecord.branch_name}</p>
+                            <p>Check-in: {new Date(branchRecord.check_in_at).toLocaleTimeString('id-ID')}</p>
+                            {branchRecord.check_out_at && (
+                                <>
+                                    <p>Check-out: {new Date(branchRecord.check_out_at).toLocaleTimeString('id-ID')}</p>
+                                    <p>Durasi: {(() => {
+                                        const diff = new Date(branchRecord.check_out_at).getTime() - new Date(branchRecord.check_in_at).getTime();
+                                        const hours = Math.floor(diff / 3600000);
+                                        const minutes = Math.floor((diff % 3600000) / 60000);
+                                        return `${hours} jam ${minutes} menit`;
+                                    })()}</p>
+                                </>
                             )}
-                        >
-                            {tab === 'ijin' ? 'Ijin' : `Absen ${tab}`}
-                        </button>
-                    ))}
-                </div>
+                            <p>Status: {branchRecord.status}</p>
+                        </div>
+                    ) : null;
+                })()}
 
-                {attendanceType === 'ijin' ? (
-                    <div className="space-y-4 p-4 border border-slate-200 rounded-sm">
-                        <Select
-                            onValueChange={(v: string | null) => {
-                                if (v) setIjinType(v);
-                            }}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Pilih Tipe Ijin" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="sick">SICK</SelectItem>
-                                <SelectItem value="leave">LEAVE</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Textarea
-                            placeholder="Alasan Ijin..."
-                            onChange={(e) => setIjinReason(e.target.value)}
-                        />
+                {noAttendanceMessage && (
+                    <div className="p-4 bg-yellow-50 text-yellow-800 rounded-sm text-sm border border-yellow-200">
+                        {noAttendanceMessage}
                     </div>
-                ) : (
-                    <Camera
-                        facingMode="environment"
-                        onCapture={handleCapture}
-                        onReset={() => setPhotoFile(null)}
-                    />
                 )}
-
-                {(photoFile || attendanceType === 'ijin') && (
-                    <Button
-                        onClick={handleSubmit}
-                        disabled={loading || (attendanceType !== 'ijin' && !isInRange)}
-                    >
-                        {loading ? 'Mengirim...' : 'Submit'}
-                    </Button>
-                )}
-
-                {/* Debug: display todayRecord status */}
-                {/* <div className="p-2 bg-yellow-100 text-xs text-yellow-800 rounded">
-                    DEBUG: todayRecord = {JSON.stringify(todayRecord)}
-                </div> */}
-
-                <div className="p-4 bg-slate-50 rounded-sm border border-slate-200 text-sm">
-                    <p>
-                        Status Lokasi:{' '}
-                        {loadingLocation
-                            ? 'Mengecek...'
-                            : locationError ||
-                              (isInRange ? 'Dalam jangkauan' : 'Di luar jangkauan')}
-                    </p>
-                    <p>Jarak: {distance ? `${Math.round(distance)}m` : '-'}</p>
-                </div>
 
                 {successResult && (
                     <div className="p-4 bg-emerald-50 text-emerald-800 rounded-sm text-sm">
