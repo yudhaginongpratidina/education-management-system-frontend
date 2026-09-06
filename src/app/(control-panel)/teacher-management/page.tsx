@@ -51,6 +51,7 @@ import { Button } from '@/components/ui/button';
 import TeacherInfo from '@/modules/teacher/teacher-info';
 import TeacherForm from '@/modules/teacher/teacher-form';
 import TeacherProgramForm from '@/modules/teacher/teacher-program-form';
+import TeacherBranchForm from '@/modules/teacher/teacher-branch-form';
 import TeacherAvailabilityForm from '@/modules/teacher/teacher-availability-form';
 import TeacherPhoto from '@/components/teacher-photo';
 
@@ -172,11 +173,11 @@ export default function Page() {
             <Table className="border">
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Foto</TableHead>
+                        <TableHead className="hidden md:table-cell">Foto</TableHead>
                         <TableHead>Nama</TableHead>
                         <TableHead>Posisi</TableHead>
-                        <TableHead>Pendidikan Terakhir</TableHead>
-                        <TableHead>Nomor Telepon</TableHead>
+                        <TableHead className="hidden md:table-cell">Pendidikan Terakhir</TableHead>
+                        <TableHead className="hidden md:table-cell">Nomor Telepon</TableHead>
                         <TableHead>Aksi</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -184,7 +185,7 @@ export default function Page() {
                     {Array.isArray(teachers) &&
                         teachers.map((teacher: any) => (
                             <TableRow key={teacher.id}>
-                                <TableCell className="font-medium capitalize">
+                                <TableCell className="font-medium capitalize hidden md:table-cell">
                                     <TeacherPhoto slug={teacher.photo} />
                                 </TableCell>
                                 <TableCell className="font-medium capitalize">
@@ -193,10 +194,10 @@ export default function Page() {
                                 <TableCell className="font-medium capitalize">
                                     {teacher.position}
                                 </TableCell>
-                                <TableCell className="font-medium capitalize">
+                                <TableCell className="font-medium capitalize hidden md:table-cell">
                                     {teacher.last_education}
                                 </TableCell>
-                                <TableCell className="font-medium capitalize">
+                                <TableCell className="font-medium capitalize hidden md:table-cell">
                                     {teacher.phone_number}
                                 </TableCell>
                                 <TableCell className="flex gap-2">
@@ -281,6 +282,31 @@ export default function Page() {
                                                 </DialogDescription>
                                             </DialogHeader>
                                             <TeacherProgramForm teacherId={teacher.id} />
+                                        </DialogContent>
+                                    </Dialog>
+                                    <Dialog>
+                                        <DialogTrigger
+                                            render={
+                                                <Button
+                                                    size="icon"
+                                                    variant="outline"
+                                                    className="h-10"
+                                                >
+                                                    <Icon icon="at-icons:location" />
+                                                </Button>
+                                            }
+                                        />
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>PENEMPATAN</DialogTitle>
+                                                <DialogDescription>
+                                                    Ini adalah form penempatan guru
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <TeacherBranchForm
+                                                teacherId={teacher.id}
+                                                onSuccess={() => {}}
+                                            />
                                         </DialogContent>
                                     </Dialog>
                                     <AlertDialog>

@@ -21,6 +21,12 @@ const actions = [
         className: 'text-violet-600 bg-violet-50',
     },
     {
+        icon: 'mdi:map-marker',
+        title: 'Penempatan',
+        description: 'Kelola lokasi tempat guru ini bekerja.',
+        className: 'text-amber-600 bg-amber-50',
+    },
+    {
         icon: 'at-icons:trash-can',
         title: 'Hapus Guru',
         description: 'Hapus data guru ini secara permanen dari sistem.',
