@@ -85,7 +85,7 @@ export default function AttendancePage() {
         try {
             setNoAttendanceMessage(null);
             const res = await http.get(`/teacher-attendances?teacher_id=${teacher_id}`);
-            const dataList = Array.isArray(res.data) ? res.data : (res.data.data || []);
+            const dataList = Array.isArray(res.data) ? res.data : res.data.data || [];
 
             const now = new Date();
             const todayStr = now.toISOString().split('T')[0];
@@ -162,9 +162,31 @@ export default function AttendancePage() {
             alert('Pilih cabang terlebih dahulu');
             return;
         }
+
+        const existingRecord = todayRecord
+            ? Array.isArray(todayRecord)
+                ? todayRecord.find((r: any) => r.branch_id.toString() === selectedBranchId)
+                : todayRecord.branch_id.toString() === selectedBranchId
+                  ? todayRecord
+                  : null
+            : null;
+
+        if (existingRecord) {
+            if (existingRecord.status === 'PRESENT' && attendanceType === 'ijin') {
+                alert('Anda sudah melakukan check-in di cabang ini, tidak bisa mengajukan ijin.');
+                return;
+            }
+            if (existingRecord.status !== 'PRESENT' && attendanceType !== 'ijin') {
+                alert(
+                    `Anda sudah mengajukan ijin/sakit (${existingRecord.status}) di cabang ini, tidak bisa melakukan absen.`,
+                );
+                return;
+            }
+        }
+
         setLoading(true);
         const user_id = localStorage.getItem('user_id');
-        const teacher_id = user_id ? parseInt(user_id) : 2;
+        const teacher_id = user_id ? parseInt(user_id) : 3;
 
         const dateStr = new Date().toISOString().split('T')[0];
 
@@ -184,8 +206,6 @@ export default function AttendancePage() {
                     time: new Date().toLocaleTimeString('id-ID'),
                 });
             } else if (attendanceType === 'masuk') {
-                const existingRecord = todayRecord ? (Array.isArray(todayRecord) ? todayRecord.find((r: any) => r.branch_id.toString() === selectedBranchId) : (todayRecord.branch_id.toString() === selectedBranchId ? todayRecord : null)) : null;
-                
                 if (existingRecord && existingRecord.check_in_at) {
                     alert('Anda sudah melakukan check-in di cabang ini hari ini.');
                     return;
@@ -208,8 +228,6 @@ export default function AttendancePage() {
                     time: new Date().toLocaleTimeString('id-ID'),
                 });
             } else if (attendanceType === 'pulang') {
-                const existingRecord = todayRecord ? (Array.isArray(todayRecord) ? todayRecord.find((r: any) => r.branch_id.toString() === selectedBranchId) : (todayRecord.branch_id.toString() === selectedBranchId ? todayRecord : null)) : null;
-
                 if (!existingRecord || !existingRecord.id) {
                     alert('Data absen tidak ditemukan untuk cabang ini.');
                     return;
@@ -344,28 +362,50 @@ export default function AttendancePage() {
                     </>
                 )}
 
-                {todayRecord && (() => {
-                    const branchRecord = Array.isArray(todayRecord) ? todayRecord.find((r: any) => r.branch_id.toString() === selectedBranchId) : (todayRecord.branch_id.toString() === selectedBranchId ? todayRecord : null);
-                    return branchRecord && branchRecord.check_in_at ? (
-                        <div className="p-4 bg-blue-50 text-blue-800 rounded-sm text-sm border border-blue-200 space-y-1">
-                            <p className="font-semibold">Status Absen Hari Ini:</p>
-                            <p>Cabang: {branchRecord.branch_name}</p>
-                            <p>Check-in: {new Date(branchRecord.check_in_at).toLocaleTimeString('id-ID')}</p>
-                            {branchRecord.check_out_at && (
-                                <>
-                                    <p>Check-out: {new Date(branchRecord.check_out_at).toLocaleTimeString('id-ID')}</p>
-                                    <p>Durasi: {(() => {
-                                        const diff = new Date(branchRecord.check_out_at).getTime() - new Date(branchRecord.check_in_at).getTime();
-                                        const hours = Math.floor(diff / 3600000);
-                                        const minutes = Math.floor((diff % 3600000) / 60000);
-                                        return `${hours} jam ${minutes} menit`;
-                                    })()}</p>
-                                </>
-                            )}
-                            <p>Status: {branchRecord.status}</p>
-                        </div>
-                    ) : null;
-                })()}
+                {todayRecord &&
+                    (() => {
+                        const branchRecord = Array.isArray(todayRecord)
+                            ? todayRecord.find(
+                                  (r: any) => r.branch_id.toString() === selectedBranchId,
+                              )
+                            : todayRecord.branch_id.toString() === selectedBranchId
+                              ? todayRecord
+                              : null;
+                        return branchRecord && branchRecord.check_in_at ? (
+                            <div className="p-4 bg-blue-50 text-blue-800 rounded-sm text-sm border border-blue-200 space-y-1">
+                                <p className="font-semibold">Status Absen Hari Ini:</p>
+                                <p>Cabang: {branchRecord.branch_name}</p>
+                                <p>
+                                    Check-in:{' '}
+                                    {new Date(branchRecord.check_in_at).toLocaleTimeString('id-ID')}
+                                </p>
+                                {branchRecord.check_out_at && (
+                                    <>
+                                        <p>
+                                            Check-out:{' '}
+                                            {new Date(branchRecord.check_out_at).toLocaleTimeString(
+                                                'id-ID',
+                                            )}
+                                        </p>
+                                        <p>
+                                            Durasi:{' '}
+                                            {(() => {
+                                                const diff =
+                                                    new Date(branchRecord.check_out_at).getTime() -
+                                                    new Date(branchRecord.check_in_at).getTime();
+                                                const hours = Math.floor(diff / 3600000);
+                                                const minutes = Math.floor(
+                                                    (diff % 3600000) / 60000,
+                                                );
+                                                return `${hours} jam ${minutes} menit`;
+                                            })()}
+                                        </p>
+                                    </>
+                                )}
+                                <p>Status: {branchRecord.status}</p>
+                            </div>
+                        ) : null;
+                    })()}
 
                 {noAttendanceMessage && (
                     <div className="p-4 bg-yellow-50 text-yellow-800 rounded-sm text-sm border border-yellow-200">
