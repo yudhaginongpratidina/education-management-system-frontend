@@ -37,9 +37,11 @@ export default function LoginForm() {
             const response = await http.post('/auth/login', values);
             const { access_token } = response.data.data;
             const decoded = decodeJWT(access_token);
+            console.log('decoded', decoded?.sub);
 
             localStorage.setItem('token', access_token);
             localStorage.setItem('role', decoded?.role || '');
+            localStorage.setItem('user_id', decoded?.sub || '');
 
             const roleMenu = await http.get(`/role-menus/${decoded?.role}`);
             localStorage.setItem('menu', JSON.stringify(roleMenu.data.data));
