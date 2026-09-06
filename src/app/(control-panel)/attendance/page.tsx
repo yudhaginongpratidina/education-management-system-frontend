@@ -64,33 +64,36 @@ export default function Page() {
             const res = await http.get(`/teacher-attendances?teacher_id=${teacher_id}`);
             // Log structure to verify
             console.log('API Response:', res.data);
-            
-            const dataList = Array.isArray(res.data) ? res.data : (res.data.data || []);
-            
+
+            const dataList = Array.isArray(res.data) ? res.data : res.data.data || [];
+
             // Debug: Log the list to be searched
             console.log('Data list to search:', dataList);
 
             // Match record. Try matching based on date, if that fails, try matching the most recent record.
             const now = new Date();
             const todayStr = now.toISOString().split('T')[0];
-            
+
             let record = dataList.find((d: any) => {
                 const dateToCompare = d.check_in_at || d.created_at || d.attendance_date;
-                const recordDate = dateToCompare ? new Date(dateToCompare).toISOString().split('T')[0] : '';
+                const recordDate = dateToCompare
+                    ? new Date(dateToCompare).toISOString().split('T')[0]
+                    : '';
                 return recordDate === todayStr;
             });
 
             // Fallback: If no date match, take the most recent record if it exists
             if (!record && dataList.length > 0) {
                 console.log('No date match, falling back to most recent record');
-                record = dataList.sort((a: any, b: any) => 
-                    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                record = dataList.sort(
+                    (a: any, b: any) =>
+                        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
                 )[0];
             }
-            
+
             setTodayRecord(record || null);
         } catch (e) {
-            console.error('Failed to fetch today\'s attendance', e);
+            console.error("Failed to fetch today's attendance", e);
         }
     }, []);
 
@@ -144,7 +147,10 @@ export default function Page() {
                     notes: ijinReason || null,
                 };
                 await http.post('/teacher-attendances', payload);
-                setSuccessResult({ status: 'Berhasil', time: new Date().toLocaleTimeString('id-ID') });
+                setSuccessResult({
+                    status: 'Berhasil',
+                    time: new Date().toLocaleTimeString('id-ID'),
+                });
             } else if (attendanceType === 'masuk') {
                 // Check if already checked in
                 if (todayRecord && todayRecord.check_in_at) {
@@ -166,18 +172,23 @@ export default function Page() {
                     check_in_longitude: coords?.longitude || null,
                 };
                 await http.post('/teacher-attendances', payload);
-                setSuccessResult({ status: 'Berhasil Check-in', time: new Date().toLocaleTimeString('id-ID') });
+                setSuccessResult({
+                    status: 'Berhasil Check-in',
+                    time: new Date().toLocaleTimeString('id-ID'),
+                });
             } else if (attendanceType === 'pulang') {
                 // Check if can check out
                 console.log('Today record check for checkout:', todayRecord);
-                
+
                 if (!todayRecord || !todayRecord.id) {
-                     alert('Data absen tidak ditemukan atau ID tidak valid.');
-                     return;
+                    alert('Data absen tidak ditemukan atau ID tidak valid.');
+                    return;
                 }
-                
+
                 if (todayRecord.status !== 'PRESENT' || !todayRecord.check_in_at) {
-                    alert(`Tidak dapat melakukan check-out. Status: ${todayRecord.status}, Check-in: ${todayRecord.check_in_at ? 'Ada' : 'Tidak Ada'}`);
+                    alert(
+                        `Tidak dapat melakukan check-out. Status: ${todayRecord.status}, Check-in: ${todayRecord.check_in_at ? 'Ada' : 'Tidak Ada'}`,
+                    );
                     return;
                 }
                 if (todayRecord.check_out_at) {
@@ -194,10 +205,13 @@ export default function Page() {
                     check_out_latitude: coords?.latitude || null,
                     check_out_longitude: coords?.longitude || null,
                 };
-                
+
                 console.log(`Patching attendance with payload:`, payload);
                 await http.patch(`/teacher-attendances/${todayRecord.id}`, payload);
-                setSuccessResult({ status: 'Berhasil Check-out', time: new Date().toLocaleTimeString('id-ID') });
+                setSuccessResult({
+                    status: 'Berhasil Check-out',
+                    time: new Date().toLocaleTimeString('id-ID'),
+                });
             }
             await fetchTodayAttendance();
         } catch (e) {
