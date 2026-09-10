@@ -88,7 +88,6 @@ export default function AttendancePage() {
     }, []);
 
     const fetchTodayAttendance = useCallback(async () => {
-        
         try {
             setNoAttendanceMessage(null);
             const current = await http.get(`/auth/me`);
@@ -99,18 +98,25 @@ export default function AttendancePage() {
             const res = await http.get(`/teacher-attendances?teacher_id=${teacher_id}`);
             console.log('res', res);
             const dataList = Array.isArray(res.data) ? res.data : res.data.data || [];
+            console.log('dataList:', dataList);
 
             const now = new Date();
             const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            console.log('dateStr:', dateStr);
 
             // Filter all records for today
             const todayRecords = dataList.filter((d: any) => {
-                const dateToCompare = d.check_in_at || d.created_at || d.attendance_date;
-                const recordDate = dateToCompare
-                    ? new Date(dateToCompare).toISOString().split('T')[0]
-                    : '';
+                // Gunakan attendance_date jika ada, karena itu merepresentasikan tanggal absen yang benar
+                const dateToCompare = d.attendance_date;
+
+                if (!dateToCompare) return false;
+
+                // Ambil bagian YYYY-MM-DD dari string ISO (karena backend mengirim 2026-09-11T00:00:00.000Z)
+                const recordDate = dateToCompare.split('T')[0];
+
                 return recordDate === dateStr;
             });
+            console.log('todayRecords:', todayRecords);
 
             setTodayRecord(todayRecords.length > 0 ? todayRecords : null);
             setNoAttendanceMessage(null); // Reset message
