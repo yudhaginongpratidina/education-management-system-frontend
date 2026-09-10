@@ -18,8 +18,12 @@ export default function Page() {
 
     const getRecords = async () => {
         try {
-            const user_id = localStorage.getItem('user_id');
-            const teacher_id = user_id ? parseInt(user_id) : 3;
+            // const user_id = localStorage.getItem('user_id');
+            // const teacher_id = user_id ? parseInt(user_id) : 3;
+            const current = await http.get(`/auth/me`);
+            const data = current.data.data;
+            const teacher = await http.get(`/teachers?slug=${data.slug}`);
+            const teacher_id = teacher.data.data[0].id;
             const response = await http.get(`/teacher-attendances?teacher_id=${teacher_id}`);
             setMyRecords(response.data.data || []);
         } catch (error) {

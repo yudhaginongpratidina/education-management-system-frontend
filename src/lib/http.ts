@@ -29,11 +29,15 @@ async function getApiUrl() {
 
     try {
         const res = await fetch('/api/config');
+        if (!res.ok) {
+            throw new Error(`Failed to fetch API config: ${res.statusText}`);
+        }
         const data = await res.json();
+        console.log('API config fetched:', data);
         cachedApiUrl = data.apiUrl;
         return cachedApiUrl;
     } catch (e) {
-        console.error('Failed to fetch API config, falling back to default');
+        console.error('Failed to fetch API config, falling back to default. Error:', e);
         return 'http://localhost:4000';
     }
 }
@@ -44,6 +48,8 @@ http.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
         // Convert string | null to string | undefined
         config.baseURL = apiUrl || undefined;
     }
+
+    console.log('Requesting:', (config.baseURL || '') + (config.url || ''));
 
     if (typeof window === 'undefined') {
         return config;

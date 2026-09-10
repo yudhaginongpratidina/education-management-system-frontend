@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Camera } from '@/components/ui/camera';
+
 import {
     Select,
     SelectContent,
@@ -9,10 +9,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { toast } from '@/components/ui/toast';
+import { Camera } from '@/components/ui/camera';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+
 import { cn } from '@/lib/utils';
 import { http } from '@/lib/http';
+import { parseAxiosError } from '@/lib/parse-axios-error';
+
 // Haversine formula
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371e3;
@@ -71,7 +76,11 @@ export default function AttendancePage() {
 
     const fetchBranches = useCallback(async () => {
         try {
-            const res = await http.get('/teacher-branches/2');
+            const current = await http.get(`/auth/me`);
+            const data = current.data.data;
+            const teacher = await http.get(`/teachers?slug=${data.slug}`);
+
+            const res = await http.get(`/teacher-branches/${teacher.data.data[0].id}`);
             setAssignedBranches(res.data.data);
         } catch (e) {
             console.error('Failed to fetch branches', e);
@@ -79,8 +88,10 @@ export default function AttendancePage() {
     }, []);
 
     const fetchTodayAttendance = useCallback(async () => {
-        const user_id = localStorage.getItem('user_id');
-        const teacher_id = user_id ? parseInt(user_id) : 2;
+        const current = await http.get(`/auth/me`);
+        const data = current.data.data;
+        const teacher = await http.get(`/teachers?slug=${data.slug}`);
+        const teacher_id = teacher.data.data[0].id;
 
         try {
             setNoAttendanceMessage(null);
@@ -185,8 +196,10 @@ export default function AttendancePage() {
         }
 
         setLoading(true);
-        const user_id = localStorage.getItem('user_id');
-        const teacher_id = user_id ? parseInt(user_id) : 3;
+        const current = await http.get(`/auth/me`);
+        const data = current.data.data;
+        const teacher = await http.get(`/teachers?slug=${data.slug}`);
+        const teacher_id = teacher.data.data[0].id;
 
         const dateStr = new Date().toISOString().split('T')[0];
 
@@ -261,9 +274,15 @@ export default function AttendancePage() {
                 });
             }
             await fetchTodayAttendance();
-        } catch (e) {
-            console.error(e);
-            alert('Gagal mengirim data');
+        } catch (error) {
+            const { message } = parseAxiosError(error);
+            toast.add({
+                title: 'Error',
+                type: 'error',
+                description: message,
+            });
+            // console.error(e);
+            // alert('Gagal mengirim data');
         } finally {
             setLoading(false);
         }
