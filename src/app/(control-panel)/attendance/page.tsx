@@ -204,15 +204,25 @@ export default function AttendancePage() {
         }
 
         setLoading(true);
-        const current = await http.get(`/auth/me`);
-        const data = current.data.data;
-        const teacher = await http.get(`/teachers?slug=${data.slug}`);
-        const teacher_id = teacher.data.data[0].id;
-
-        const now = new Date();
-        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
         try {
+            const current = await http.get(`/auth/me`);
+            const data = current.data.data;
+            const teacher = await http.get(`/teachers?slug=${data.slug}`);
+            const teacher_id = teacher.data.data[0].id;
+
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+            let photoSlug = null;
+            if (attendanceType !== 'ijin' && photoFile) {
+                const formData = new FormData();
+                formData.append('file', photoFile);
+                const uploadRes = await http.post('/storage', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                photoSlug = uploadRes.data.data.slug;
+            }
+
             if (attendanceType === 'ijin') {
                 const payload: any = {
                     teacher_id: Number(teacher_id),
@@ -239,7 +249,7 @@ export default function AttendancePage() {
                     status: 'PRESENT',
                     attendance_date: dateStr,
                     check_in_at: getLocalISOTimestamp(),
-                    check_in_photo: null,
+                    check_in_photo: photoSlug,
                     check_in_latitude: coords?.latitude.toString() || null,
                     check_in_longitude: coords?.longitude.toString() || null,
                     is_approved: true,
@@ -266,9 +276,9 @@ export default function AttendancePage() {
                     status: 'PRESENT',
                     attendance_date: existingRecord.attendance_date,
                     check_in_at: existingRecord.check_in_at,
-                    check_in_photo: null,
+                    check_in_photo: existingRecord.check_in_photo,
                     check_out_at: getLocalISOTimestamp(),
-                    check_out_photo: null,
+                    check_out_photo: photoSlug,
                     check_in_latitude: existingRecord.check_in_latitude,
                     check_in_longitude: existingRecord.check_in_longitude,
                     check_out_latitude: coords?.latitude.toString() || null,
@@ -285,13 +295,8 @@ export default function AttendancePage() {
             await fetchTodayAttendance();
         } catch (error) {
             const { message } = parseAxiosError(error);
-            toast.add({
-                title: 'Error',
-                type: 'error',
-                description: message,
-            });
-            // console.error(e);
-            // alert('Gagal mengirim data');
+            console.error('Attendance error:', error);
+            alert(`Gagal mengirim data: ${message}`);
         } finally {
             setLoading(false);
         }
