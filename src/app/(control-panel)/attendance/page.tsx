@@ -88,18 +88,20 @@ export default function AttendancePage() {
     }, []);
 
     const fetchTodayAttendance = useCallback(async () => {
-        const current = await http.get(`/auth/me`);
-        const data = current.data.data;
-        const teacher = await http.get(`/teachers?slug=${data.slug}`);
-        const teacher_id = teacher.data.data[0].id;
-
+        
         try {
             setNoAttendanceMessage(null);
+            const current = await http.get(`/auth/me`);
+            const data = current.data.data;
+            const teacher = await http.get(`/teachers?slug=${data.slug}`);
+            const teacher_id = teacher.data.data[0].id;
+            console.log('teacher_id', teacher_id);
             const res = await http.get(`/teacher-attendances?teacher_id=${teacher_id}`);
+            console.log('res', res);
             const dataList = Array.isArray(res.data) ? res.data : res.data.data || [];
 
             const now = new Date();
-            const todayStr = now.toISOString().split('T')[0];
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
             // Filter all records for today
             const todayRecords = dataList.filter((d: any) => {
@@ -107,7 +109,7 @@ export default function AttendancePage() {
                 const recordDate = dateToCompare
                     ? new Date(dateToCompare).toISOString().split('T')[0]
                     : '';
-                return recordDate === todayStr;
+                return recordDate === dateStr;
             });
 
             setTodayRecord(todayRecords.length > 0 ? todayRecords : null);
@@ -201,7 +203,8 @@ export default function AttendancePage() {
         const teacher = await http.get(`/teachers?slug=${data.slug}`);
         const teacher_id = teacher.data.data[0].id;
 
-        const dateStr = new Date().toISOString().split('T')[0];
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
         try {
             if (attendanceType === 'ijin') {
