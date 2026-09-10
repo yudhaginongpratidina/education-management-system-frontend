@@ -44,7 +44,22 @@ export default function LoginForm() {
             localStorage.setItem('user_id', decoded?.sub || '');
 
             const roleMenu = await http.get(`/role-menus/${decoded?.role}`);
-            localStorage.setItem('menu', JSON.stringify(roleMenu.data.data));
+            let menuData = roleMenu.data.data;
+
+            if (decoded?.role === 'guru') {
+                const current = await http.get(`/auth/me`);
+                const data = current.data.data;
+                // console.log('data', data);
+
+                const teacher = await http.get(`/teachers?slug=${data.slug}`);
+                // console.log('teacher', teacher.data.data[0]);
+
+                if (teacher.data.data[0].position !== 'kepala sekolah') {
+                    menuData = menuData.filter((menu: any) => menu.slug !== 'persetujuan-absensi');
+                }
+            }
+
+            localStorage.setItem('menu', JSON.stringify(menuData));
 
             toast.add({
                 title: 'Success',
