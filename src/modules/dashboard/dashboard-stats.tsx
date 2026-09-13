@@ -1,79 +1,95 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
 import { StatsCard } from './stats-card';
 
-const API_URL = 'http://localhost:4000/dashboard';
-const TOKEN =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwic2lkIjoiMjI5ZGM0NTMtNDRlOC00OWM1LTg3MTYtMDAwMDI0YTRiYzE5IiwiaXNzIjoieW91ci1hcHAtbmFtZSIsImF1ZCI6InlvdXItYXBwLXVzZXJzIiwicm9sZSI6InN1cGVyLWFkbWluIiwiaWF0IjoxNzg5MzEyMTY4LCJleHAiOjE3ODkzMTkzNjh9.4j39ugnl2gOwJqUiIr1QtiUliE4d28Ut53EOWFQkPhc';
+const endpoints = [
+    {
+        key: 'totalRole',
+        endpoint: 'total-role',
+        title: 'Total Role',
+        desc: 'Role sistem',
+        sub: 'Total role yang terdaftar',
+    },
+    {
+        key: 'totalMenu',
+        endpoint: 'total-menu',
+        title: 'Total Menu',
+        desc: 'Menu sistem',
+        sub: 'Total menu yang terdaftar',
+    },
+    {
+        key: 'totalUser',
+        endpoint: 'total-user',
+        title: 'Total User',
+        desc: 'User aktif',
+        sub: 'Total user yang terdaftar',
+    },
+    {
+        key: 'totalProgram',
+        endpoint: 'total-program',
+        title: 'Total Program',
+        desc: 'Program aktif',
+        sub: 'Total program yang terdaftar',
+    },
+    {
+        key: 'totalBranch',
+        endpoint: 'total-branch',
+        title: 'Total Branch',
+        desc: 'Cabang aktif',
+        sub: 'Total cabang yang terdaftar',
+    },
+    {
+        key: 'totalTeacher',
+        endpoint: 'total-teacher',
+        title: 'Total Guru',
+        desc: 'Guru aktif',
+        sub: 'Total guru yang terdaftar',
+    },
+];
 
-async function fetchData(endpoint: string) {
-    try {
-        const response = await http.get(`${API_URL}/${endpoint}`, {
-            headers: {
-                Authorization: `Bearer ${TOKEN}`,
-            },
-        });
-        return response.data.success ? response.data.data.total : 0;
-    } catch (error) {
-        console.error(parseAxiosError(error));
-        return 0;
+export function DashboardStats() {
+    const [statsData, setStatsData] = useState<Record<string, number | string>>({});
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchAllStats() {
+            setLoading(true);
+            const newData: Record<string, number | string> = {};
+
+            for (const item of endpoints) {
+                try {
+                    const response = await http.get(`/dashboard/${item.endpoint}`);
+                    newData[item.key] = response.data.success ? response.data.data.total : 0;
+                } catch (error) {
+                    console.error(`Error fetching ${item.endpoint}:`, parseAxiosError(error));
+                    newData[item.key] = 0;
+                }
+            }
+
+            setStatsData(newData);
+            setLoading(false);
+        }
+
+        fetchAllStats();
+    }, []);
+
+    if (loading) {
+        return <div className="p-4">Loading stats...</div>;
     }
-}
-
-export async function DashboardStats() {
-    const [totalRole, totalMenu, totalUser, totalProgram, totalBranch, totalTeacher] =
-        await Promise.all([
-            fetchData('total-role'),
-            fetchData('total-menu'),
-            fetchData('total-user'),
-            fetchData('total-program'),
-            fetchData('total-branch'),
-            fetchData('total-teacher'),
-        ]);
-
-    const stats = [
-        {
-            title: 'Total Role',
-            value: totalRole,
-            desc: 'Role sistem',
-            sub: 'Total role yang terdaftar',
-        },
-        {
-            title: 'Total Menu',
-            value: totalMenu,
-            desc: 'Menu sistem',
-            sub: 'Total menu yang terdaftar',
-        },
-        {
-            title: 'Total User',
-            value: totalUser,
-            desc: 'User aktif',
-            sub: 'Total user yang terdaftar',
-        },
-        {
-            title: 'Total Program',
-            value: totalProgram,
-            desc: 'Program aktif',
-            sub: 'Total program yang terdaftar',
-        },
-        {
-            title: 'Total Branch',
-            value: totalBranch,
-            desc: 'Cabang aktif',
-            sub: 'Total cabang yang terdaftar',
-        },
-        {
-            title: 'Total Guru',
-            value: totalTeacher,
-            desc: 'Guru aktif',
-            sub: 'Total guru yang terdaftar',
-        },
-    ];
 
     return (
         <div className="w-full p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {stats.map((stat, i) => (
-                <StatsCard key={i} {...stat} />
+            {endpoints.map((item, i) => (
+                <StatsCard
+                    key={i}
+                    title={item.title}
+                    value={statsData[item.key] || 0}
+                    desc={item.desc}
+                    sub={item.sub}
+                />
             ))}
         </div>
     );
