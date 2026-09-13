@@ -20,6 +20,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
+import { toast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 
 interface Branch {
@@ -42,7 +43,7 @@ export default function AttendanceReportPage() {
     const [branches, setBranches] = useState<Branch[]>([]);
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [reportData, setReportData] = useState<AttendanceRecord[]>([]);
-    const [month, setMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
+    const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
     const [selectedBranchId, setSelectedBranchId] = useState<string>('');
     const [selectedTeacherId, setSelectedTeacherId] = useState<string>('');
 
@@ -56,7 +57,12 @@ export default function AttendanceReportPage() {
                 setBranches(branchRes.data.data);
                 setTeachers(teacherRes.data.data);
             } catch (error) {
-                console.error(parseAxiosError(error));
+                const { message } = parseAxiosError(error);
+                toast.add({
+                    title: 'Error',
+                    type: 'error',
+                    description: message,
+                });
             }
         };
         fetchData();
@@ -70,7 +76,12 @@ export default function AttendanceReportPage() {
             );
             setReportData(res.data.data);
         } catch (error) {
-            console.error(parseAxiosError(error));
+            const { message } = parseAxiosError(error);
+            toast.add({
+                title: 'Error',
+                type: 'error',
+                description: message,
+            });
         }
     };
 
@@ -81,6 +92,49 @@ export default function AttendanceReportPage() {
                 `/report-attendance/teacher/${selectedTeacherId}?month=${month}`,
             );
             setReportData(res.data.data);
+        } catch (error) {
+            const { message } = parseAxiosError(error);
+            toast.add({
+                title: 'Error',
+                type: 'error',
+                description: message,
+            });
+        }
+    };
+
+    const handleExportBranch = async () => {
+        if (!selectedBranchId) return;
+        try {
+            const res = await http.get(
+                `/report-attendance/export/branch/${selectedBranchId}?month=${month}`,
+                { responseType: 'blob' },
+            );
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `laporan-cabang-${selectedBranchId}-${month}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error(parseAxiosError(error));
+        }
+    };
+
+    const handleExportTeacher = async () => {
+        if (!selectedTeacherId) return;
+        try {
+            const res = await http.get(
+                `/report-attendance/export/teacher/${selectedTeacherId}?month=${month}`,
+                { responseType: 'blob' },
+            );
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `laporan-guru-${selectedTeacherId}-${month}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
         } catch (error) {
             console.error(parseAxiosError(error));
         }
@@ -105,7 +159,10 @@ export default function AttendanceReportPage() {
                             }}
                         >
                             <SelectTrigger className="w-50">
-                                <SelectValue placeholder="Pilih Cabang" />
+                                <SelectValue placeholder="Pilih Cabang">
+                                    {branches.find((b) => String(b.id) === selectedBranchId)
+                                        ?.name || 'Pilih Cabang'}
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                                 {branches.map((b) => (
@@ -124,6 +181,9 @@ export default function AttendanceReportPage() {
                         <Button onClick={fetchBranchReport} className="h-10">
                             Cari
                         </Button>
+                        <Button onClick={handleExportBranch} className="h-10" variant="outline">
+                            Export
+                        </Button>
                     </div>
                 </TabsContent>
 
@@ -137,7 +197,10 @@ export default function AttendanceReportPage() {
                             }}
                         >
                             <SelectTrigger className="w-50">
-                                <SelectValue placeholder="Pilih Guru" />
+                                <SelectValue placeholder="Pilih Guru">
+                                    {teachers.find((t) => String(t.id) === selectedTeacherId)
+                                        ?.full_name || 'Pilih Guru'}
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                                 {teachers.map((t) => (
@@ -155,6 +218,9 @@ export default function AttendanceReportPage() {
                         />
                         <Button onClick={fetchTeacherReport} className="h-10">
                             Cari
+                        </Button>
+                        <Button onClick={handleExportTeacher} className="h-10" variant="outline">
+                            Export
                         </Button>
                     </div>
                 </TabsContent>
