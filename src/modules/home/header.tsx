@@ -2,97 +2,115 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Icon } from '@iconify/react';
+import { usePathname } from 'next/navigation';
+import { GraduationCap, Menu, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+
+const navItems = [
+    { href: '/', label: 'Beranda' },
+    { href: '/about', label: 'Tentang' },
+    { href: '/course', label: 'Program' },
+    { href: '/trainers', label: 'Pengajar' },
+    { href: '/contact', label: 'Kontak' },
+];
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const pathname = usePathname();
 
     return (
-        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
-            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-                <Link href="/" className="text-2xl font-bold text-primary">
-                    Mentor
+        <header className="glass sticky top-0 z-50 border-b border-border/60">
+            <div className="container mx-auto flex items-center justify-between px-4 py-3">
+                <Link href="/" className="flex items-center gap-2.5">
+                    <span className="flex size-10 items-center justify-center rounded-xl bg-brand-gradient text-primary-foreground shadow-brand">
+                        <GraduationCap className="size-5" />
+                    </span>
+                    <span className="leading-tight">
+                        <span className="block font-heading text-lg font-bold tracking-tight">
+                            Bimbel Cerdas
+                        </span>
+                        <span className="block text-[0.6875rem] text-muted-foreground">
+                            Belajar jadi menyenangkan
+                        </span>
+                    </span>
                 </Link>
 
                 {/* Desktop Nav */}
-                <nav className="hidden md:flex items-center gap-6">
-                    <Link href="/" className="font-semibold text-primary">
-                        Home
-                    </Link>
-                    <Link href="/about" className="text-gray-600 hover:text-primary">
-                        About
-                    </Link>
-                    <Link href="/course" className="text-gray-600 hover:text-primary">
-                        Courses
-                    </Link>
-                    <Link href="/trainers" className="text-gray-600 hover:text-primary">
-                        Trainers
-                    </Link>
-                    <Link href="/contact" className="text-gray-600 hover:text-primary">
-                        Contact
-                    </Link>
+                <nav className="hidden items-center gap-1 md:flex">
+                    {navItems.map((item) => {
+                        const active =
+                            item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                                    active
+                                        ? 'bg-accent text-accent-foreground'
+                                        : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
+                                )}
+                            >
+                                {item.label}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
-                <div className="hidden md:flex items-center gap-4">
-                    <Link
-                        href="/course"
-                        className="bg-primary text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-blue-700 transition"
+                <div className="hidden items-center gap-2 md:flex">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        nativeButton={false}
+                        render={<Link href="/login" />}
                     >
-                        Get Started
-                    </Link>
+                        Masuk
+                    </Button>
+                    <Button size="sm" nativeButton={false} render={<Link href="/contact" />}>
+                        Daftar Sekarang
+                    </Button>
                 </div>
 
                 {/* Mobile Toggle */}
-                <button className="md:hidden text-2xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    <Icon icon={isMenuOpen ? 'bi:x' : 'bi:list'} />
+                <button
+                    className="text-2xl text-foreground md:hidden"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    aria-label="Buka menu"
+                >
+                    {isMenuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
                 </button>
             </div>
 
             {/* Mobile Nav */}
             {isMenuOpen && (
-                <nav className="md:hidden bg-white border-t px-4 py-4 flex flex-col gap-4">
-                    <Link
-                        href="/"
-                        className="font-semibold text-primary"
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        Home
-                    </Link>
-                    <Link
-                        href="/about"
-                        className="text-gray-600"
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        About
-                    </Link>
-                    <Link
-                        href="/course"
-                        className="text-gray-600"
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        Courses
-                    </Link>
-                    <Link
-                        href="/trainers"
-                        className="text-gray-600"
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        Trainers
-                    </Link>
-                    <Link
-                        href="/contact"
-                        className="text-gray-600"
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        Contact
-                    </Link>
-                    <Link
-                        href="/course"
-                        className="bg-primary text-white px-5 py-2 rounded-full text-sm font-semibold text-center"
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        Get Started
-                    </Link>
+                <nav className="animate-fade-in border-t border-border/60 bg-card px-4 py-4 md:hidden">
+                    <div className="flex flex-col gap-1">
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                        <Button
+                            className="mt-2"
+                            nativeButton={false}
+                            render={<Link href="/contact" />}
+                        >
+                            Daftar Sekarang
+                        </Button>
+                        <Button
+                            variant="outline"
+                            nativeButton={false}
+                            render={<Link href="/login" />}
+                        >
+                            Masuk
+                        </Button>
+                    </div>
                 </nav>
             )}
         </header>

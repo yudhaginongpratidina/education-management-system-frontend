@@ -2,60 +2,71 @@ import Header from '@/modules/home/header';
 import Footer from '@/modules/home/footer';
 import Testimonials from '@/modules/home/testimonials';
 import FAQ from '@/modules/home/faq';
+import Counts from '@/modules/home/counts';
+import LearningMethod from '@/modules/home/learning-method';
+import Facilities from '@/modules/home/facilities';
 import { Icon } from '@iconify/react';
+
+const values = [
+    'Kurikulum selaras dengan materi sekolah',
+    'Pengajar berpengalaman dan bersertifikat',
+    'Laporan progres untuk orang tua',
+];
 
 export default function AboutPage() {
     return (
         <main>
             <Header />
 
-            {/* Enhanced Page Title */}
-            <div className="bg-gray-950 py-24">
-                <div className="container mx-auto px-4 text-center">
-                    <h1 className="text-5xl font-extrabold text-white mb-6">About Our Mission</h1>
-                    <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                        We are dedicated to revolutionizing education through technology and
-                        expert-led learning experiences.
+            {/* Page Title */}
+            <div className="bg-brand-gradient relative overflow-hidden py-24 text-primary-foreground">
+                <div className="grid-pattern absolute inset-0 opacity-15" />
+                <div className="container relative mx-auto px-4 text-center">
+                    <h1 className="font-heading text-4xl font-extrabold tracking-tight md:text-5xl">
+                        Tentang Misi Kami
+                    </h1>
+                    <p className="mx-auto mt-4 max-w-2xl text-primary-foreground/85">
+                        Membantu setiap siswa menemukan cara belajar terbaiknya melalui bimbingan
+                        yang personal, terstruktur, dan menyenangkan.
                     </p>
                 </div>
             </div>
 
-            {/* About Us Section */}
-            <section className="py-20 bg-white">
+            <section className="bg-background py-20">
                 <div className="container mx-auto px-4">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                    <div className="grid items-center gap-16 lg:grid-cols-2">
                         <div className="relative">
                             <img
                                 src="/assets/img/about-2.jpg"
-                                alt="About"
-                                className="w-full rounded-3xl shadow-2xl"
+                                alt="Tentang kami"
+                                className="w-full rounded-3xl shadow-soft"
                             />
-                            <div className="absolute -bottom-6 -right-6 bg-primary text-white p-8 rounded-2xl shadow-xl hidden md:block">
-                                <p className="text-4xl font-bold">10+</p>
-                                <p className="text-sm">Years of Excellence</p>
+                            <div className="bg-brand-gradient text-primary-foreground absolute -right-6 -bottom-6 hidden rounded-2xl p-7 shadow-brand md:block">
+                                <p className="font-heading text-4xl font-bold">10+</p>
+                                <p className="text-sm text-primary-foreground/85">
+                                    Tahun pengalaman
+                                </p>
                             </div>
                         </div>
                         <div>
-                            <h3 className="text-4xl font-bold mb-6">
-                                Empowering Learners Globally
-                            </h3>
-                            <p className="text-gray-600 mb-8 leading-relaxed">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                eiusmod tempor incididunt ut labore et dolore magna aliqua. We
-                                believe in providing accessible, high-quality education to everyone.
+                            <span className="text-primary mb-3 inline-block text-sm font-semibold tracking-wide uppercase">
+                                Cerita Kami
+                            </span>
+                            <h2 className="font-heading mb-5 text-3xl font-bold tracking-tight md:text-4xl">
+                                Menumbuhkan semangat belajar sejak dini
+                            </h2>
+                            <p className="mb-8 leading-relaxed text-muted-foreground">
+                                Berawal dari sebuah kelas kecil, kini Bimbel Cerdas telah dipercaya
+                                ribuan keluarga. Kami terus berkomitmen menghadirkan pengalaman
+                                belajar yang bermakna dan berdampak nyata bagi prestasi siswa.
                             </p>
                             <ul className="space-y-4">
-                                {[
-                                    'Expert Curriculum',
-                                    'Industry Recognized Certifications',
-                                    'Flexible Learning Paths',
-                                ].map((item) => (
+                                {values.map((item) => (
                                     <li key={item} className="flex items-center gap-3">
-                                        <Icon
-                                            icon="bi:check-circle-fill"
-                                            className="text-primary text-xl"
-                                        />
-                                        <span className="font-semibold text-gray-800">{item}</span>
+                                        <span className="bg-success/12 text-success flex size-6 items-center justify-center rounded-full">
+                                            <Icon icon="mdi:check-bold" className="text-xs" />
+                                        </span>
+                                        <span className="font-medium">{item}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -64,6 +75,9 @@ export default function AboutPage() {
                 </div>
             </section>
 
+            <Counts />
+            <LearningMethod />
+            <Facilities />
             <Testimonials />
             <FAQ />
 

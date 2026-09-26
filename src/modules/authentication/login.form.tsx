@@ -120,8 +120,13 @@ export default function LoginForm() {
                             </Field>
                         )}
                     />
-                    <Button type="submit" className="h-10">
-                        Login
+                    <Button
+                        type="submit"
+                        size="lg"
+                        className="mt-1 w-full"
+                        disabled={form.formState.isSubmitting}
+                    >
+                        {form.formState.isSubmitting ? 'Memproses...' : 'Masuk'}
                     </Button>
                 </FieldGroup>
             </form>

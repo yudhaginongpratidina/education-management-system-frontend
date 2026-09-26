@@ -22,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { MENU_ACTIVE_OPTIONS, MENU_TYPE_OPTIONS } from '@/lib/ems-constants';
 
 const formSchema = z.object({
     parent_id: z.number().optional(),
@@ -149,7 +150,11 @@ export default function MenuForm({ type, slug, onSuccess }: MenuFormProps) {
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="type">Tipe</FieldLabel>
-                                <Select value={field.value} onValueChange={field.onChange}>
+                                <Select
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                    items={MENU_TYPE_OPTIONS}
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih Tipe" />
                                     </SelectTrigger>
@@ -219,8 +224,9 @@ export default function MenuForm({ type, slug, onSuccess }: MenuFormProps) {
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="is_active">Status Aktif</FieldLabel>
                                 <Select
-                                    value={field.value ? 'Aktif' : 'Tidak Aktif'}
+                                    value={field.value ? 'true' : 'false'}
                                     onValueChange={(val) => field.onChange(val === 'true')}
+                                    items={MENU_ACTIVE_OPTIONS}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih Status" />

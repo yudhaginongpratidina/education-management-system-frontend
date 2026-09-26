@@ -1,77 +1,94 @@
 import { Icon } from '@iconify/react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+
+const contactInfo = [
+    {
+        icon: 'mdi:map-marker-outline',
+        title: 'Alamat',
+        value: 'Jl. Sudirman No. 123, Jakarta',
+    },
+    {
+        icon: 'mdi:phone-outline',
+        title: 'Telepon',
+        value: '(021) 555-0101',
+    },
+    {
+        icon: 'mdi:email-outline',
+        title: 'Email',
+        value: 'halo@bimbelcerdas.id',
+    },
+];
 
 export default function ContactForm() {
     return (
-        <section className="py-20 bg-white">
+        <section className="bg-background py-20">
             <div className="container mx-auto px-4">
-                <div className="grid lg:grid-cols-3 gap-12">
+                <div className="grid gap-10 lg:grid-cols-3">
                     {/* Contact Info */}
-                    <div className="space-y-8">
-                        <div className="flex gap-4">
-                            <div className="bg-primary/10 p-4 rounded-full h-fit">
-                                <Icon icon="bi:geo-alt" className="text-2xl text-primary" />
+                    <div className="space-y-5">
+                        {contactInfo.map((item) => (
+                            <div
+                                key={item.title}
+                                className="hover:border-primary/30 flex gap-4 rounded-2xl border border-border/60 bg-card p-5 shadow-card transition-colors"
+                            >
+                                <div className="bg-brand-gradient-soft text-primary flex size-11 shrink-0 items-center justify-center rounded-2xl">
+                                    <Icon icon={item.icon} className="text-2xl" />
+                                </div>
+                                <div>
+                                    <h3 className="font-heading font-semibold">{item.title}</h3>
+                                    <p className="text-sm text-muted-foreground">{item.value}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-bold text-lg">Address</h3>
-                                <p className="text-gray-600">
-                                    A108 Adam Street, New York, NY 535022
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="bg-primary/10 p-4 rounded-full h-fit">
-                                <Icon icon="bi:telephone" className="text-2xl text-primary" />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-lg">Call Us</h3>
-                                <p className="text-gray-600">+1 5589 55488 55</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="bg-primary/10 p-4 rounded-full h-fit">
-                                <Icon icon="bi:envelope" className="text-2xl text-primary" />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-lg">Email Us</h3>
-                                <p className="text-gray-600">info@example.com</p>
-                            </div>
-                        </div>
+                        ))}
                     </div>
 
                     {/* Form */}
-                    <form className="lg:col-span-2 bg-gray-50 p-8 rounded-2xl shadow-sm space-y-6">
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <input
-                                type="text"
-                                placeholder="Your Name"
-                                className="w-full p-4 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary"
-                                required
-                            />
-                            <input
-                                type="email"
-                                placeholder="Your Email"
-                                className="w-full p-4 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary"
+                    <form className="space-y-5 rounded-3xl border border-border/60 bg-card p-6 shadow-card lg:col-span-2 lg:p-8">
+                        <div className="grid gap-5 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <label htmlFor="contact-name" className="text-sm font-medium">
+                                    Nama
+                                </label>
+                                <Input id="contact-name" placeholder="Nama lengkap" required />
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="contact-email" className="text-sm font-medium">
+                                    Email
+                                </label>
+                                <Input
+                                    id="contact-email"
+                                    type="email"
+                                    placeholder="nama@email.com"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="contact-subject" className="text-sm font-medium">
+                                Subjek
+                            </label>
+                            <Input
+                                id="contact-subject"
+                                placeholder="Ingin bertanya tentang..."
                                 required
                             />
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Subject"
-                            className="w-full p-4 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary"
-                            required
-                        />
-                        <textarea
-                            placeholder="Message"
-                            rows={5}
-                            className="w-full p-4 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary"
-                            required
-                        ></textarea>
-                        <button
-                            type="submit"
-                            className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition w-full md:w-auto"
-                        >
-                            Send Message
-                        </button>
+                        <div className="space-y-2">
+                            <label htmlFor="contact-message" className="text-sm font-medium">
+                                Pesan
+                            </label>
+                            <Textarea
+                                id="contact-message"
+                                placeholder="Tuliskan pesan Anda..."
+                                rows={5}
+                                required
+                            />
+                        </div>
+                        <Button type="submit" size="lg" className="w-full md:w-auto">
+                            Kirim Pesan
+                        </Button>
                     </form>
                 </div>
             </div>

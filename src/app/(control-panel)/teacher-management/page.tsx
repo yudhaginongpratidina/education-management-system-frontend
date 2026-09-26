@@ -131,6 +131,11 @@ export default function Page() {
         getPrograms();
     }, [selectedProgramName]);
 
+    const programFilterItems = [
+        { value: 'all', label: 'Semua Program' },
+        ...programs.map((p: { name: string }) => ({ value: p.name, label: p.name })),
+    ];
+
     return (
         <>
             <div className="w-full justify-between flex items-center mb-4">
@@ -138,6 +143,7 @@ export default function Page() {
                     <Select
                         onValueChange={(value) => setSelectedProgramName(value ?? 'all')}
                         defaultValue="all"
+                        items={programFilterItems}
                     >
                         <SelectTrigger className="w-45">
                             <SelectValue placeholder="Pilih Program" />

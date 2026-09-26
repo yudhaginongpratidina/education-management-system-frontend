@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
+import { ATTENDANCE_PERMISSION_OPTIONS } from '@/lib/ems-constants';
 
 // Haversine formula
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -349,6 +350,7 @@ export default function AttendancePage() {
                                     onValueChange={(v: string | null) => {
                                         if (v) setIjinType(v);
                                     }}
+                                    items={ATTENDANCE_PERMISSION_OPTIONS}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Pilih Tipe Ijin" />

@@ -10,6 +10,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
+import { SESSION_PERIOD_OPTIONS } from '@/lib/ems-constants';
 
 // components
 import { toast } from '@/components/ui/toast';
@@ -184,7 +185,11 @@ export default function ProgramPackageForm({
                     render={({ field, fieldState }) => (
                         <Field>
                             <FieldLabel>Jenis Periode</FieldLabel>
-                            <Select value={field.value} onValueChange={field.onChange}>
+                            <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
+                                items={SESSION_PERIOD_OPTIONS}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Pilih Periode" />
                                 </SelectTrigger>

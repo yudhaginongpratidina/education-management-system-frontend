@@ -1,25 +1,47 @@
 import { Icon } from '@iconify/react';
 
 const features = [
-    { icon: 'bi:mortarboard', title: 'Expert Instruction', desc: 'Learn from industry leaders.' },
-    { icon: 'bi:globe', title: 'Global Community', desc: 'Connect with students worldwide.' },
-    { icon: 'bi:clock', title: 'Flexible Learning', desc: 'Study at your own pace.' },
-    { icon: 'bi:award', title: 'Certified Skills', desc: 'Gain recognized certifications.' },
+    {
+        icon: 'mdi:teacher',
+        title: 'Pengajar Berpengalaman',
+        desc: 'Dibimbing tutor pilihan yang sabar dan menguasai materi.',
+    },
+    {
+        icon: 'mdi:account-group',
+        title: 'Kelas Kecil',
+        desc: 'Maksimal 8 siswa per kelas agar lebih fokus dan terarah.',
+    },
+    {
+        icon: 'mdi:clock-outline',
+        title: 'Jadwal Fleksibel',
+        desc: 'Pilih jadwal sesuai kesibukan sekolah dan kegiatanmu.',
+    },
+    {
+        icon: 'mdi:chart-line',
+        title: 'Laporan Progres',
+        desc: 'Pantau perkembangan belajar melalui laporan berkala.',
+    },
 ];
 
 export default function FeaturesOverview() {
     return (
-        <section className="py-20 bg-white">
+        <section className="bg-background py-20">
             <div className="container mx-auto px-4">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {features.map((feature, index) => (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    {features.map((feature) => (
                         <div
-                            key={index}
-                            className="p-8 rounded-2xl bg-gray-50 hover:bg-primary/5 transition duration-300"
+                            key={feature.title}
+                            className="group hover:border-primary/30 rounded-2xl border border-border/60 bg-card p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
                         >
-                            <Icon icon={feature.icon} className="text-4xl text-primary mb-6" />
-                            <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                            <p className="text-gray-600 text-sm leading-relaxed">{feature.desc}</p>
+                            <div className="bg-brand-gradient-soft text-primary mb-5 flex size-12 items-center justify-center rounded-2xl">
+                                <Icon icon={feature.icon} className="text-2xl" />
+                            </div>
+                            <h3 className="font-heading mb-2 text-lg font-semibold">
+                                {feature.title}
+                            </h3>
+                            <p className="text-sm leading-relaxed text-muted-foreground">
+                                {feature.desc}
+                            </p>
                         </div>
                     ))}
                 </div>

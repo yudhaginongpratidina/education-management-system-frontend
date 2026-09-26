@@ -7,13 +7,14 @@ export default function ContactPage() {
         <main>
             <Header />
 
-            {/* Page Title */}
-            <div className="bg-gray-100 py-16 text-center">
-                <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-                <p className="text-gray-600 max-w-xl mx-auto">
-                    Have questions or need assistance? Reach out to us, and we'll get back to you as
-                    soon as possible.
-                </p>
+            <div className="gradient-mesh border-b border-border/60 py-16 text-center">
+                <div className="container mx-auto px-4">
+                    <h1 className="font-heading text-4xl font-bold tracking-tight">Hubungi Kami</h1>
+                    <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+                        Punya pertanyaan atau butuh bantuan? Kirim pesan dan tim kami akan segera
+                        menghubungi Anda.
+                    </p>
+                </div>
             </div>
 
             <ContactForm />

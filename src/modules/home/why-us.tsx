@@ -1,53 +1,62 @@
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+
+const items = [
+    {
+        icon: 'mdi:clipboard-text-outline',
+        title: 'Materi Terstruktur',
+        desc: 'Rangkaian materi disusun runtut mulai dari dasar hingga mahir.',
+    },
+    {
+        icon: 'mdi:gem',
+        title: 'Pengajar Berkualitas',
+        desc: 'Tutor diseleksi ketat dan berpengalaman mengajar di bidangnya.',
+    },
+    {
+        icon: 'mdi:inbox-multiple-outline',
+        title: 'Evaluasi Rutin',
+        desc: 'Kuis dan try out berkala untuk mengukur kesiapan siswa.',
+    },
+];
 
 export default function WhyUs() {
-    const items = [
-        {
-            icon: 'bi:clipboard-data',
-            title: 'Corporis voluptates',
-            desc: 'Consequuntur sunt aut quasi enim aliquam quae harum pariatur laboris',
-        },
-        {
-            icon: 'bi:gem',
-            title: 'Ullamco laboris',
-            desc: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia',
-        },
-        {
-            icon: 'bi:inboxes',
-            title: 'Labore consequatur',
-            desc: 'Aut suscipit aut cum nemo deleniti aut omnis. Doloribus ut maiores omnis',
-        },
-    ];
     return (
-        <section className="py-16 bg-white">
+        <section className="bg-background py-20">
             <div className="container mx-auto px-4">
-                <div className="grid lg:grid-cols-3 gap-8">
-                    <div className="bg-primary text-white p-8 rounded-lg">
-                        <h3 className="text-2xl font-bold mb-4">Why Choose Our Products?</h3>
-                        <p className="mb-6">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                            tempor incididunt ut labore et dolore magna aliqua.
-                        </p>
-                        <Link
-                            href="#"
-                            className="inline-block bg-white/20 px-6 py-2 rounded-full hover:bg-white/30 transition"
+                <div className="grid gap-6 lg:grid-cols-3">
+                    <div className="bg-brand-gradient flex flex-col justify-between rounded-3xl p-8 text-primary-foreground shadow-brand">
+                        <div>
+                            <h3 className="font-heading mb-4 text-2xl font-bold">
+                                Kenapa memilih Bimbel Cerdas?
+                            </h3>
+                            <p className="text-primary-foreground/85">
+                                Kami menghadirkan pengalaman belajar yang personal, terukur, dan
+                                menyenangkan untuk hasil yang nyata.
+                            </p>
+                        </div>
+                        <Button
+                            variant="secondary"
+                            className="mt-6 w-fit bg-white/15 text-primary-foreground hover:bg-white/25"
+                            nativeButton={false}
+                            render={<Link href="/about" />}
                         >
-                            Learn More
-                        </Link>
+                            Selengkapnya
+                        </Button>
                     </div>
-                    <div className="lg:col-span-2 grid md:grid-cols-3 gap-6">
-                        {items.map((item, index) => (
+                    <div className="grid gap-6 md:grid-cols-3 lg:col-span-2">
+                        {items.map((item) => (
                             <div
-                                key={index}
-                                className="bg-gray-50 p-6 rounded-lg text-center hover:shadow-md transition"
+                                key={item.title}
+                                className="hover:border-primary/30 rounded-2xl border border-border/60 bg-card p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
                             >
-                                <Icon
-                                    icon={item.icon}
-                                    className="text-3xl text-primary mb-4 mx-auto"
-                                />
-                                <h4 className="font-bold mb-2">{item.title}</h4>
-                                <p className="text-sm text-gray-600">{item.desc}</p>
+                                <div className="bg-brand-gradient-soft text-primary mb-4 flex size-12 items-center justify-center rounded-2xl">
+                                    <Icon icon={item.icon} className="text-2xl" />
+                                </div>
+                                <h4 className="font-heading mb-2 font-semibold">{item.title}</h4>
+                                <p className="text-sm leading-relaxed text-muted-foreground">
+                                    {item.desc}
+                                </p>
                             </div>
                         ))}
                     </div>

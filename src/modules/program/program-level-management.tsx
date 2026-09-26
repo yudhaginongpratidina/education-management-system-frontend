@@ -10,6 +10,7 @@ import { Controller, useForm } from 'react-hook-form';
 // utils
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
+import { PROGRAM_STATUS_OPTIONS } from '@/lib/ems-constants';
 
 // components
 import {
@@ -165,7 +166,11 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="status">Status</FieldLabel>
-                                <Select value={field.value} onValueChange={field.onChange}>
+                                <Select
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                    items={PROGRAM_STATUS_OPTIONS}
+                                >
                                     <SelectTrigger className="h-10">
                                         <SelectValue placeholder="Pilih Status" />
                                     </SelectTrigger>

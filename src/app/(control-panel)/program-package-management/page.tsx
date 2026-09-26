@@ -92,11 +92,14 @@ export default function Page() {
         }
     };
 
+    const programItems = programs.map((p) => ({ value: p.slug, label: p.name }));
+
     return (
         <div className="space-y-6">
             <Select
                 value={selectedProgram}
                 onValueChange={(value) => setSelectedProgram(value ?? '')}
+                items={programItems}
             >
                 <SelectTrigger>
                     <SelectValue className="capitalize" placeholder="Pilih Program" />
