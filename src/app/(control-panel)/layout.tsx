@@ -131,10 +131,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         if (menuData) {
             const rawMenu = JSON.parse(menuData);
 
+            // Halaman yang selalu boleh diakses tanpa entri menu (mis. saat pengembangan UI).
+            const alwaysAllowed = ['/dashboard', '/landing-page'];
+
             // Authorization check
-            const isAuthorized = rawMenu.some(
-                (item: any) => item.url === pathname || pathname === '/dashboard',
-            );
+            const isAuthorized =
+                alwaysAllowed.includes(pathname) ||
+                rawMenu.some((item: any) => item.url === pathname);
             if (!isAuthorized && pathname !== '/unauthorized') {
                 router.push('/unauthorized');
             }
