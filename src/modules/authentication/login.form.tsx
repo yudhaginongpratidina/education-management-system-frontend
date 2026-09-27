@@ -2,9 +2,11 @@
 
 // dependencies
 import * as z from 'zod';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
+import { Eye, EyeOff } from 'lucide-react';
 
 // utils
 import { http } from '@/lib/http';
@@ -24,6 +26,7 @@ const formSchema = z.object({
 
 export default function LoginForm() {
     const router = useRouter();
+    const [showPassword, setShowPassword] = useState(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -108,14 +111,31 @@ export default function LoginForm() {
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                                <Input
-                                    {...field}
-                                    id="password"
-                                    type="password"
-                                    placeholder="********"
-                                    className="h-10"
-                                    required
-                                />
+                                <div className="relative">
+                                    <Input
+                                        {...field}
+                                        id="password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        placeholder="********"
+                                        className="h-10 pr-10"
+                                        required
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon-sm"
+                                        className="absolute top-1/2 right-1.5 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                        aria-label={
+                                            showPassword
+                                                ? 'Sembunyikan password'
+                                                : 'Tampilkan password'
+                                        }
+                                        aria-pressed={showPassword}
+                                    >
+                                        {showPassword ? <EyeOff /> : <Eye />}
+                                    </Button>
+                                </div>
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}

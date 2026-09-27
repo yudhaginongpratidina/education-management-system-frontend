@@ -130,7 +130,7 @@ export default function ClassForm({ type, classData, onSuccess }: ClassFormProps
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor="branch_id">Cabang</FieldLabel>
                             <Select
-                                value={field.value ? String(field.value) : undefined}
+                                value={field.value ? String(field.value) : null}
                                 onValueChange={(value) => field.onChange(value)}
                                 items={branchItems}
                             >

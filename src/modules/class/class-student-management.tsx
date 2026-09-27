@@ -181,7 +181,7 @@ export default function ClassStudentManagement({
                         <Field>
                             <FieldLabel htmlFor="student_program_id">Siswa</FieldLabel>
                             <Select
-                                value={selectedProgramId || undefined}
+                                value={selectedProgramId || null}
                                 onValueChange={(value) => setSelectedProgramId(value ?? '')}
                                 items={studentProgramItems}
                             >

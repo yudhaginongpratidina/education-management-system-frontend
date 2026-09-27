@@ -258,7 +258,7 @@ export default function StudentProgramForm({
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor="branch_id">Cabang</FieldLabel>
                             <Select
-                                value={field.value ? String(field.value) : undefined}
+                                value={field.value ? String(field.value) : null}
                                 onValueChange={(value) => field.onChange(value)}
                                 items={branchItems}
                             >
@@ -284,7 +284,7 @@ export default function StudentProgramForm({
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor="program_slug">Program</FieldLabel>
                             <Select
-                                value={field.value || undefined}
+                                value={field.value || null}
                                 onValueChange={(value) =>
                                     handleProgramChange(value ?? '', field.onChange)
                                 }
@@ -313,7 +313,7 @@ export default function StudentProgramForm({
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="program_package_id">Paket Program</FieldLabel>
                                 <Select
-                                    value={field.value ? String(field.value) : undefined}
+                                    value={field.value ? String(field.value) : null}
                                     onValueChange={(value) =>
                                         handlePackageChange(value ?? '', field.onChange)
                                     }
@@ -341,7 +341,7 @@ export default function StudentProgramForm({
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="program_level_id">Level Program</FieldLabel>
                                 <Select
-                                    value={field.value ? String(field.value) : undefined}
+                                    value={field.value ? String(field.value) : null}
                                     onValueChange={(value) => field.onChange(value)}
                                     items={levelItems}
                                 >

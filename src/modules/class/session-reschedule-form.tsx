@@ -121,7 +121,7 @@ export default function SessionRescheduleForm({
             <Field>
                 <FieldLabel htmlFor="reschedule_teacher">Guru</FieldLabel>
                 <Select
-                    value={teacherId || undefined}
+                    value={teacherId || null}
                     onValueChange={(value) => setTeacherId(value ?? '')}
                     items={teacherItems}
                 >

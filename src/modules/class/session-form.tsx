@@ -158,7 +158,7 @@ export default function SessionForm({ type, classId, session, onSuccess }: Sessi
                 <Field>
                     <FieldLabel htmlFor="session_class">Kelas</FieldLabel>
                     <Select
-                        value={selectedClassId || undefined}
+                        value={selectedClassId || null}
                         onValueChange={(value) => setSelectedClassId(value ?? '')}
                         disabled={type === 'update'}
                         items={classItems}
@@ -211,7 +211,7 @@ export default function SessionForm({ type, classId, session, onSuccess }: Sessi
             <Field>
                 <FieldLabel htmlFor="session_teacher">Guru</FieldLabel>
                 <Select
-                    value={teacherId || undefined}
+                    value={teacherId || null}
                     onValueChange={(value) => setTeacherId(value ?? '')}
                     items={teacherItems}
                 >

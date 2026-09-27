@@ -81,7 +81,7 @@ export default function SessionSubstituteForm({
             <Field>
                 <FieldLabel htmlFor="substitute_teacher">Guru Pengganti</FieldLabel>
                 <Select
-                    value={teacherId || undefined}
+                    value={teacherId || null}
                     onValueChange={(value) => setTeacherId(value ?? '')}
                     items={teacherItems}
                 >

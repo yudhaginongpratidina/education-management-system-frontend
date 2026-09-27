@@ -55,8 +55,6 @@ function isActivePath(pathname: string, url?: string | null) {
 }
 
 function Brand() {
-    const { state } = useSidebar();
-    const collapsed = state === 'collapsed';
     return (
         <SidebarMenu>
             <SidebarMenuItem>
@@ -64,7 +62,7 @@ function Brand() {
                     <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-brand-gradient text-primary-foreground shadow-brand">
                         <GraduationCap className="size-5" />
                     </div>
-                    <div className="grid flex-1 text-left leading-tight">
+                    <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
                         <span className="truncate font-heading text-sm font-semibold">EMS</span>
                         <span className="truncate text-xs text-muted-foreground">
                             Bimbel Management
@@ -73,6 +71,21 @@ function Brand() {
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>
+    );
+}
+
+function SidebarMenuLink({ href, children }: { href: string; children: React.ReactNode }) {
+    const { isMobile, setOpenMobile } = useSidebar();
+
+    return (
+        <Link
+            href={href}
+            onClick={() => {
+                if (isMobile) setOpenMobile(false);
+            }}
+        >
+            {children}
+        </Link>
     );
 }
 
@@ -175,7 +188,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                 )
                                                 .map((child) => (
                                                     <SidebarMenuItem key={child.id}>
-                                                        <Link href={child.url || '#'}>
+                                                        <SidebarMenuLink href={child.url || '#'}>
                                                             <SidebarMenuButton
                                                                 tooltip={child.name}
                                                                 isActive={isActivePath(
@@ -189,11 +202,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                         'material-symbols:menu-rounded'
                                                                     }
                                                                 />
-                                                                <span className="capitalize">
+                                                                <span className="capitalize group-data-[collapsible=icon]:hidden">
                                                                     {child.name}
                                                                 </span>
                                                             </SidebarMenuButton>
-                                                        </Link>
+                                                        </SidebarMenuLink>
                                                     </SidebarMenuItem>
                                                 ))}
                                         </SidebarMenu>
@@ -207,7 +220,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                     <SidebarGroupContent>
                                         <SidebarMenu className="gap-1">
                                             <SidebarMenuItem>
-                                                <Link href={item.url || '#'}>
+                                                <SidebarMenuLink href={item.url || '#'}>
                                                     <SidebarMenuButton
                                                         tooltip={item.name}
                                                         isActive={isActivePath(pathname, item.url)}
@@ -218,11 +231,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                 'material-symbols:menu-rounded'
                                                             }
                                                         />
-                                                        <span className="capitalize">
+                                                        <span className="capitalize group-data-[collapsible=icon]:hidden">
                                                             {item.name}
                                                         </span>
                                                     </SidebarMenuButton>
-                                                </Link>
+                                                </SidebarMenuLink>
                                             </SidebarMenuItem>
                                         </SidebarMenu>
                                     </SidebarGroupContent>
@@ -233,14 +246,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     })}
                 </SidebarContent>
                 <SidebarFooter>
-                    <div className="flex items-center gap-3 rounded-xl px-2 py-2">
+                    <div className="flex items-center gap-3 rounded-xl px-2 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
                         <Avatar className="h-9 w-9 rounded-lg">
                             <AvatarImage src="/assets/img/user.jpg" alt="User" />
                             <AvatarFallback className="rounded-lg bg-brand-gradient text-primary-foreground text-xs font-semibold">
                                 U
                             </AvatarFallback>
                         </Avatar>
-                        <div className="grid flex-1 text-left leading-tight">
+                        <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
                             <span className="truncate text-sm font-medium">Pengguna</span>
                             <span className="truncate text-xs text-muted-foreground">
                                 user@gmail.com

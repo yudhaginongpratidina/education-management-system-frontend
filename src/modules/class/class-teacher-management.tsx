@@ -169,7 +169,7 @@ export default function ClassTeacherManagement({ classId }: { classId: number })
                         <Field>
                             <FieldLabel htmlFor="teacher_id">Guru</FieldLabel>
                             <Select
-                                value={selectedTeacherId || undefined}
+                                value={selectedTeacherId || null}
                                 onValueChange={(value) => setSelectedTeacherId(value ?? '')}
                                 items={teacherItems}
                             >

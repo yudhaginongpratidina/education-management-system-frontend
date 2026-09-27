@@ -214,7 +214,7 @@ export default function SessionStudentManagement({
                         <Field>
                             <FieldLabel htmlFor="student_program_id">Siswa</FieldLabel>
                             <Select
-                                value={selectedProgramId || undefined}
+                                value={selectedProgramId || null}
                                 onValueChange={(value) => setSelectedProgramId(value ?? '')}
                                 items={studentItems}
                             >
