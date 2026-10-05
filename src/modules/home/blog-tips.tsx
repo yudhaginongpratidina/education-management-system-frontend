@@ -1,37 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import { ArrowRight, CalendarDays, Clock } from 'lucide-react';
 
-const articles = [
-    {
-        category: 'Tips Belajar',
-        title: '5 kebiasaan kecil yang membuat belajar di rumah lebih efektif',
-        excerpt:
-            'Mulai dari menyiapkan meja belajar sampai teknik jeda 25 menit. Kebiasaan sederhana ini lebih berpengaruh daripada belajar semalaman.',
-        date: '12 Feb 2026',
-        read: '6 menit',
-        img: '/assets/img/course-1.jpg',
-    },
-    {
-        category: 'Untuk Orang Tua',
-        title: 'Mendampingi anak belajar tanpa membuatnya merasa ditekan',
-        excerpt:
-            'Peran orang tua bukan sekadar menagih nilai. Berikut cara memberi dukungan yang membuat anak lebih percaya diri.',
-        date: '28 Jan 2026',
-        read: '5 menit',
-        img: '/assets/img/about.jpg',
-    },
-    {
-        category: 'UTBK & Ujian',
-        title: 'Strategi mengerjakan soal UTBK agar tidak kehabisan waktu',
-        excerpt:
-            'Urutan pengerjaan, cara menandai soal sulit, dan manajemen menit per subtes yang sering dipakai alumni kami.',
-        date: '9 Jan 2026',
-        read: '7 menit',
-        img: '/assets/img/course-3.jpg',
-    },
-];
+import { useLandingSection } from './landing-content';
 
 export default function BlogTips() {
+    const articles = useLandingSection('articles');
+
     return (
         <section className="bg-background py-20">
             <div className="container mx-auto px-4">
@@ -56,12 +32,12 @@ export default function BlogTips() {
                 <div className="grid gap-6 md:grid-cols-3">
                     {articles.map((article) => (
                         <article
-                            key={article.title}
+                            key={article.id ?? article.title}
                             className="group hover:border-primary/30 flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
                         >
                             <div className="relative overflow-hidden">
                                 <img
-                                    src={article.img}
+                                    src={article.image}
                                     alt=""
                                     className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />

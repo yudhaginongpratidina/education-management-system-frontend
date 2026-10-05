@@ -188,7 +188,7 @@ export default function Page() {
                                 </Button>
                             }
                         />
-                        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+                        <DialogContent className="sm:max-w-lg">
                             <DialogHeader>
                                 <DialogTitle>TAMBAH SISWA</DialogTitle>
                                 <DialogDescription>Masukan data siswa baru.</DialogDescription>
@@ -246,7 +246,7 @@ export default function Page() {
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+                                            <DialogContent className="sm:max-w-lg">
                                                 <DialogHeader>
                                                     <DialogTitle>EDIT SISWA</DialogTitle>
                                                     <DialogDescription>
@@ -275,7 +275,7 @@ export default function Page() {
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+                                            <DialogContent className="sm:max-w-3xl">
                                                 <DialogHeader>
                                                     <DialogTitle>PROGRAM SISWA</DialogTitle>
                                                     <DialogDescription>

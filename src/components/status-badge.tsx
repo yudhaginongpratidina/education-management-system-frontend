@@ -25,6 +25,17 @@ const STATUS_MAP: Record<string, { label: string; variant: Variant }> = {
     // Teacher role
     PRIMARY: { label: 'Guru Utama', variant: 'default' },
     SUBSTITUTE: { label: 'Guru Pengganti', variant: 'secondary' },
+    // Asset condition
+    GOOD: { label: 'Baik', variant: 'success' },
+    FAIR: { label: 'Cukup', variant: 'warning' },
+    DAMAGED: { label: 'Rusak Ringan', variant: 'warning' },
+    BROKEN: { label: 'Rusak Berat', variant: 'destructive' },
+    // Asset status
+    IN_USE: { label: 'Digunakan', variant: 'info' },
+    MAINTENANCE: { label: 'Perawatan', variant: 'warning' },
+    RETIRED: { label: 'Tidak Dipakai', variant: 'secondary' },
+    LOST: { label: 'Hilang', variant: 'destructive' },
+    DISPOSED: { label: 'Dilepas', variant: 'secondary' },
 };
 
 export function StatusBadge({ status }: { status?: string | null }) {

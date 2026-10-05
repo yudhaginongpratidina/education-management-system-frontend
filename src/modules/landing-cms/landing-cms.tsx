@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Icon } from '@iconify/react';
 
 import { cn } from '@/lib/utils';
+import { http } from '@/lib/http';
+import { parseAxiosError } from '@/lib/parse-axios-error';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,7 +32,23 @@ import {
     TestimonialsEditor,
 } from './sections-engage';
 
-const STORAGE_KEY = 'landing-cms-content';
+const SECTION_KEYS: (keyof LandingContent)[] = [
+    'hero',
+    'trust',
+    'features',
+    'about',
+    'programs',
+    'method',
+    'schedule',
+    'facilities',
+    'pricing',
+    'testimonials',
+    'branches',
+    'faqs',
+    'articles',
+    'enrollment',
+    'footer',
+];
 
 type SectionKey =
     | 'overview'
@@ -186,49 +204,59 @@ export function LandingCms() {
     const [content, setContent] = useState<LandingContent>(initialContent);
     const [active, setActive] = useState<SectionKey>('overview');
     const [hydrated, setHydrated] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        let stored: LandingContent | null = null;
-        try {
-            const raw = window.localStorage.getItem(STORAGE_KEY);
-            stored = raw ? (JSON.parse(raw) as LandingContent) : null;
-        } catch {
-            stored = null;
-        }
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- memuat konten tersimpan sekali saat mount
-        if (stored) setContent({ ...initialContent, ...stored });
-        setHydrated(true);
+        let mounted = true;
+        http.get('/landing/content')
+            .then((response) => {
+                if (!mounted) return;
+                const data = response.data?.data ?? {};
+                setContent({ ...initialContent, ...data });
+            })
+            .catch((error) => {
+                const { message } = parseAxiosError(error);
+                toast.add({ title: 'Gagal memuat konten', type: 'error', description: message });
+            })
+            .finally(() => {
+                if (mounted) setHydrated(true);
+            });
+        return () => {
+            mounted = false;
+        };
     }, []);
 
-    const save = () => {
+    const save = async () => {
+        setSaving(true);
         try {
-            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+            const sections = SECTION_KEYS.map((key) => ({ key, content: content[key] }));
+            const response = await http.put('/landing/sections', { sections });
             toast.add({
                 title: 'Tersimpan',
                 type: 'success',
-                description: 'Perubahan landing page disimpan (mode demo, belum terhubung API).',
+                description: response.data.message ?? 'Perubahan landing page disimpan.',
             });
-        } catch {
-            toast.add({
-                title: 'Gagal menyimpan',
-                type: 'error',
-                description: 'Terjadi kesalahan.',
-            });
+        } catch (error) {
+            const { message } = parseAxiosError(error);
+            toast.add({ title: 'Gagal menyimpan', type: 'error', description: message });
+        } finally {
+            setSaving(false);
         }
     };
 
-    const reset = () => {
-        setContent(initialContent);
+    const reset = async () => {
         try {
-            window.localStorage.removeItem(STORAGE_KEY);
-        } catch {
-            // ignore
+            await http.post('/landing/sections/reset');
+            setContent(initialContent);
+            toast.add({
+                title: 'Direset',
+                type: 'info',
+                description: 'Konten dikembalikan ke pengaturan awal.',
+            });
+        } catch (error) {
+            const { message } = parseAxiosError(error);
+            toast.add({ title: 'Gagal reset', type: 'error', description: message });
         }
-        toast.add({
-            title: 'Direset',
-            type: 'info',
-            description: 'Konten dikembalikan ke pengaturan awal.',
-        });
     };
 
     const groups = useMemo(() => {
@@ -269,9 +297,9 @@ export function LandingCms() {
                         <Icon icon="mdi:open-in-new" />
                         Pratinjau
                     </Button>
-                    <Button onClick={save}>
+                    <Button onClick={save} disabled={saving}>
                         <Icon icon="mdi:content-save-outline" />
-                        Simpan
+                        {saving ? 'Menyimpan...' : 'Simpan'}
                     </Button>
                 </div>
             </div>
@@ -436,9 +464,9 @@ export function LandingCms() {
                                             <Icon icon="mdi:restore" />
                                             Reset
                                         </Button>
-                                        <Button onClick={save}>
+                                        <Button onClick={save} disabled={saving}>
                                             <Icon icon="mdi:content-save-outline" />
-                                            Simpan
+                                            {saving ? 'Menyimpan...' : 'Simpan'}
                                         </Button>
                                     </div>
                                 </div>
@@ -510,9 +538,8 @@ function Overview({
             <div className="bg-brand-gradient-soft flex items-start gap-3 rounded-xl p-4">
                 <Icon icon="mdi:information-outline" className="text-primary mt-0.5 text-lg" />
                 <p className="text-sm text-muted-foreground">
-                    Ini adalah tampilan awal (UI). Perubahan saat ini disimpan di browser sebagai
-                    demo. Untuk menyambungkannya ke backend, tinggal ganti sumber data pada
-                    masing-masing editor.
+                    Setiap perubahan disimpan ke backend melalui tombol Simpan, lalu langsung
+                    dipakai oleh halaman publik. Gunakan Reset untuk mengembalikan ke konten awal.
                 </p>
             </div>
         </div>

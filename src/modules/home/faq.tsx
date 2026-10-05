@@ -2,38 +2,10 @@
 import { useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 
-const faqs = [
-    {
-        question: 'Apakah ada kelas percobaan gratis?',
-        answer: 'Ada. Setiap calon siswa mendapat satu sesi percobaan gratis setelah mengikuti tes diagnostik. Tidak ada kewajiban melanjutkan jika dirasa belum cocok.',
-    },
-    {
-        question: 'Bagaimana cara memantau perkembangan anak?',
-        answer: 'Laporan progres dikirim setiap empat sesi melalui WhatsApp, berisi catatan tutor, hasil kuis, dan rekomendasi belajar di rumah. Orang tua juga bisa menjadwalkan konsultasi langsung dengan tutor.',
-    },
-    {
-        question: 'Berapa jumlah siswa dalam satu kelas?',
-        answer: 'Kelas reguler maksimal 8 siswa, kelas intensif maksimal 6 siswa, dan kelas privat 1 siswa dengan 1 tutor. Kami sengaja membatasi jumlah agar setiap anak tetap terpantau.',
-    },
-    {
-        question: 'Kalau berhalangan, apakah jadwal bisa diganti?',
-        answer: 'Bisa. Beri tahu admin minimal satu hari sebelumnya, lalu sesi dapat dipindahkan ke kelas lain yang setara selama kuota masih tersedia.',
-    },
-    {
-        question: 'Apakah tersedia kelas online?',
-        answer: 'Tersedia, terutama untuk program privat. Beberapa kelas reguler juga membuka opsi online bila siswa berhalangan hadir ke cabang.',
-    },
-    {
-        question: 'Bagaimana sistem pembayarannya?',
-        answer: 'Pembayaran dilakukan bulanan di awal periode melalui transfer atau tunai di cabang. Jika ingin berhenti, cukup konfirmasi sebelum periode berikutnya dimulai tanpa biaya tambahan.',
-    },
-    {
-        question: 'Apakah ada biaya pendaftaran?',
-        answer: 'Ada, sebesar Rp 50.000 sekali bayar. Biaya ini sudah termasuk modul belajar pertama dan kartu progres siswa.',
-    },
-];
+import { useLandingSection } from './landing-content';
 
 export default function FAQ() {
+    const faqs = useLandingSection('faqs');
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     return (
@@ -56,7 +28,7 @@ export default function FAQ() {
                         const open = openIndex === index;
                         return (
                             <div
-                                key={faq.question}
+                                key={faq.id ?? faq.question}
                                 className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card"
                             >
                                 <button

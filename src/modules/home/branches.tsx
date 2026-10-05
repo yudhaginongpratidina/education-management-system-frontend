@@ -1,41 +1,12 @@
+'use client';
+
 import { Icon } from '@iconify/react';
 
-const branches = [
-    {
-        city: 'Jakarta Selatan',
-        address: 'Jl. Sudirman No. 123, Kebayoran Baru',
-        phone: '(021) 555-0101',
-        wa: '6281234567801',
-        hours: 'Senin–Sabtu, 08.00–20.00',
-        programs: 'Calistung, SD, SMP, SMA, UTBK',
-    },
-    {
-        city: 'Bandung',
-        address: 'Jl. Braga No. 45, Sumur Bandung',
-        phone: '(022) 555-0202',
-        wa: '6281234567802',
-        hours: 'Senin–Sabtu, 08.00–20.00',
-        programs: 'SD, SMP, SMA, Privat',
-    },
-    {
-        city: 'Surabaya',
-        address: 'Jl. Basuki Rahmat No. 78, Tegalsari',
-        phone: '(031) 555-0303',
-        wa: '6281234567803',
-        hours: 'Senin–Sabtu, 09.00–20.00',
-        programs: 'SD, SMP, SMA, UTBK',
-    },
-    {
-        city: 'Yogyakarta',
-        address: 'Jl. Malioboro No. 90, Gedongtengen',
-        phone: '(0274) 555-0404',
-        wa: '6281234567804',
-        hours: 'Senin–Jumat, 09.00–19.00',
-        programs: 'SD, SMP, SMA, Privat',
-    },
-];
+import { useLandingSection } from './landing-content';
 
 export default function Branches() {
+    const branches = useLandingSection('branches');
+
     return (
         <section className="bg-muted/40 py-20">
             <div className="container mx-auto px-4">
@@ -54,7 +25,7 @@ export default function Branches() {
                 <div className="grid gap-6 md:grid-cols-2">
                     {branches.map((branch) => (
                         <div
-                            key={branch.city}
+                            key={branch.id ?? branch.city}
                             className="rounded-2xl border border-border/60 bg-card p-6 shadow-card transition-colors hover:border-primary/30"
                         >
                             <div className="mb-4 flex items-start gap-4">
@@ -76,14 +47,17 @@ export default function Branches() {
                             </div>
 
                             <div className="mb-4 flex flex-wrap gap-2">
-                                {branch.programs.split(', ').map((program) => (
-                                    <span
-                                        key={program}
-                                        className="bg-primary/10 text-primary rounded-full px-2.5 py-1 text-xs font-medium"
-                                    >
-                                        {program}
-                                    </span>
-                                ))}
+                                {branch.programs
+                                    .split(', ')
+                                    .filter(Boolean)
+                                    .map((program) => (
+                                        <span
+                                            key={program}
+                                            className="bg-primary/10 text-primary rounded-full px-2.5 py-1 text-xs font-medium"
+                                        >
+                                            {program}
+                                        </span>
+                                    ))}
                             </div>
 
                             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4">

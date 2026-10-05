@@ -24,13 +24,13 @@ const formSchema = z.object({
     radius: z.string().optional(),
 });
 
-type ProgramFormProps = {
+type BranchFormProps = {
     type: 'create' | 'update';
     slug?: string;
     onSuccess: () => void;
 };
 
-export default function BranchForm({ type, slug, onSuccess }: ProgramFormProps) {
+export default function BranchForm({ type, slug, onSuccess }: BranchFormProps) {
     const [branchId, setBranchId] = useState<number>(0);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -117,12 +117,12 @@ export default function BranchForm({ type, slug, onSuccess }: ProgramFormProps) 
                         control={form.control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor="name">Nama Program</FieldLabel>
+                                <FieldLabel htmlFor="name">Nama Cabang</FieldLabel>
                                 <Input
                                     {...field}
                                     id="name"
                                     type="text"
-                                    placeholder="Masukan Nama Program"
+                                    placeholder="Masukan Nama Cabang"
                                     className="h-10"
                                     required
                                 />

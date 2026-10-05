@@ -79,8 +79,7 @@ export default function ClassStudentManagement({
 
     const getStudentPrograms = async () => {
         try {
-            const url = branchId ? `/student-programs?branch_id=${branchId}` : '/student-programs';
-            const response = await http.get(url);
+            const response = await http.get(`/classes/${classId}/eligible-students`);
             setStudentPrograms(extractList(response.data));
         } catch (error) {
             const { message } = parseAxiosError(error);
@@ -170,7 +169,9 @@ export default function ClassStudentManagement({
 
     const studentProgramItems = availablePrograms.map((program) => ({
         value: String(program.id),
-        label: `${program.student_full_name} - ${program.package_name ?? '-'}`,
+        label: `${program.student_name} - ${program.package_name ?? '-'}${
+            program.branch_name ? ` · Cabang: ${program.branch_name}` : ''
+        }${program.total_sessions != null ? ` · sisa ${program.remaining} sesi` : ''}`,
     }));
 
     return (
@@ -191,8 +192,13 @@ export default function ClassStudentManagement({
                                 <SelectContent>
                                     {availablePrograms.map((program) => (
                                         <SelectItem key={program.id} value={String(program.id)}>
-                                            {program.student_full_name} -{' '}
-                                            {program.package_name ?? '-'}
+                                            {program.student_name} - {program.package_name ?? '-'}
+                                            {program.branch_name
+                                                ? ` · Cabang: ${program.branch_name}`
+                                                : ''}
+                                            {program.total_sessions != null
+                                                ? ` · sisa ${program.remaining} sesi`
+                                                : ''}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -221,6 +227,7 @@ export default function ClassStudentManagement({
                         <TableRow>
                             <TableHead>Nama Siswa</TableHead>
                             <TableHead>Paket / Level</TableHead>
+                            <TableHead>Cabang</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Bergabung</TableHead>
                             <TableHead>Keluar</TableHead>
@@ -231,7 +238,7 @@ export default function ClassStudentManagement({
                         {members.length === 0 && (
                             <TableRow>
                                 <TableCell
-                                    colSpan={6}
+                                    colSpan={7}
                                     className="text-center text-muted-foreground"
                                 >
                                     Belum ada siswa di kelas ini.
@@ -249,6 +256,7 @@ export default function ClassStudentManagement({
                                         </span>
                                     </div>
                                 </TableCell>
+                                <TableCell>{member.branch_name ?? '-'}</TableCell>
                                 <TableCell>
                                     <StatusBadge
                                         status={

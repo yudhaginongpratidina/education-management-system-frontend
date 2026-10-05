@@ -26,9 +26,9 @@ import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field
 
 const formSchema = z.object({
     name: z.string().min(1, 'Name is required'),
-    description: z.string().optional(),
-    requirements: z.string().optional(),
-    price_per_session: z.number().min(0, 'Price must be 0 or greater'),
+    description: z.string().nullish(),
+    requirements: z.string().nullish(),
+    price_per_session: z.coerce.number<number>().min(0, 'Price must be 0 or greater'),
     status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
 });
 
@@ -94,11 +94,13 @@ export default function ProgramForm({ type, slug, onSuccess }: ProgramFormProps)
             const response = await http.get(`programs?slug=${slug}`);
             const { name, description, requirements, price_per_session, status } =
                 response.data.data;
-            form.setValue('name', name);
-            form.setValue('description', description);
-            form.setValue('requirements', requirements);
-            form.setValue('price_per_session', price_per_session);
-            form.setValue('status', status);
+            form.reset({
+                name: name ?? '',
+                description: description ?? '',
+                requirements: requirements ?? '',
+                price_per_session: Math.floor(Number(price_per_session) || 0),
+                status: status ?? 'ACTIVE',
+            });
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({
@@ -149,6 +151,7 @@ export default function ProgramForm({ type, slug, onSuccess }: ProgramFormProps)
                                     type="text"
                                     placeholder="Masukan Deskripsi"
                                     className="h-10"
+                                    value={field.value || ''}
                                 />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>

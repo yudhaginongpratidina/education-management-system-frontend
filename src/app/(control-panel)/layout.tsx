@@ -145,7 +145,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             const rawMenu = JSON.parse(menuData);
 
             // Halaman yang selalu boleh diakses tanpa entri menu (mis. saat pengembangan UI).
-            const alwaysAllowed = ['/dashboard', '/landing-page'];
+            const alwaysAllowed = [
+                '/dashboard',
+                '/landing-page',
+                '/my-sessions',
+                '/cashflow',
+                '/reports',
+                '/asset-management',
+                '/guide',
+            ];
 
             // Authorization check
             const isAuthorized =
@@ -294,6 +302,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 className="h-9 w-56 rounded-lg border border-input bg-card/70 pr-3 pl-9 text-sm outline-none transition-[box-shadow,border-color] placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
                             />
                         </div>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            nativeButton={false}
+                            render={<Link href="/guide" />}
+                            aria-label="Panduan pengguna"
+                            title="Panduan pengguna"
+                        >
+                            <Icon icon="mdi:book-open-page-variant-outline" />
+                        </Button>
                         <ThemeToggle />
                         <Button
                             variant="outline"

@@ -7,7 +7,12 @@ import { useEffect, useState } from 'react';
 // utils
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
-import { ATTENDANCE_STATUS_OPTIONS, extractList } from '@/lib/ems-constants';
+import {
+    ATTENDANCE_STATUS_OPTIONS,
+    extractList,
+    formatDate,
+    formatTime,
+} from '@/lib/ems-constants';
 
 // components
 import {
@@ -57,11 +62,16 @@ export default function SessionStudentManagement({
 }) {
     const [participants, setParticipants] = useState<any[]>([]);
     const [availablePrograms, setAvailablePrograms] = useState<any[]>([]);
+    const [fullQuotaStudents, setFullQuotaStudents] = useState<string[]>([]);
     const [selectedProgramId, setSelectedProgramId] = useState<string>('');
     const [attendanceStatus, setAttendanceStatus] = useState<string>('PRESENT');
     const [notesItem, setNotesItem] = useState<any | null>(null);
     const [notesValue, setNotesValue] = useState<string>('');
     const [notesAttendance, setNotesAttendance] = useState<string>('PRESENT');
+    const [rescheduleItem, setRescheduleItem] = useState<any | null>(null);
+    const [targetSessions, setTargetSessions] = useState<any[]>([]);
+    const [targetSessionId, setTargetSessionId] = useState<string>('');
+    const [rescheduleReason, setRescheduleReason] = useState<string>('');
 
     const getParticipants = async () => {
         try {
@@ -76,20 +86,30 @@ export default function SessionStudentManagement({
     const getAvailablePrograms = async () => {
         try {
             if (classId) {
-                const response = await http.get(`/classes/${classId}/students`);
-                const activeMembers = extractList(response.data).filter(
-                    (member: any) => !member.left_at,
+                const response = await http.get(`/classes/${classId}/student-quotas`);
+                const rows = extractList(response.data);
+                setFullQuotaStudents(
+                    rows
+                        .filter((member: any) => !member.can_join)
+                        .map((member: any) => member.student_name),
                 );
                 setAvailablePrograms(
-                    activeMembers.map((member: any) => ({
-                        id: member.student_program_id,
-                        student_full_name: member.student_name,
-                        package_name: member.package_name,
-                    })),
+                    rows
+                        .filter((member: any) => member.can_join)
+                        .map((member: any) => ({
+                            id: member.student_program_id,
+                            student_full_name: member.student_name,
+                            package_name: member.package_name,
+                            branch_name: member.branch_name,
+                            used: member.used,
+                            total_sessions: member.total_sessions,
+                            remaining: member.remaining,
+                        })),
                 );
             } else {
                 const response = await http.get('/student-programs');
                 setAvailablePrograms(extractList(response.data));
+                setFullQuotaStudents([]);
             }
         } catch (error) {
             const { message } = parseAxiosError(error);
@@ -203,7 +223,60 @@ export default function SessionStudentManagement({
 
     const studentItems = options.map((program) => ({
         value: String(program.id),
-        label: `${program.student_full_name} - ${program.package_name ?? '-'}`,
+        label: `${program.student_full_name} - ${program.package_name ?? '-'}${
+            program.branch_name ? ` · ${program.branch_name}` : ''
+        }${program.total_sessions != null ? ` · sisa ${program.remaining} sesi` : ''}`,
+    }));
+
+    const openReschedule = async (item: any) => {
+        setRescheduleItem(item);
+        setTargetSessionId('');
+        setRescheduleReason('');
+        setTargetSessions([]);
+        try {
+            const url = classId ? `/classes/${classId}/sessions` : '/sessions';
+            const response = await http.get(url);
+            const list = extractList(response.data).filter(
+                (session: any) =>
+                    session.id !== sessionId &&
+                    !['CANCELLED', 'RESCHEDULED'].includes(session.status),
+            );
+            setTargetSessions(list);
+        } catch (error) {
+            const { message } = parseAxiosError(error);
+            toast.add({ title: 'Error', type: 'error', description: message });
+        }
+    };
+
+    const submitReschedule = async () => {
+        if (!rescheduleItem || !targetSessionId) {
+            toast.add({ title: 'Error', type: 'error', description: 'Pilih sesi tujuan' });
+            return;
+        }
+        try {
+            const response = await http.post(
+                `/sessions/${sessionId}/students/${rescheduleItem.student_program_id}/reschedule`,
+                {
+                    target_session_id: Number(targetSessionId),
+                    reason: rescheduleReason || undefined,
+                },
+            );
+            toast.add({
+                title: 'Success',
+                type: 'success',
+                description: response.data.message ?? 'Siswa dijadwalkan ulang',
+            });
+            setRescheduleItem(null);
+            getParticipants();
+        } catch (error) {
+            const { message } = parseAxiosError(error);
+            toast.add({ title: 'Error', type: 'error', description: message });
+        }
+    };
+
+    const targetItems = targetSessions.map((session) => ({
+        value: String(session.id),
+        label: `${formatDate(session.scheduled_date)} · ${formatTime(session.start_time)}-${formatTime(session.end_time)}${session.class_name ? ` · ${session.class_name}` : ''}`,
     }));
 
     return (
@@ -226,6 +299,10 @@ export default function SessionStudentManagement({
                                         <SelectItem key={program.id} value={String(program.id)}>
                                             {program.student_full_name} -{' '}
                                             {program.package_name ?? '-'}
+                                            {program.branch_name ? ` · ${program.branch_name}` : ''}
+                                            {program.total_sessions != null
+                                                ? ` · sisa ${program.remaining} sesi`
+                                                : ''}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -261,6 +338,13 @@ export default function SessionStudentManagement({
                     </div>
                 </FieldGroup>
             </div>
+
+            {fullQuotaStudents.length > 0 && (
+                <p className="text-muted-foreground text-xs">
+                    Kuota penuh: <span className="font-medium">{fullQuotaStudents.join(', ')}</span>
+                    . Gunakan tombol jadwalkan ulang siswa untuk memindahkan sesinya.
+                </p>
+            )}
 
             <div className="max-h-100 overflow-auto rounded-md border">
                 <Table>
@@ -341,7 +425,15 @@ export default function SessionStudentManagement({
                                         </Button>
                                     </div>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="flex gap-2">
+                                    <Button
+                                        size="icon"
+                                        variant="outline"
+                                        title="Jadwalkan ulang siswa"
+                                        onClick={() => openReschedule(item)}
+                                    >
+                                        <Icon icon="mdi:calendar-swap" />
+                                    </Button>
                                     <AlertDialog>
                                         <AlertDialogTrigger
                                             render={
@@ -415,6 +507,64 @@ export default function SessionStudentManagement({
                     <DialogFooter>
                         <Button className="h-10" onClick={saveNotes}>
                             Simpan
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog
+                open={!!rescheduleItem}
+                onOpenChange={(open) => !open && setRescheduleItem(null)}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>JADWALKAN ULANG SISWA</DialogTitle>
+                    </DialogHeader>
+                    <FieldGroup>
+                        <Field>
+                            <FieldLabel>Siswa</FieldLabel>
+                            <p className="text-sm font-medium">
+                                {rescheduleItem?.student_name ?? '-'}
+                            </p>
+                        </Field>
+                        <Field>
+                            <FieldLabel htmlFor="target_session">Sesi Tujuan</FieldLabel>
+                            <Select
+                                value={targetSessionId || null}
+                                onValueChange={(value) => setTargetSessionId(value ?? '')}
+                                items={targetItems}
+                            >
+                                <SelectTrigger className="h-10">
+                                    <SelectValue placeholder="Pilih sesi tujuan" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {targetSessions.map((session) => (
+                                        <SelectItem key={session.id} value={String(session.id)}>
+                                            {formatDate(session.scheduled_date)} ·{' '}
+                                            {formatTime(session.start_time)}-
+                                            {formatTime(session.end_time)}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-muted-foreground mt-1 text-xs">
+                                Sesi tujuan harus masih dalam periode paket siswa.
+                            </p>
+                        </Field>
+                        <Field>
+                            <FieldLabel htmlFor="reschedule_reason">Alasan</FieldLabel>
+                            <Textarea
+                                id="reschedule_reason"
+                                className="min-h-10"
+                                value={rescheduleReason}
+                                onChange={(event) => setRescheduleReason(event.target.value)}
+                                placeholder="Alasan reschedule"
+                            />
+                        </Field>
+                    </FieldGroup>
+                    <DialogFooter>
+                        <Button className="h-10" onClick={submitReschedule}>
+                            Jadwalkan Ulang
                         </Button>
                     </DialogFooter>
                 </DialogContent>

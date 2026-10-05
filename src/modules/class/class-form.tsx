@@ -44,6 +44,14 @@ type ClassFormProps = {
 
 export default function ClassForm({ type, classData, onSuccess }: ClassFormProps) {
     const [branches, setBranches] = useState<any[]>([]);
+    const [programs, setPrograms] = useState<any[]>([]);
+    const [levels, setLevels] = useState<any[]>([]);
+    const [programId, setProgramId] = useState<string>(
+        classData?.program_id ? String(classData.program_id) : '',
+    );
+    const [levelId, setLevelId] = useState<string>(
+        classData?.program_level_id ? String(classData.program_level_id) : '',
+    );
 
     const form = useForm<ClassInputValues, any, ClassFormValues>({
         resolver: zodResolver(formSchema),
@@ -56,18 +64,35 @@ export default function ClassForm({ type, classData, onSuccess }: ClassFormProps
         },
     });
 
-    const getBranches = async () => {
+    const getReferences = async () => {
         try {
-            const response = await http.get('/branches');
-            setBranches(extractList(response.data));
+            const [branchesRes, programsRes] = await Promise.all([
+                http.get('/branches'),
+                http.get('/programs'),
+            ]);
+            setBranches(extractList(branchesRes.data));
+            setPrograms(extractList(programsRes.data));
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({ title: 'Error', type: 'error', description: message });
         }
     };
 
+    const loadLevels = async (programSlug: string) => {
+        if (!programSlug) {
+            setLevels([]);
+            return;
+        }
+        try {
+            const response = await http.get(`/program-levels/${programSlug}`);
+            setLevels(extractList(response.data));
+        } catch {
+            setLevels([]);
+        }
+    };
+
     useEffect(() => {
-        getBranches();
+        getReferences();
     }, []);
 
     useEffect(() => {
@@ -79,13 +104,28 @@ export default function ClassForm({ type, classData, onSuccess }: ClassFormProps
                 description: classData.description ?? '',
                 status: classData.status ?? 'ACTIVE',
             });
+            setProgramId(classData.program_id ? String(classData.program_id) : '');
+            setLevelId(classData.program_level_id ? String(classData.program_level_id) : '');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [classData]);
 
+    // Keep level options in sync with the selected program.
+    useEffect(() => {
+        const program = programs.find((item) => String(item.id) === programId);
+        if (program) loadLevels(program.slug);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [programId, programs]);
+
     const onSubmit = async (values: ClassFormValues) => {
+        if (!programId) {
+            toast.add({ title: 'Error', type: 'error', description: 'Program wajib dipilih' });
+            return;
+        }
         const payload = {
             branch_id: Number(values.branch_id),
+            program_id: Number(programId),
+            program_level_id: levelId ? Number(levelId) : null,
             name: values.name,
             code: values.code,
             description: values.description || undefined,
@@ -119,6 +159,14 @@ export default function ClassForm({ type, classData, onSuccess }: ClassFormProps
         value: String(branch.id),
         label: branch.name,
     }));
+    const programItems = programs.map((program) => ({
+        value: String(program.id),
+        label: program.name,
+    }));
+    const levelItems = levels.map((level) => ({
+        value: String(level.id),
+        label: level.name,
+    }));
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -149,6 +197,54 @@ export default function ClassForm({ type, classData, onSuccess }: ClassFormProps
                         </Field>
                     )}
                 />
+
+                <div className="grid gap-4 md:grid-cols-2">
+                    <Field>
+                        <FieldLabel htmlFor="program_id">Program</FieldLabel>
+                        <Select
+                            value={programId || null}
+                            onValueChange={(value) => {
+                                setProgramId(value ?? '');
+                                setLevelId('');
+                            }}
+                            items={programItems}
+                        >
+                            <SelectTrigger className="h-10">
+                                <SelectValue placeholder="Pilih Program" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {programs.map((program) => (
+                                    <SelectItem key={program.id} value={String(program.id)}>
+                                        {program.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p className="text-muted-foreground text-xs">
+                            Kelas ini hanya untuk siswa yang mengambil program tersebut.
+                        </p>
+                    </Field>
+                    <Field>
+                        <FieldLabel htmlFor="program_level_id">Level (opsional)</FieldLabel>
+                        <Select
+                            value={levelId || null}
+                            onValueChange={(value) => setLevelId(value ?? '')}
+                            items={levelItems}
+                        >
+                            <SelectTrigger className="h-10">
+                                <SelectValue placeholder="Semua level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {levels.map((level) => (
+                                    <SelectItem key={level.id} value={String(level.id)}>
+                                        {level.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </Field>
+                </div>
+
                 <Controller
                     name="name"
                     control={form.control}

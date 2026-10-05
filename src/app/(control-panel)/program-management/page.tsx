@@ -181,7 +181,7 @@ export default function Page() {
                                                 </Button>
                                             }
                                         />
-                                        <DialogContent className="min-w-md">
+                                        <DialogContent className="sm:max-w-2xl">
                                             <DialogHeader>
                                                 <DialogTitle>LEVEL</DialogTitle>
                                                 <DialogDescription>

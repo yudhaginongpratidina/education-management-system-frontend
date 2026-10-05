@@ -79,7 +79,7 @@ http.interceptors.response.use(
         }
 
         if (error.response && error.response.status >= 500) {
-            console.error('Server error:', error.response.data);
+            console.warn('Server error:', error.config?.url, error.response.status);
         }
 
         return Promise.reject(error);

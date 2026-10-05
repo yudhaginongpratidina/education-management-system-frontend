@@ -1,52 +1,14 @@
+'use client';
+
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
 
-const plans = [
-    {
-        name: 'Reguler',
-        price: 'Rp 250.000',
-        sessions: '8 sesi / bulan',
-        desc: 'Untuk pendampingan belajar rutin sepulang sekolah.',
-        features: [
-            '2 sesi per minggu (90 menit)',
-            'Kelas maksimal 8 siswa',
-            'Modul cetak + e-modul',
-            'Kuis mingguan',
-            'Laporan progres tiap 4 sesi',
-        ],
-        featured: false,
-    },
-    {
-        name: 'Intensif',
-        price: 'Rp 450.000',
-        sessions: '12 sesi / bulan',
-        desc: 'Persiapan ujian sekolah, UTBK, atau mengejar target nilai.',
-        features: [
-            '3 sesi per minggu (90 menit)',
-            'Kelas maksimal 6 siswa',
-            'Modul + bank soal terlengkap',
-            'Try out bulanan & analisis nilai',
-            'Sesi konsultasi orang tua',
-        ],
-        featured: true,
-    },
-    {
-        name: 'Privat',
-        price: 'Rp 750.000',
-        sessions: '8 sesi / bulan',
-        desc: 'Pendampingan satu lawan satu dengan jadwal fleksibel.',
-        features: [
-            'Jadwal bebas, termasuk akhir pekan',
-            '1 siswa dibimbing 1 tutor',
-            'Kurikulum disusun personal',
-            'Laporan progres mingguan',
-            'Bisa di cabang, rumah, atau online',
-        ],
-        featured: false,
-    },
-];
+import { useLandingSection } from './landing-content';
 
 export default function Pricing() {
+    const pricing = useLandingSection('pricing');
+    const plans = pricing.plans;
+
     return (
         <section className="bg-muted/40 py-20">
             <div className="container mx-auto px-4">
@@ -66,7 +28,7 @@ export default function Pricing() {
                 <div className="grid gap-6 md:grid-cols-3">
                     {plans.map((plan) => (
                         <div
-                            key={plan.name}
+                            key={plan.id ?? plan.name}
                             className={`relative flex flex-col rounded-3xl border p-8 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft ${
                                 plan.featured
                                     ? 'border-primary/40 bg-card ring-2 ring-primary/20'
@@ -118,16 +80,19 @@ export default function Pricing() {
                     ))}
                 </div>
 
-                <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-border/60 bg-card p-5 text-sm text-muted-foreground shadow-card">
-                    <p className="mb-2 flex items-center gap-2 font-medium text-foreground">
-                        <Icon icon="mdi:tag-outline" className="text-primary text-lg" />
-                        Potongan yang tersedia
-                    </p>
-                    <ul className="grid gap-1.5 sm:grid-cols-2">
-                        <li>Bayar 3 bulan sekaligus: hemat 10%</li>
-                        <li>Pendaftaran anak kedua: potongan 15%</li>
-                    </ul>
-                </div>
+                {pricing.discounts.length > 0 && (
+                    <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-border/60 bg-card p-5 text-sm text-muted-foreground shadow-card">
+                        <p className="mb-2 flex items-center gap-2 font-medium text-foreground">
+                            <Icon icon="mdi:tag-outline" className="text-primary text-lg" />
+                            Potongan yang tersedia
+                        </p>
+                        <ul className="grid gap-1.5 sm:grid-cols-2">
+                            {pricing.discounts.map((discount) => (
+                                <li key={discount}>{discount}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
         </section>
     );

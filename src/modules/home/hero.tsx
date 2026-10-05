@@ -1,38 +1,31 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, PlayCircle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const slides = [
-    {
-        title: 'Belajar hari ini, berprestasi esok hari',
-        desc: 'Bimbingan belajar berkualitas untuk jenjang SD, SMP, dan SMA dengan pengajar berpengalaman.',
-        img: '/assets/img/hero-bg.jpg',
-    },
-    {
-        title: 'Kelas kecil, perhatian lebih',
-        desc: 'Setiap siswa mendapat pendampingan personal agar konsep benar-benar dipahami, bukan sekadar dihafal.',
-        img: '/assets/img/about.jpg',
-    },
-    {
-        title: 'Raih nilai terbaikmu bersama kami',
-        desc: 'Program terstruktur, evaluasi rutin, dan laporan progres untuk orang tua.',
-        img: '/assets/img/course-1.jpg',
-    },
-];
+import { useLandingSection } from './landing-content';
 
 export default function Hero() {
+    const hero = useLandingSection('hero');
+    const slides = hero.slides.map((item) => ({
+        title: item.title,
+        desc: item.desc,
+        img: item.image,
+    }));
+    const total = Math.max(slides.length, 1);
+
     const [current, setCurrent] = useState(0);
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setCurrent((prev) => (prev + 1) % slides.length);
+            setCurrent((prev) => (prev + 1) % total);
         }, 6000);
         return () => clearInterval(timer);
-    }, []);
+    }, [total]);
 
-    const slide = slides[current];
+    const slide = slides[current] ?? slides[0] ?? { title: '', desc: '', img: '' };
 
     return (
         <section className="relative flex min-h-[88vh] items-center overflow-hidden bg-slate-950 text-white">
@@ -51,7 +44,7 @@ export default function Hero() {
                 <div key={current} className="animate-fade-up max-w-2xl">
                     <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-sm font-medium backdrop-blur">
                         <Sparkles className="size-4" />
-                        Bimbel modern untuk generasi cerdas
+                        {hero.badge}
                     </span>
                     <h1 className="mt-6 font-heading text-4xl leading-[1.1] font-extrabold tracking-tight md:text-6xl">
                         {slide.title}
@@ -60,8 +53,12 @@ export default function Hero() {
                         {slide.desc}
                     </p>
                     <div className="mt-9 flex flex-wrap gap-3">
-                        <Button size="lg" nativeButton={false} render={<Link href="/course" />}>
-                            Lihat Program
+                        <Button
+                            size="lg"
+                            nativeButton={false}
+                            render={<Link href={hero.primaryCta.href} />}
+                        >
+                            {hero.primaryCta.label}
                             <ArrowRight className="size-4" />
                         </Button>
                         <Button
@@ -69,20 +66,16 @@ export default function Hero() {
                             variant="outline"
                             className="text-foreground"
                             nativeButton={false}
-                            render={<Link href="/contact" />}
+                            render={<Link href={hero.secondaryCta.href} />}
                         >
                             <PlayCircle className="size-4" />
-                            Konsultasi Gratis
+                            {hero.secondaryCta.label}
                         </Button>
                     </div>
 
                     <div className="mt-10 flex flex-wrap gap-8">
-                        {[
-                            { value: '1.200+', label: 'Siswa aktif' },
-                            { value: '64', label: 'Program belajar' },
-                            { value: '24', label: 'Pengajar ahli' },
-                        ].map((stat) => (
-                            <div key={stat.label}>
+                        {hero.stats.map((stat) => (
+                            <div key={stat.id ?? stat.label}>
                                 <p className="font-heading text-2xl font-bold">{stat.value}</p>
                                 <p className="text-sm text-slate-400">{stat.label}</p>
                             </div>

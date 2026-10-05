@@ -1,28 +1,79 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
 
-const trainers = [
-    {
-        name: 'Rina Kartika',
-        role: 'Matematika',
-        img: 'trainer-1.jpg',
-        bio: 'Alumni pendidikan matematika dengan pengalaman 8 tahun mengajar.',
-    },
-    {
-        name: 'Andi Pratama',
-        role: 'Bahasa Inggris',
-        img: 'trainer-2.jpg',
-        bio: 'Praktisi bahasa dengan metode belajar aktif dan menyenangkan.',
-    },
-    {
-        name: 'Dita Larasati',
-        role: 'IPA & Sains',
-        img: 'trainer-3.jpg',
-        bio: 'Pengajar sains yang suka mengajak siswa bereksperimen langsung.',
-    },
-];
+import { http } from '@/lib/http';
+import { parseAxiosError } from '@/lib/parse-axios-error';
+import { extractList } from '@/lib/ems-constants';
+import TeacherPhoto from '@/components/teacher-photo';
+import { toast } from '@/components/ui/toast';
+
+type Trainer = {
+    id: number;
+    name: string;
+    photo?: string | null;
+    role: string;
+    bio: string;
+};
 
 export default function TrainersList() {
+    const [trainers, setTrainers] = useState<Trainer[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let mounted = true;
+
+        const loadTrainers = async () => {
+            try {
+                const [teachersRes, programsRes] = await Promise.all([
+                    http.get('/teachers'),
+                    http.get('/teacher-programs'),
+                ]);
+
+                // Group the programs (subjects) each teacher handles.
+                const programMap = new Map<number, string[]>();
+                for (const row of extractList(programsRes.data)) {
+                    const list = programMap.get(row.teacher_id) ?? [];
+                    if (row.program_name && !list.includes(row.program_name)) {
+                        list.push(row.program_name);
+                    }
+                    programMap.set(row.teacher_id, list);
+                }
+
+                const list: Trainer[] = extractList(teachersRes.data)
+                    .filter((teacher: any) => Boolean(teacher.still_actively_working))
+                    .map((teacher: any) => {
+                        const programs = programMap.get(teacher.id) ?? [];
+                        return {
+                            id: teacher.id,
+                            name: teacher.full_name,
+                            photo: teacher.photo,
+                            role: programs.length > 0 ? programs.join(' · ') : teacher.position,
+                            bio: teacher.last_education
+                                ? `Pendidikan terakhir: ${teacher.last_education}.`
+                                : 'Pengajar berpengalaman di Bimbel Cerdas.',
+                        };
+                    });
+
+                if (mounted) setTrainers(list);
+            } catch (error) {
+                const { message } = parseAxiosError(error);
+                if (mounted) {
+                    toast.add({ title: 'Error', type: 'error', description: message });
+                }
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        };
+
+        loadTrainers();
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
     return (
         <section className="bg-muted/40 py-20">
             <div className="container mx-auto px-4">
@@ -34,17 +85,25 @@ export default function TrainersList() {
                         Belajar bersama pengajar terbaik
                     </h2>
                 </div>
+
+                {!loading && trainers.length === 0 && (
+                    <p className="text-center text-muted-foreground">
+                        Data pengajar belum tersedia.
+                    </p>
+                )}
+
                 <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {trainers.map((trainer) => (
                         <div
-                            key={trainer.name}
+                            key={trainer.id}
                             className="group hover:border-primary/30 overflow-hidden rounded-3xl border border-border/60 bg-card shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
                         >
                             <div className="relative overflow-hidden">
-                                <img
-                                    src={`/assets/img/trainers/${trainer.img}`}
+                                <TeacherPhoto
+                                    slug={trainer.photo}
                                     alt={trainer.name}
-                                    className="h-80 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    className="h-80 w-full rounded-none"
+                                    iconClassName="size-12"
                                 />
                                 <div className="bg-brand-gradient absolute inset-0 flex items-center justify-center gap-4 opacity-0 transition-opacity duration-300 group-hover:opacity-90">
                                     {['mdi:twitter', 'mdi:facebook', 'mdi:instagram'].map(

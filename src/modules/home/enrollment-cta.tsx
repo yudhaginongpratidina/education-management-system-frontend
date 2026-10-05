@@ -1,15 +1,15 @@
+'use client';
+
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
 
-const steps = [
-    { title: 'Isi formulir', desc: 'Daftar online atau langsung di cabang terdekat.' },
-    { title: 'Tes diagnostik', desc: 'Gratis 45 menit untuk memetakan kemampuan awal.' },
-    { title: 'Pilih jadwal', desc: 'Tentukan kelas dan jam yang sesuai hasil tes.' },
-    { title: 'Mulai belajar', desc: 'Sesi pertama bisa dicoba gratis tanpa komitmen.' },
-];
+import { useLandingSection } from './landing-content';
 
 export default function EnrollmentCta() {
+    const enrollment = useLandingSection('enrollment');
+    const steps = enrollment.steps;
+
     return (
         <section className="bg-muted/40 py-20">
             <div className="container mx-auto px-4">
@@ -40,7 +40,7 @@ export default function EnrollmentCta() {
                                     nativeButton={false}
                                     render={
                                         <a
-                                            href="https://wa.me/6281234567890"
+                                            href={`https://wa.me/${enrollment.whatsapp}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         />
@@ -51,13 +51,13 @@ export default function EnrollmentCta() {
                                 </Button>
                             </div>
                             <p className="mt-4 text-sm text-muted-foreground">
-                                Senin–Sabtu, 08.00–20.00 · 0812-3456-7890
+                                {enrollment.hours} · {enrollment.phone}
                             </p>
                         </div>
 
                         <ol className="relative space-y-6 border-l border-dashed border-border pl-8">
                             {steps.map((step, index) => (
-                                <li key={step.title} className="relative">
+                                <li key={step.id ?? step.title} className="relative">
                                     <span className="bg-brand-gradient font-heading absolute top-0 -left-[3.25rem] flex size-9 items-center justify-center rounded-full text-sm font-semibold text-primary-foreground shadow-brand">
                                         {index + 1}
                                     </span>

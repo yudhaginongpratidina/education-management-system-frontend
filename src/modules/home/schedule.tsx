@@ -1,3 +1,5 @@
+'use client';
+
 import { Icon } from '@iconify/react';
 import {
     Table,
@@ -8,45 +10,11 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-const schedules = [
-    {
-        program: 'SD (Kelas 1–6)',
-        days: 'Senin & Rabu',
-        time: '15.00 – 16.30',
-        type: 'Reguler',
-        quota: '8 siswa',
-    },
-    {
-        program: 'SMP (Kelas 7–9)',
-        days: 'Selasa & Kamis',
-        time: '16.00 – 17.30',
-        type: 'Reguler',
-        quota: '8 siswa',
-    },
-    {
-        program: 'SMA (Kelas 10–12)',
-        days: 'Senin – Kamis',
-        time: '17.00 – 18.30',
-        type: 'Reguler',
-        quota: '8 siswa',
-    },
-    {
-        program: 'Intensif UTBK',
-        days: 'Sabtu',
-        time: '09.00 – 12.00',
-        type: 'Intensif',
-        quota: '10 siswa',
-    },
-    {
-        program: 'Privat',
-        days: 'Fleksibel',
-        time: 'Sesuai kesepakatan',
-        type: 'Privat',
-        quota: '1 siswa',
-    },
-];
+import { useLandingSection } from './landing-content';
 
 export default function Schedule() {
+    const schedules = useLandingSection('schedule');
+
     return (
         <section className="bg-muted/40 py-20">
             <div className="container mx-auto px-4">
@@ -75,7 +43,7 @@ export default function Schedule() {
                         </TableHeader>
                         <TableBody>
                             {schedules.map((row) => (
-                                <TableRow key={row.program}>
+                                <TableRow key={row.id ?? row.program}>
                                     <TableCell className="font-medium">{row.program}</TableCell>
                                     <TableCell className="text-muted-foreground">
                                         {row.days}

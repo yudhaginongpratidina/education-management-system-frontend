@@ -3,6 +3,7 @@
 // dependencies
 import * as z from 'zod';
 import { useEffect, useState } from 'react';
+import { Icon } from '@iconify/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -10,6 +11,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
 import { STUDENT_PROGRAM_STATUS_OPTIONS, toDateInput, extractList } from '@/lib/ems-constants';
+import {
+    computeEndedAt,
+    computeTotalSessions,
+    intensityLabel,
+    sessionPeriodLabel,
+    type SessionPeriod,
+} from '@/lib/enrollment';
 
 // components
 import {
@@ -58,6 +66,7 @@ export default function StudentProgramForm({
     const [branches, setBranches] = useState<any[]>([]);
     const [packages, setPackages] = useState<any[]>([]);
     const [levels, setLevels] = useState<any[]>([]);
+    const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
     const [loading, setLoading] = useState(false);
 
     const form = useForm<StudentProgramInputValues, any, StudentProgramFormValues>({
@@ -141,6 +150,12 @@ export default function StudentProgramForm({
                 selling_price: Number(data.selling_price ?? 0),
                 notes: data.notes ?? '',
             });
+
+            const selectedPkg =
+                found?.packages.find(
+                    (item: any) => String(item.id) === String(data.program_package_id),
+                ) ?? null;
+            setSelectedPackage(selectedPkg);
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({ title: 'Error', type: 'error', description: message });
@@ -180,6 +195,7 @@ export default function StudentProgramForm({
         form.setValue('program_level_id', undefined as any);
         setPackages([]);
         setLevels([]);
+        setSelectedPackage(null);
         if (!value) return;
         try {
             await loadPackagesAndLevels(value);
@@ -191,12 +207,44 @@ export default function StudentProgramForm({
 
     const handlePackageChange = (value: string, onChange: (value: any) => void) => {
         onChange(value);
-        const selected = packages.find((item) => String(item.id) === value);
+        const selected = packages.find((item) => String(item.id) === value) ?? null;
+        setSelectedPackage(selected);
         if (selected) {
             form.setValue('normal_price', Number(selected.normal_price ?? 0));
             form.setValue('selling_price', Number(selected.selling_price ?? 0));
         }
     };
+
+    // The package (duration + bonus) decides the end date, which is recomputed
+    // whenever the start date or the chosen package changes.
+    const startedAtValue = form.watch('started_at');
+    useEffect(() => {
+        if (!selectedPackage || !startedAtValue) return;
+        const totalMonths =
+            Number(selectedPackage.duration_months ?? 0) +
+            Number(selectedPackage.bonus_duration_months ?? 0);
+        if (totalMonths > 0) {
+            form.setValue('ended_at', computeEndedAt(startedAtValue, totalMonths));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedPackage, startedAtValue]);
+
+    const packageInfo = (() => {
+        if (!selectedPackage) return null;
+        const duration = Number(selectedPackage.duration_months ?? 0);
+        const bonus = Number(selectedPackage.bonus_duration_months ?? 0);
+        const totalMonths = duration + bonus;
+        const perPeriod = Number(selectedPackage.sessions_per_period ?? 0);
+        const period = selectedPackage.session_period as SessionPeriod | null;
+        return {
+            duration,
+            bonus,
+            totalMonths,
+            intensity: intensityLabel(perPeriod, period),
+            period: sessionPeriodLabel(period),
+            totalSessions: computeTotalSessions(totalMonths, perPeriod, period),
+        };
+    })();
 
     const onSubmit = async (values: StudentProgramFormValues) => {
         const payload = {
@@ -361,6 +409,36 @@ export default function StudentProgramForm({
                         )}
                     />
                 </div>
+                {packageInfo && (
+                    <div className="bg-muted/40 rounded-lg border p-3">
+                        <p className="flex items-center gap-1.5 text-sm font-medium">
+                            <Icon
+                                icon="mdi:package-variant-closed-check"
+                                className="text-primary"
+                            />
+                            Ketentuan Paket
+                        </p>
+                        <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
+                            <dt className="text-muted-foreground">Durasi</dt>
+                            <dd className="text-right font-medium">
+                                {packageInfo.duration} bulan
+                                {packageInfo.bonus > 0 ? ` + ${packageInfo.bonus} bonus` : ''}
+                            </dd>
+                            <dt className="text-muted-foreground">Intensitas</dt>
+                            <dd className="text-right font-medium">{packageInfo.intensity}</dd>
+                            <dt className="text-muted-foreground">Periode</dt>
+                            <dd className="text-right font-medium">{packageInfo.period}</dd>
+                            <dt className="text-muted-foreground">Total Sesi</dt>
+                            <dd className="text-right font-medium">
+                                {packageInfo.totalSessions} sesi
+                            </dd>
+                        </dl>
+                        <p className="text-muted-foreground mt-2 text-xs">
+                            Tanggal mulai dan selesai mengikuti paket ini. Tanggal selesai dihitung
+                            otomatis.
+                        </p>
+                    </div>
+                )}
                 <Controller
                     name="status"
                     control={form.control}
@@ -410,13 +488,17 @@ export default function StudentProgramForm({
                         control={form.control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor="ended_at">Tanggal Selesai</FieldLabel>
+                                <FieldLabel htmlFor="ended_at">
+                                    Tanggal Selesai (otomatis)
+                                </FieldLabel>
                                 <Input
                                     {...field}
                                     value={field.value ?? ''}
                                     id="ended_at"
                                     type="date"
                                     className="h-10"
+                                    disabled
+                                    readOnly
                                 />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>

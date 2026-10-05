@@ -1,63 +1,12 @@
+'use client';
+
 import { Icon } from '@iconify/react';
 
-const courses = [
-    {
-        title: 'Matematika Dasar & Olimpiade',
-        level: 'SD – SMP',
-        price: 'Rp 350.000',
-        duration: '90 menit/sesi',
-        frequency: '2x per minggu',
-        img: '/assets/img/course-1.jpg',
-        topics: ['Bilangan & operasi', 'Aljabar dasar', 'Geometri', 'Soal cerita'],
-    },
-    {
-        title: 'Bahasa Inggris Aktif',
-        level: 'SMP – SMA',
-        price: 'Rp 400.000',
-        duration: '90 menit/sesi',
-        frequency: '2x per minggu',
-        img: '/assets/img/course-2.jpg',
-        topics: ['Speaking & pronunciation', 'Grammar', 'Reading', 'TOEFL dasar'],
-    },
-    {
-        title: 'IPA Terpadu & Sains',
-        level: 'SD – SMP',
-        price: 'Rp 375.000',
-        duration: '90 menit/sesi',
-        frequency: '2x per minggu',
-        img: '/assets/img/course-3.jpg',
-        topics: ['Fisika dasar', 'Biologi', 'Kimia dasar', 'Praktik sederhana'],
-    },
-    {
-        title: 'Intensif UTBK',
-        level: 'SMA Kelas 12 & Alumni',
-        price: 'Rp 550.000',
-        duration: '180 menit/sesi',
-        frequency: '1x per minggu',
-        img: '/assets/img/hero-bg.jpg',
-        topics: ['Penalaran umum', 'TPS kuantitatif', 'Literasi', 'Try out berkala'],
-    },
-    {
-        title: 'Bahasa Indonesia & Menulis',
-        level: 'SD – SMA',
-        price: 'Rp 330.000',
-        duration: '90 menit/sesi',
-        frequency: '2x per minggu',
-        img: '/assets/img/course-details.jpg',
-        topics: ['Membaca pemahaman', 'Menulis karangan', 'Tata bahasa', 'Karya ilmiah'],
-    },
-    {
-        title: 'Calistung (Baca Tulis Hitung)',
-        level: 'TK – SD awal',
-        price: 'Rp 300.000',
-        duration: '60 menit/sesi',
-        frequency: '2x per minggu',
-        img: '/assets/img/about-2.jpg',
-        topics: ['Mengenal huruf', 'Menulis permulaan', 'Berhitung', 'Permainan edukatif'],
-    },
-];
+import { useLandingSection } from './landing-content';
 
 export default function CoursesList() {
+    const programs = useLandingSection('programs').filter((program) => program.published !== false);
+
     return (
         <section className="bg-background py-20">
             <div className="container mx-auto px-4">
@@ -75,14 +24,14 @@ export default function CoursesList() {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {courses.map((course) => (
+                    {programs.map((course) => (
                         <div
-                            key={course.title}
+                            key={course.id ?? course.title}
                             className="group hover:border-primary/30 flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
                         >
                             <div className="relative overflow-hidden">
                                 <img
-                                    src={course.img}
+                                    src={course.image}
                                     alt=""
                                     className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />

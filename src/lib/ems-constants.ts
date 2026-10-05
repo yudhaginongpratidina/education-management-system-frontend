@@ -47,6 +47,14 @@ export const DAY_OF_WEEK_OPTIONS = [
 
 export const SCHOOL_LEVEL_OPTIONS = ['TK', 'SD', 'SMP', 'SMA', 'SMK', 'Mahasiswa', 'Umum'] as const;
 
+// Stored as plain text in `teachers.position`, so value === label.
+export const TEACHER_POSITION_OPTIONS = [
+    { value: 'Calon Guru', label: 'Calon Guru' },
+    { value: 'Guru Utama', label: 'Guru Utama' },
+    { value: 'Guru Bantu (Partime)', label: 'Guru Bantu (Partime)' },
+    { value: 'Kepala Sekolah', label: 'Kepala Sekolah' },
+] as const;
+
 export const PROGRAM_STATUS_OPTIONS = [
     { value: 'ACTIVE', label: 'Aktif' },
     { value: 'INACTIVE', label: 'Tidak Aktif' },
@@ -70,6 +78,22 @@ export const MENU_ACTIVE_OPTIONS = [
 export const ATTENDANCE_PERMISSION_OPTIONS = [
     { value: 'sick', label: 'Sakit' },
     { value: 'leave', label: 'Izin' },
+] as const;
+
+export const ASSET_CONDITION_OPTIONS = [
+    { value: 'GOOD', label: 'Baik' },
+    { value: 'FAIR', label: 'Cukup' },
+    { value: 'DAMAGED', label: 'Rusak Ringan' },
+    { value: 'BROKEN', label: 'Rusak Berat' },
+] as const;
+
+export const ASSET_STATUS_OPTIONS = [
+    { value: 'ACTIVE', label: 'Aktif' },
+    { value: 'IN_USE', label: 'Digunakan' },
+    { value: 'MAINTENANCE', label: 'Perawatan' },
+    { value: 'RETIRED', label: 'Tidak Dipakai' },
+    { value: 'LOST', label: 'Hilang' },
+    { value: 'DISPOSED', label: 'Dilepas' },
 ] as const;
 
 type Option = { value: string; label: string };
@@ -102,6 +126,21 @@ export function formatDate(value?: string | null): string {
         month: 'short',
         year: 'numeric',
     });
+}
+
+// Local calendar helpers — avoid the UTC off-by-one that `toISOString()` causes
+// for timezones ahead of UTC (e.g. WIB +07), which made date filters exclude
+// "today" data.
+export function todayLocal(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
+        now.getDate(),
+    ).padStart(2, '0')}`;
+}
+
+export function monthStartLocal(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
 }
 
 export function formatTime(value?: string | null): string {

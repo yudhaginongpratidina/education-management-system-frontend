@@ -1,37 +1,12 @@
+'use client';
+
 import { Icon } from '@iconify/react';
 
-const steps = [
-    {
-        no: '01',
-        icon: 'mdi:clipboard-pulse-outline',
-        title: 'Tes diagnostik',
-        duration: '45 menit',
-        desc: 'Siswa mengerjakan tes singkat untuk memetakan kemampuan awal dan bagian materi yang perlu diperkuat.',
-    },
-    {
-        no: '02',
-        icon: 'mdi:map-outline',
-        title: 'Rencana belajar personal',
-        duration: '1–2 hari',
-        desc: 'Tutor menyusun target dan urutan materi sesuai hasil tes, lalu mendiskusikannya dengan orang tua.',
-    },
-    {
-        no: '03',
-        icon: 'mdi:account-group-outline',
-        title: 'Kelas kecil & aktif',
-        duration: '2–3 sesi/minggu',
-        desc: 'Maksimal 8 siswa per kelas. Sekitar 70% waktu dipakai untuk latihan soal dan pembahasan langsung.',
-    },
-    {
-        no: '04',
-        icon: 'mdi:chart-timeline-variant',
-        title: 'Evaluasi & laporan',
-        duration: 'Tiap 4 sesi',
-        desc: 'Kuis mingguan dan laporan progres dikirim ke orang tua agar perkembangan belajar terpantau jelas.',
-    },
-];
+import { useLandingSection } from './landing-content';
 
 export default function LearningMethod() {
+    const steps = useLandingSection('method');
+
     return (
         <section className="bg-muted/40 py-20">
             <div className="container mx-auto px-4">
@@ -49,13 +24,13 @@ export default function LearningMethod() {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    {steps.map((step) => (
+                    {steps.map((step, index) => (
                         <div
-                            key={step.no}
+                            key={step.id ?? step.title}
                             className="relative rounded-2xl border border-border/60 bg-card p-6 shadow-card"
                         >
                             <span className="font-heading absolute top-5 right-5 text-3xl font-bold text-muted-foreground/25">
-                                {step.no}
+                                {String(index + 1).padStart(2, '0')}
                             </span>
                             <div className="bg-brand-gradient-soft text-primary mb-5 flex size-12 items-center justify-center rounded-2xl">
                                 <Icon icon={step.icon} className="text-2xl" />

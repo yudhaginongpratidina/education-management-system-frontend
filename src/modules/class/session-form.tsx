@@ -76,12 +76,14 @@ export default function SessionForm({ type, classId, session, onSuccess }: Sessi
                 return;
             }
             try {
-                const response = await http.get(`/classes/${selectedClassId}/students`);
-                const activeMembers = extractList(response.data).filter(
-                    (member: any) => !member.left_at,
+                const response = await http.get(`/classes/${selectedClassId}/student-quotas`);
+                const quotaRows = extractList(response.data);
+                setMembers(quotaRows);
+                setStudentProgramIds(
+                    quotaRows
+                        .filter((member: any) => member.can_join)
+                        .map((member: any) => member.student_program_id),
                 );
-                setMembers(activeMembers);
-                setStudentProgramIds(activeMembers.map((member: any) => member.student_program_id));
             } catch (error) {
                 const { message } = parseAxiosError(error);
                 toast.add({ title: 'Error', type: 'error', description: message });
@@ -270,13 +272,40 @@ export default function SessionForm({ type, classId, session, onSuccess }: Sessi
                                     id={`member-${member.student_program_id}`}
                                     checked={studentProgramIds.includes(member.student_program_id)}
                                     onCheckedChange={() => toggleMember(member.student_program_id)}
+                                    disabled={!member.can_join}
                                 />
-                                <FieldLabel htmlFor={`member-${member.student_program_id}`}>
-                                    {member.student_name}
+                                <FieldLabel
+                                    htmlFor={`member-${member.student_program_id}`}
+                                    className="flex items-center gap-2"
+                                >
+                                    <span>{member.student_name}</span>
+                                    {member.branch_name && (
+                                        <span className="text-muted-foreground text-xs">
+                                            ({member.branch_name})
+                                        </span>
+                                    )}
+                                    {member.total_sessions != null && (
+                                        <span
+                                            className={
+                                                member.can_join
+                                                    ? 'text-muted-foreground text-xs'
+                                                    : 'text-destructive text-xs'
+                                            }
+                                        >
+                                            {member.used}/{member.total_sessions} sesi
+                                            {member.can_join
+                                                ? ` · sisa ${member.remaining}`
+                                                : ' · kuota penuh, gunakan reschedule'}
+                                        </span>
+                                    )}
                                 </FieldLabel>
                             </div>
                         ))}
                     </div>
+                    <p className="text-muted-foreground text-xs">
+                        Siswa dengan kuota penuh tidak dapat ditambahkan ke sesi baru. Gunakan fitur
+                        reschedule untuk memindahkan sesinya.
+                    </p>
                 </Field>
             )}
 

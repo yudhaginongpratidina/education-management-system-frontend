@@ -51,12 +51,15 @@ import { StatusBadge } from '@/components/status-badge';
 
 // module components
 import StudentProgramForm from '@/modules/student/student-program-form';
+import StudentProgramSummary from '@/modules/student/student-program-summary';
+import { intensityLabel } from '@/lib/enrollment';
 
 export default function StudentProgramsList({ studentId }: { studentId: number }) {
     const [items, setItems] = useState<any[]>([]);
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [openEditId, setOpenEditId] = useState<number | null>(null);
+    const [openSummaryId, setOpenSummaryId] = useState<number | null>(null);
 
     const getItems = async () => {
         try {
@@ -134,7 +137,7 @@ export default function StudentProgramsList({ studentId }: { studentId: number }
                                 </Button>
                             }
                         />
-                        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+                        <DialogContent className="sm:max-w-lg">
                             <DialogHeader>
                                 <DialogTitle>ASSIGN PROGRAM KE SISWA</DialogTitle>
                                 <DialogDescription>
@@ -159,6 +162,8 @@ export default function StudentProgramsList({ studentId }: { studentId: number }
                             <TableHead>Level</TableHead>
                             <TableHead>Cabang</TableHead>
                             <TableHead>Periode</TableHead>
+                            <TableHead>Intensitas</TableHead>
+                            <TableHead>Sesi</TableHead>
                             <TableHead>Harga</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Aksi</TableHead>
@@ -168,7 +173,7 @@ export default function StudentProgramsList({ studentId }: { studentId: number }
                         {items.length === 0 && (
                             <TableRow>
                                 <TableCell
-                                    colSpan={7}
+                                    colSpan={9}
                                     className="text-center text-muted-foreground"
                                 >
                                     Belum ada program yang di-assign.
@@ -184,6 +189,12 @@ export default function StudentProgramsList({ studentId }: { studentId: number }
                                 <TableCell>{item.branch_name ?? '-'}</TableCell>
                                 <TableCell>
                                     {formatDate(item.started_at)} - {formatDate(item.ended_at)}
+                                </TableCell>
+                                <TableCell>
+                                    {intensityLabel(item.sessions_per_period, item.session_period)}
+                                </TableCell>
+                                <TableCell>
+                                    {item.total_sessions != null ? `${item.total_sessions}` : '-'}
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex flex-col">
@@ -206,6 +217,29 @@ export default function StudentProgramsList({ studentId }: { studentId: number }
                                 </TableCell>
                                 <TableCell className="flex gap-2">
                                     <Dialog
+                                        open={openSummaryId === item.id}
+                                        onOpenChange={(open) =>
+                                            setOpenSummaryId(open ? item.id : null)
+                                        }
+                                    >
+                                        <DialogTrigger
+                                            render={
+                                                <Button size="icon" variant="outline">
+                                                    <Icon icon="mdi:chart-box-outline" />
+                                                </Button>
+                                            }
+                                        />
+                                        <DialogContent className="sm:max-w-md">
+                                            <DialogHeader>
+                                                <DialogTitle>RINGKASAN PAKET</DialogTitle>
+                                                <DialogDescription>
+                                                    Pemakaian sesi dan ketentuan paket siswa.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <StudentProgramSummary id={item.id} />
+                                        </DialogContent>
+                                    </Dialog>
+                                    <Dialog
                                         open={openEditId === item.id}
                                         onOpenChange={(open) =>
                                             setOpenEditId(open ? item.id : null)
@@ -218,7 +252,7 @@ export default function StudentProgramsList({ studentId }: { studentId: number }
                                                 </Button>
                                             }
                                         />
-                                        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+                                        <DialogContent className="sm:max-w-lg">
                                             <DialogHeader>
                                                 <DialogTitle>EDIT PROGRAM SISWA</DialogTitle>
                                                 <DialogDescription>

@@ -205,6 +205,7 @@ export default function Page() {
                         <TableRow>
                             <TableHead>Kode</TableHead>
                             <TableHead>Nama Kelas</TableHead>
+                            <TableHead>Program</TableHead>
                             <TableHead>Cabang</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Deskripsi</TableHead>
@@ -215,7 +216,7 @@ export default function Page() {
                         {classes.length === 0 && (
                             <TableRow>
                                 <TableCell
-                                    colSpan={6}
+                                    colSpan={7}
                                     className="text-center text-muted-foreground"
                                 >
                                     Belum ada kelas.
@@ -226,6 +227,16 @@ export default function Page() {
                             <TableRow key={item.id}>
                                 <TableCell className="font-mono text-xs">{item.code}</TableCell>
                                 <TableCell className="font-medium">{item.name}</TableCell>
+                                <TableCell>
+                                    <div className="flex flex-col">
+                                        <span>{item.program_name ?? '-'}</span>
+                                        {item.program_level_name && (
+                                            <span className="text-muted-foreground text-xs">
+                                                {item.program_level_name}
+                                            </span>
+                                        )}
+                                    </div>
+                                </TableCell>
                                 <TableCell>{branchName(item.branch_id)}</TableCell>
                                 <TableCell>
                                     <StatusBadge status={item.status} />
@@ -273,7 +284,7 @@ export default function Page() {
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+                                            <DialogContent className="sm:max-w-3xl">
                                                 <DialogHeader>
                                                     <DialogTitle>SISWA KELAS</DialogTitle>
                                                     <DialogDescription>
@@ -300,7 +311,7 @@ export default function Page() {
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+                                            <DialogContent className="sm:max-w-3xl">
                                                 <DialogHeader>
                                                     <DialogTitle>GURU KELAS</DialogTitle>
                                                     <DialogDescription>
@@ -325,7 +336,7 @@ export default function Page() {
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+                                            <DialogContent className="sm:max-w-3xl">
                                                 <DialogHeader>
                                                     <DialogTitle>JADWAL KELAS</DialogTitle>
                                                     <DialogDescription>
@@ -349,7 +360,7 @@ export default function Page() {
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
+                                            <DialogContent className="sm:max-w-4xl">
                                                 <DialogHeader>
                                                     <DialogTitle>SESI KELAS</DialogTitle>
                                                     <DialogDescription>

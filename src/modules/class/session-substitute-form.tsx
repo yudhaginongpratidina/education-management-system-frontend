@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 // utils
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
-
 import { extractList } from '@/lib/ems-constants';
 
 // components
@@ -37,8 +36,20 @@ export default function SessionSubstituteForm({
 
     const getTeachers = async () => {
         try {
-            const response = await http.get('/teachers');
-            setTeachers(extractList(response.data));
+            const sessionDate = String(session.scheduled_date ?? '').slice(0, 10);
+            const response = await http.get(`/classes/${session.class_id}/teachers`);
+            const substitutes = extractList(response.data).filter((row: any) => {
+                if (row.role !== 'SUBSTITUTE') return false;
+                const started = row.started_at ? String(row.started_at).slice(0, 10) : null;
+                const ended = row.ended_at ? String(row.ended_at).slice(0, 10) : null;
+                return (!started || started <= sessionDate) && (!ended || ended >= sessionDate);
+            });
+
+            const map = new Map<string, any>();
+            for (const row of substitutes) {
+                if (!map.has(String(row.teacher_id))) map.set(String(row.teacher_id), row);
+            }
+            setTeachers([...map.values()]);
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({ title: 'Error', type: 'error', description: message });
@@ -47,6 +58,7 @@ export default function SessionSubstituteForm({
 
     useEffect(() => {
         getTeachers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onSubmit = async () => {
@@ -72,12 +84,16 @@ export default function SessionSubstituteForm({
     };
 
     const teacherItems = teachers.map((teacher) => ({
-        value: String(teacher.id),
-        label: teacher.full_name,
+        value: String(teacher.teacher_id),
+        label: teacher.teacher_name,
     }));
 
     return (
         <FieldGroup>
+            <div className="bg-muted/40 rounded-lg border p-3 text-xs text-muted-foreground">
+                Daftar guru pengganti berisi guru yang ditugaskan sebagai SUBSTITUTE untuk kelas ini
+                dan aktif pada tanggal sesi.
+            </div>
             <Field>
                 <FieldLabel htmlFor="substitute_teacher">Guru Pengganti</FieldLabel>
                 <Select
@@ -90,12 +106,17 @@ export default function SessionSubstituteForm({
                     </SelectTrigger>
                     <SelectContent>
                         {teachers.map((teacher) => (
-                            <SelectItem key={teacher.id} value={String(teacher.id)}>
-                                {teacher.full_name}
+                            <SelectItem key={teacher.teacher_id} value={String(teacher.teacher_id)}>
+                                {teacher.teacher_name}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
+                {teachers.length === 0 && (
+                    <p className="text-muted-foreground mt-1 text-xs">
+                        Belum ada guru pengganti yang ditugaskan pada kelas ini.
+                    </p>
+                )}
             </Field>
             <Field>
                 <FieldLabel htmlFor="substitute_notes">Catatan</FieldLabel>

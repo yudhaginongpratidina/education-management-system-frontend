@@ -31,7 +31,7 @@ import {
 import { toast } from '@/components/ui/toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { StatusBadge } from '@/components/status-badge';
 import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field';
 
 const formSchema = z.object({
@@ -106,26 +106,51 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 min-w-0">
             <form onSubmit={form.handleSubmit(onSubmit)}>
                 <FieldGroup>
-                    <Controller
-                        name="level"
-                        control={form.control}
-                        render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor="level">Level</FieldLabel>
-                                <Input
-                                    {...field}
-                                    value={field.value == null ? '' : String(field.value)}
-                                    id="level"
-                                    type="number"
-                                    className="h-10"
-                                />
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            </Field>
-                        )}
-                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Controller
+                            name="level"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor="level">Level</FieldLabel>
+                                    <Input
+                                        {...field}
+                                        value={field.value == null ? '' : String(field.value)}
+                                        id="level"
+                                        type="number"
+                                        className="h-10"
+                                    />
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            name="status"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor="status">Status</FieldLabel>
+                                    <Select
+                                        value={field.value}
+                                        onValueChange={field.onChange}
+                                        items={PROGRAM_STATUS_OPTIONS}
+                                    >
+                                        <SelectTrigger className="h-10">
+                                            <SelectValue placeholder="Pilih Status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="ACTIVE">Aktif</SelectItem>
+                                            <SelectItem value="INACTIVE">Tidak Aktif</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                </Field>
+                            )}
+                        />
+                    </div>
                     <Controller
                         name="name"
                         control={form.control}
@@ -150,104 +175,106 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor="description">Deskripsi</FieldLabel>
-                                <Textarea
+                                <Input
                                     {...field}
                                     id="description"
                                     placeholder="Masukan Deskripsi"
                                     className="h-10"
+                                    value={field.value || ''}
                                 />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}
                     />
-                    <Controller
-                        name="status"
-                        control={form.control}
-                        render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor="status">Status</FieldLabel>
-                                <Select
-                                    value={field.value}
-                                    onValueChange={field.onChange}
-                                    items={PROGRAM_STATUS_OPTIONS}
-                                >
-                                    <SelectTrigger className="h-10">
-                                        <SelectValue placeholder="Pilih Status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="ACTIVE">Aktif</SelectItem>
-                                        <SelectItem value="INACTIVE">Tidak Aktif</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            </Field>
-                        )}
-                    />
-                    <div className=" flex flex-col gap-2">
-                        <Button type="submit" className="w-full h-10">
-                            {editingLevel ? 'Update' : 'Simpan'}
-                        </Button>
+                    <div className="flex items-center justify-end gap-2 pt-2">
                         {editingLevel && (
                             <Button
                                 type="button"
-                                className="w-full h-10"
+                                variant="outline"
+                                className="h-10"
                                 onClick={() => {
                                     setEditingLevel(null);
-                                    form.reset();
+                                    form.reset({
+                                        level: 1,
+                                        name: '',
+                                        description: '',
+                                        status: 'ACTIVE',
+                                    });
                                 }}
                             >
                                 Batal
                             </Button>
                         )}
+                        <Button type="submit" className="h-10 min-w-24">
+                            {editingLevel ? 'Update' : 'Simpan'}
+                        </Button>
                     </div>
                 </FieldGroup>
             </form>
 
-            <div className="w-full h-40 overflow-auto">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="text-center">Level</TableHead>
-                            <TableHead>Nama</TableHead>
-                            <TableHead>Deskripsi</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Aksi</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {programLevels.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell className="text-center">{item.level}</TableCell>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell>{item.description}</TableCell>
-                                <TableCell>
-                                    {item.status === 'ACTIVE' ? 'Aktif' : 'Tidak Aktif'}
-                                </TableCell>
-                                <TableCell className="flex gap-2">
-                                    <Button
-                                        size="icon"
-                                        onClick={() => {
-                                            setEditingLevel(item.level);
-                                            form.setValue('level', item.level);
-                                            form.setValue('name', item.name);
-                                            form.setValue('description', item.description || '');
-                                            form.setValue('status', item.status);
-                                        }}
-                                    >
-                                        <Icon icon="boxicons:pencil-square" />
-                                    </Button>
-                                    <Button
-                                        size="icon"
-                                        variant="destructive"
-                                        onClick={() => onDelete(item.level)}
-                                    >
-                                        <Icon icon="bi:trash-fill" />
-                                    </Button>
-                                </TableCell>
+            <div className="rounded-lg border border-border/60 overflow-hidden">
+                <div className="max-h-60 overflow-y-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-16 text-center">Level</TableHead>
+                                <TableHead>Nama</TableHead>
+                                <TableHead>Deskripsi</TableHead>
+                                <TableHead className="w-28 text-center">Status</TableHead>
+                                <TableHead className="w-24 text-right">Aksi</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {programLevels.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="py-6 text-center text-muted-foreground">
+                                        Belum ada data level
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                programLevels.map((item) => (
+                                    <TableRow key={item.id ?? item.level}>
+                                        <TableCell className="text-center font-medium">{item.level}</TableCell>
+                                        <TableCell className="font-medium">{item.name}</TableCell>
+                                        <TableCell
+                                            className="max-w-[200px] truncate text-muted-foreground"
+                                            title={item.description || '-'}
+                                        >
+                                            {item.description || '-'}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <StatusBadge status={item.status} />
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex items-center justify-end gap-1.5">
+                                                <Button
+                                                    size="icon-sm"
+                                                    variant="outline"
+                                                    onClick={() => {
+                                                        setEditingLevel(item.level);
+                                                        form.setValue('level', item.level);
+                                                        form.setValue('name', item.name);
+                                                        form.setValue('description', item.description || '');
+                                                        form.setValue('status', item.status);
+                                                    }}
+                                                >
+                                                    <Icon icon="boxicons:pencil-square" className="size-4" />
+                                                </Button>
+                                                <Button
+                                                    size="icon-sm"
+                                                    variant="destructive"
+                                                    onClick={() => onDelete(item.level)}
+                                                >
+                                                    <Icon icon="bi:trash-fill" className="size-4" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     );

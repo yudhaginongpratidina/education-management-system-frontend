@@ -9,8 +9,16 @@ import { Controller, useForm } from 'react-hook-form';
 // utils
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
+import { TEACHER_POSITION_OPTIONS } from '@/lib/ems-constants';
 
 // components
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -327,20 +335,39 @@ export default function TeacherForm({ type, slug, onSuccess }: TeacherFormProps)
                     <Controller
                         name="position"
                         control={form.control}
-                        render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor="position">Posisi</FieldLabel>
-                                <Input
-                                    {...field}
-                                    value={field.value ?? ''}
-                                    id="position"
-                                    type="text"
-                                    placeholder="Masukan Posisi"
-                                    className="h-10"
-                                />
-                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                            </Field>
-                        )}
+                        render={({ field, fieldState }) => {
+                            const isLegacy =
+                                !!field.value &&
+                                !TEACHER_POSITION_OPTIONS.some((o) => o.value === field.value);
+                            const positionItems = [
+                                ...TEACHER_POSITION_OPTIONS,
+                                ...(isLegacy ? [{ value: field.value!, label: field.value! }] : []),
+                            ];
+                            return (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor="position">Posisi</FieldLabel>
+                                    <Select
+                                        value={field.value || null}
+                                        onValueChange={(value) => field.onChange(value ?? '')}
+                                        items={positionItems}
+                                    >
+                                        <SelectTrigger id="position" className="h-10">
+                                            <SelectValue placeholder="Pilih Posisi" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {positionItems.map((option) => (
+                                                <SelectItem key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {fieldState.invalid && (
+                                        <FieldError errors={[fieldState.error]} />
+                                    )}
+                                </Field>
+                            );
+                        }}
                     />
                     <Controller
                         name="still_actively_working"

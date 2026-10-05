@@ -1,15 +1,12 @@
+'use client';
+
 import { Icon } from '@iconify/react';
 import Link from 'next/link';
 import { GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-const socials = [
-    { icon: 'mdi:twitter', href: '#' },
-    { icon: 'mdi:facebook', href: '#' },
-    { icon: 'mdi:instagram', href: '#' },
-    { icon: 'mdi:linkedin', href: '#' },
-];
+import { useLandingSection } from './landing-content';
 
 const usefulLinks = [
     { label: 'Beranda', href: '/' },
@@ -22,6 +19,8 @@ const usefulLinks = [
 const services = ['Bimbel SD', 'Bimbel SMP', 'Bimbel SMA', 'Persiapan UTBK', 'Kelas Privat'];
 
 export default function Footer() {
+    const footer = useLandingSection('footer');
+
     return (
         <footer className="border-t border-border/60 bg-muted/40">
             <div className="container mx-auto px-4 py-16">
@@ -31,23 +30,19 @@ export default function Footer() {
                             <span className="bg-brand-gradient text-primary-foreground flex size-10 items-center justify-center rounded-xl shadow-brand">
                                 <GraduationCap className="size-5" />
                             </span>
-                            <span className="font-heading text-lg font-bold">Bimbel Cerdas</span>
+                            <span className="font-heading text-lg font-bold">{footer.brand}</span>
                         </Link>
-                        <p className="mb-4 text-sm text-muted-foreground">
-                            Jl. Sudirman No. 123
-                            <br />
-                            Jakarta, Indonesia
+                        <p className="mb-4 text-sm text-muted-foreground">{footer.address}</p>
+                        <p className="text-sm text-muted-foreground">
+                            <strong className="text-foreground">Telepon:</strong> {footer.phone}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                            <strong className="text-foreground">Telepon:</strong> (021) 555-0101
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                            <strong className="text-foreground">Email:</strong> halo@bimbelcerdas.id
+                            <strong className="text-foreground">Email:</strong> {footer.email}
                         </p>
                         <div className="mt-6 flex gap-2">
-                            {socials.map((social) => (
+                            {footer.socials.map((social) => (
                                 <Link
-                                    key={social.icon}
+                                    key={social.id ?? social.icon}
                                     href={social.href}
                                     className="hover:bg-brand-gradient flex size-9 items-center justify-center rounded-lg border border-border/60 bg-card text-muted-foreground transition-colors hover:text-primary-foreground"
                                 >
@@ -104,7 +99,7 @@ export default function Footer() {
                 <div className="mt-12 flex flex-col items-center justify-between gap-2 border-t border-border/60 pt-8 text-sm text-muted-foreground md:flex-row">
                     <p>
                         © {new Date().getFullYear()}{' '}
-                        <strong className="text-foreground">Bimbel Cerdas</strong>. Seluruh hak
+                        <strong className="text-foreground">{footer.brand}</strong>. Seluruh hak
                         cipta dilindungi.
                     </p>
                     <p>Dibuat dengan ❤️ untuk pendidikan Indonesia</p>

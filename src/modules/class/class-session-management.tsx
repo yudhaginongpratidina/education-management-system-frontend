@@ -55,6 +55,8 @@ import SessionForm from '@/modules/class/session-form';
 import SessionRescheduleForm from '@/modules/class/session-reschedule-form';
 import SessionSubstituteForm from '@/modules/class/session-substitute-form';
 import SessionStudentManagement from '@/modules/class/session-student-management';
+import SessionBulkForm from '@/modules/class/session-bulk-form';
+import RescheduleHistory from '@/modules/class/reschedule-history';
 
 export default function ClassSessionManagement({
     classId,
@@ -70,6 +72,8 @@ export default function ClassSessionManagement({
     const [dateFrom, setDateFrom] = useState<string>('');
     const [dateTo, setDateTo] = useState<string>('');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [isBulkOpen, setIsBulkOpen] = useState(false);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [isGenerateOpen, setIsGenerateOpen] = useState(false);
     const [generateFrom, setGenerateFrom] = useState<string>('');
     const [generateTo, setGenerateTo] = useState<string>('');
@@ -279,6 +283,56 @@ export default function ClassSessionManagement({
                             </DialogContent>
                         </Dialog>
                     )}
+                    <Dialog
+                        open={isBulkOpen}
+                        onOpenChange={(open) => {
+                            setIsBulkOpen(open);
+                            if (!open) getSessions();
+                        }}
+                    >
+                        <DialogTrigger
+                            render={
+                                <Button variant="outline" className="h-10">
+                                    <Icon icon="mdi:calendar-multiple" /> Tambah Banyak
+                                </Button>
+                            }
+                        />
+                        <DialogContent className="sm:max-w-3xl">
+                            <DialogHeader>
+                                <DialogTitle>TAMBAH BANYAK SESI</DialogTitle>
+                                <DialogDescription>
+                                    Tentukan beberapa tanggal dan jam sekaligus, lengkap dengan guru
+                                    dan peserta. Jadwal yang bentrok akan dilewati.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <SessionBulkForm
+                                classId={classId}
+                                onSuccess={() => {
+                                    setIsBulkOpen(false);
+                                    getSessions();
+                                }}
+                            />
+                        </DialogContent>
+                    </Dialog>
+                    <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+                        <DialogTrigger
+                            render={
+                                <Button variant="outline" className="h-10">
+                                    <Icon icon="mdi:history" /> Riwayat
+                                </Button>
+                            }
+                        />
+                        <DialogContent className="sm:max-w-3xl">
+                            <DialogHeader>
+                                <DialogTitle>RIWAYAT RESCHEDULE</DialogTitle>
+                                <DialogDescription>
+                                    Jejak penjadwalan ulang sesi, pergantian guru, dan perpindahan
+                                    sesi siswa.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <RescheduleHistory classId={classId} />
+                        </DialogContent>
+                    </Dialog>
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger
                             render={
@@ -287,7 +341,7 @@ export default function ClassSessionManagement({
                                 </Button>
                             }
                         />
-                        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+                        <DialogContent className="sm:max-w-lg">
                             <DialogHeader>
                                 <DialogTitle>TAMBAH SESI</DialogTitle>
                                 <DialogDescription>Buat sesi pembelajaran baru.</DialogDescription>
@@ -389,7 +443,7 @@ export default function ClassSessionManagement({
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+                                            <DialogContent className="sm:max-w-2xl">
                                                 <DialogHeader>
                                                     <DialogTitle>PESERTA SESI</DialogTitle>
                                                     <DialogDescription>
@@ -416,7 +470,7 @@ export default function ClassSessionManagement({
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+                                            <DialogContent className="sm:max-w-lg">
                                                 <DialogHeader>
                                                     <DialogTitle>EDIT SESI</DialogTitle>
                                                 </DialogHeader>

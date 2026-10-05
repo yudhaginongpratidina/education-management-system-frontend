@@ -1,39 +1,12 @@
+'use client';
+
 import { Icon } from '@iconify/react';
 
-const facilities = [
-    {
-        icon: 'mdi:air-conditioner',
-        title: 'Ruang kelas ber-AC',
-        desc: 'Kapasitas 8–10 kursi, pencahayaan cukup, dan sirkulasi udara yang nyaman.',
-    },
-    {
-        icon: 'mdi:book-open-page-variant-outline',
-        title: 'Modul cetak & e-modul',
-        desc: 'Ringkasan materi dan latihan soal, bisa diakses lewat ponsel setelah sesi selesai.',
-    },
-    {
-        icon: 'mdi:cctv',
-        title: 'CCTV & ruang tunggu',
-        desc: 'Orang tua bisa menunggu di ruang tunggu yang nyaman sambil memantau aktivitas kelas.',
-    },
-    {
-        icon: 'mdi:library-shelves',
-        title: 'Perpustakaan mini',
-        desc: 'Kumpulan buku latihan, ensiklopedia, dan komik edukasi untuk mengisi waktu sebelum kelas.',
-    },
-    {
-        icon: 'mdi:wifi',
-        title: 'Wi-Fi & ruang diskusi',
-        desc: 'Area belajar kelompok untuk mengerjakan tugas proyek atau diskusi soal bersama tutor.',
-    },
-    {
-        icon: 'mdi:food-apple-outline',
-        title: 'Kantin sehat',
-        desc: 'Menyediakan air minum dan makanan ringan dengan harga terjangkau bagi siswa.',
-    },
-];
+import { useLandingSection } from './landing-content';
 
 export default function Facilities() {
+    const facilities = useLandingSection('facilities');
+
     return (
         <section className="bg-background py-20">
             <div className="container mx-auto px-4">
@@ -53,7 +26,7 @@ export default function Facilities() {
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {facilities.map((item) => (
                         <div
-                            key={item.title}
+                            key={item.id ?? item.title}
                             className="flex gap-4 rounded-2xl border border-border/60 bg-card p-5 shadow-card transition-colors hover:border-primary/30"
                         >
                             <div className="bg-brand-gradient-soft text-primary flex size-11 shrink-0 items-center justify-center rounded-2xl">
