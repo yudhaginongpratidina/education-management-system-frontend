@@ -200,8 +200,8 @@ export function TestimonialsEditor({
                             value={item.text}
                             onChange={(text) => update(item.id, { text })}
                         />
-                        <TextField
-                            label="Gambar (nama file di /assets/img/testimonials)"
+                        <ImageField
+                            label="Foto Testimoni"
                             value={item.image}
                             onChange={(image) => update(item.id, { image })}
                         />

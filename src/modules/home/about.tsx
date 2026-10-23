@@ -2,6 +2,7 @@
 
 import { Icon } from '@iconify/react';
 
+import { formatImageUrl } from '@/lib/image-url';
 import { useLandingSection } from './landing-content';
 
 export default function About() {
@@ -13,7 +14,7 @@ export default function About() {
                 <div className="grid items-center gap-12 lg:grid-cols-2">
                     <div className="relative">
                         <img
-                            src="/assets/img/about.jpg"
+                            src={formatImageUrl(about.image || '/assets/img/about.jpg')}
                             alt="Suasana belajar"
                             className="w-full rounded-3xl object-cover shadow-soft"
                         />

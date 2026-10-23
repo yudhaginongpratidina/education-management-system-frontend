@@ -92,6 +92,7 @@ export type LandingContent = {
         paragraph: string;
         points: string[];
         milestones: Milestone[];
+        image?: string;
     };
     programs: Program[];
     method: MethodStep[];
@@ -220,6 +221,7 @@ export const initialContent: LandingContent = {
                 text: 'Tumbuh menjadi 4 cabang, 24 pengajar, dan 1.200+ siswa aktif.',
             },
         ],
+        image: '/assets/img/about.jpg',
     },
     programs: [
         {

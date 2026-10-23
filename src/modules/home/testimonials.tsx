@@ -1,11 +1,15 @@
 'use client';
 
 import { Icon } from '@iconify/react';
+import { formatImageUrl } from '@/lib/image-url';
 
 import { useLandingSection } from './landing-content';
 
 const testimonialImage = (image: string): string => {
     if (!image) return '/assets/img/testimonials/testimonials-1.jpg';
+    if (image.startsWith('/storage/') || image.startsWith('http') || image.startsWith('data:')) {
+        return formatImageUrl(image);
+    }
     return image.startsWith('/') ? image : `/assets/img/testimonials/${image}`;
 };
 

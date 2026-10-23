@@ -1,6 +1,7 @@
 'use client';
 
 import { Icon } from '@iconify/react';
+import { formatImageUrl } from '@/lib/image-url';
 
 import { useLandingSection } from './landing-content';
 
@@ -31,7 +32,7 @@ export default function CoursesList() {
                         >
                             <div className="relative overflow-hidden">
                                 <img
-                                    src={course.image}
+                                    src={formatImageUrl(course.image)}
                                     alt=""
                                     className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />

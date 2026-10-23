@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, PlayCircle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatImageUrl } from '@/lib/image-url';
 
 import { useLandingSection } from './landing-content';
 
@@ -12,7 +13,7 @@ export default function Hero() {
     const slides = hero.slides.map((item) => ({
         title: item.title,
         desc: item.desc,
-        img: item.image,
+        img: formatImageUrl(item.image),
     }));
     const total = Math.max(slides.length, 1);
 

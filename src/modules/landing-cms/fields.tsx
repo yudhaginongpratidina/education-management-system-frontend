@@ -4,6 +4,10 @@ import * as React from 'react';
 import { Icon } from '@iconify/react';
 
 import { cn } from '@/lib/utils';
+import { http } from '@/lib/http';
+import { parseAxiosError } from '@/lib/parse-axios-error';
+import { toast } from '@/components/ui/toast';
+import { formatImageUrl } from '@/lib/image-url';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -89,25 +93,169 @@ export function ImageField({
     label = 'Gambar',
     value,
     onChange,
+    description,
 }: {
     label?: string;
     value: string;
     onChange: (value: string) => void;
+    description?: string;
 }) {
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = React.useState(false);
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            toast.add({
+                title: 'Format Tidak Sesuai',
+                type: 'error',
+                description: 'Harap pilih file gambar (JPG, PNG, WEBP, SVG, GIF)',
+            });
+            return;
+        }
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('file', file); // Support both field names
+
+        try {
+            // Try /landing/upload first, then fallback to /storage if needed
+            let uploadedUrl = '';
+            try {
+                const res = await http.post('/landing/upload', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                uploadedUrl = res.data?.data?.url || (res.data?.data?.slug ? `/storage/${res.data.data.slug}` : '');
+            } catch {
+                const fallbackRes = await http.post('/storage', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                uploadedUrl = fallbackRes.data?.data?.slug ? `/storage/${fallbackRes.data.data.slug}` : '';
+            }
+
+            if (uploadedUrl) {
+                onChange(uploadedUrl);
+                toast.add({
+                    title: 'Berhasil',
+                    type: 'success',
+                    description: 'Gambar berhasil diunggah',
+                });
+            } else {
+                throw new Error('Gagal mendapatkan URL gambar');
+            }
+        } catch (error) {
+            const { message } = parseAxiosError(error);
+            toast.add({
+                title: 'Gagal Mengunggah',
+                type: 'error',
+                description: message || 'Terjadi kesalahan saat mengunggah gambar',
+            });
+        } finally {
+            setIsUploading(false);
+            if (event.target) event.target.value = '';
+        }
+    };
+
+    const formattedSrc = formatImageUrl(value);
+
     return (
-        <div className="flex items-end gap-3">
-            <TextField
-                label={label}
-                value={value}
-                onChange={onChange}
-                placeholder="/assets/img/..."
-                className="flex-1"
-            />
-            <div className="mb-0.5 size-16 shrink-0 overflow-hidden rounded-lg border border-border/70 bg-muted">
-                {value ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={value} alt="" className="h-full w-full object-cover" />
+        <div className="space-y-2">
+            <div className="flex items-center justify-between">
+                {label ? <FieldLabel className="text-xs font-semibold">{label}</FieldLabel> : null}
+                {description ? (
+                    <span className="text-[11px] text-muted-foreground">{description}</span>
                 ) : null}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl border border-border/70 bg-card/60 p-3 shadow-xs">
+                {/* Preview Thumbnail / Click to Upload */}
+                <div
+                    onClick={() => !isUploading && fileInputRef.current?.click()}
+                    className={cn(
+                        'group relative size-20 shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted/60 transition-all hover:border-primary/50 flex items-center justify-center',
+                        value && 'border-solid border-border/80 bg-background',
+                    )}
+                    title="Klik untuk memilih gambar"
+                >
+                    {formattedSrc ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={formattedSrc}
+                            alt=""
+                            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                        />
+                    ) : (
+                        <div className="flex flex-col items-center justify-center p-1 text-center text-muted-foreground group-hover:text-primary">
+                            <Icon icon="mdi:cloud-upload-outline" className="text-2xl" />
+                            <span className="text-[10px] font-medium leading-none mt-1">Upload</span>
+                        </div>
+                    )}
+
+                    {isUploading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-white">
+                            <Icon icon="mdi:loading" className="animate-spin text-xl" />
+                        </div>
+                    )}
+                </div>
+
+                {/* Controls & Input */}
+                <div className="flex-1 w-full space-y-2 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                        {/* Hidden native input */}
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif"
+                            className="hidden"
+                            onChange={handleFileChange}
+                        />
+
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1.5 text-xs"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isUploading}
+                        >
+                            {isUploading ? (
+                                <>
+                                    <Icon icon="mdi:loading" className="animate-spin text-sm" />
+                                    Mengunggah...
+                                </>
+                            ) : (
+                                <>
+                                    <Icon icon="mdi:upload" className="text-sm text-primary" />
+                                    {value ? 'Ganti Gambar' : 'Pilih / Unggah Gambar'}
+                                </>
+                            )}
+                        </Button>
+
+                        {value ? (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 text-xs text-destructive hover:bg-destructive/10 px-2"
+                                onClick={() => onChange('')}
+                                disabled={isUploading}
+                            >
+                                <Icon icon="mdi:trash-can-outline" className="mr-1 text-sm" /> Hapus
+                            </Button>
+                        ) : null}
+                    </div>
+
+                    {/* URL Input field */}
+                    <Input
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        placeholder="Atau tempel URL gambar / path (/assets/..., /storage/...)"
+                        className="h-8 text-xs"
+                    />
+                </div>
             </div>
         </div>
     );

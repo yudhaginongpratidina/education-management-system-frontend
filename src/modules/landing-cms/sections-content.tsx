@@ -393,6 +393,11 @@ export function AboutEditor({
                 onChange={(paragraph) => onChange({ ...value, paragraph })}
                 rows={4}
             />
+            <ImageField
+                label="Foto Tentang Kami"
+                value={value.image ?? ''}
+                onChange={(image) => onChange({ ...value, image })}
+            />
             <StringListEditor
                 label="Poin pembeda"
                 values={value.points}

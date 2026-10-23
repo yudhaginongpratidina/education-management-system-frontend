@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight, CalendarDays, Clock } from 'lucide-react';
+import { formatImageUrl } from '@/lib/image-url';
 
 import { useLandingSection } from './landing-content';
 
@@ -37,7 +38,7 @@ export default function BlogTips() {
                         >
                             <div className="relative overflow-hidden">
                                 <img
-                                    src={article.image}
+                                    src={formatImageUrl(article.image)}
                                     alt=""
                                     className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
