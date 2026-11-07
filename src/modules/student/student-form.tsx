@@ -2,9 +2,10 @@
 
 // dependencies
 import * as z from 'zod';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { AlertCircle, Loader2, UserCheck, ArrowRight } from 'lucide-react';
 
 // utils
 import { http } from '@/lib/http';
@@ -15,6 +16,7 @@ import { toDateInput } from '@/lib/ems-constants';
 import { toast } from '@/components/ui/toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field';
@@ -64,6 +66,14 @@ export default function StudentForm({ type, student, studentId, onSuccess }: Stu
         defaultValues,
     });
 
+    const [existingStudent, setExistingStudent] = useState<any | null>(null);
+    const [isCheckingName, setIsCheckingName] = useState<boolean>(false);
+
+    const watchedFullName = useWatch({
+        control: form.control,
+        name: 'full_name',
+    });
+
     const fillForm = (data: any) => {
         form.reset({
             full_name: data.full_name ?? '',
@@ -100,6 +110,57 @@ export default function StudentForm({ type, student, studentId, onSuccess }: Stu
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [student, studentId, type]);
 
+    // Check if student with full_name already exists (debounced)
+    useEffect(() => {
+        if (type !== 'create') return;
+
+        const name = (watchedFullName || '').trim();
+        if (name.length < 2) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            if (existingStudent) setExistingStudent(null);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setIsCheckingName(false);
+            return;
+        }
+
+        // Avoid refetching if current existing student already matches this exact name
+        if (
+            existingStudent &&
+            existingStudent.full_name?.trim().toLowerCase() === name.toLowerCase()
+        ) {
+            return;
+        }
+
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsCheckingName(true);
+        const timer = setTimeout(async () => {
+            try {
+                const response = await http.get('/students/check-name', {
+                    params: { name },
+                });
+                if (response.data?.exists && response.data?.data) {
+                    const found = response.data.data;
+                    setExistingStudent(found);
+                    fillForm(found);
+                    toast.add({
+                        title: 'Siswa Sudah Terdaftar',
+                        type: 'info',
+                        description: `Data siswa "${found.full_name}" telah dimuat otomatis untuk menghindari duplikasi.`,
+                    });
+                } else {
+                    setExistingStudent(null);
+                }
+            } catch {
+                // Ignore background check error
+            } finally {
+                setIsCheckingName(false);
+            }
+        }, 400);
+
+        return () => clearTimeout(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [watchedFullName, type]);
+
     const buildPayload = (values: StudentFormValues) => ({
         full_name: values.full_name,
         address: values.address || undefined,
@@ -117,7 +178,16 @@ export default function StudentForm({ type, student, studentId, onSuccess }: Stu
 
     const onSubmit = async (values: StudentFormValues) => {
         try {
-            if (type === 'create') {
+            if (existingStudent?.id) {
+                // If student already exists, update their record instead of creating duplicate
+                const response = await http.put(`/students/${existingStudent.id}`, buildPayload(values));
+                toast.add({
+                    title: 'Data Siswa Dimuat',
+                    type: 'success',
+                    description: `Menggunakan data siswa "${values.full_name}" (ID: #${existingStudent.id}). Melanjutkan ke assign program...`,
+                });
+                onSuccess({ ...values, id: existingStudent.id, ...(response.data?.data ?? response.data ?? {}) });
+            } else if (type === 'create') {
                 const response = await http.post('/students', buildPayload(values));
                 toast.add({
                     title: 'Success',
@@ -148,16 +218,82 @@ export default function StudentForm({ type, student, studentId, onSuccess }: Stu
                     control={form.control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor="full_name">Nama Lengkap</FieldLabel>
-                            <Input
-                                {...field}
-                                value={field.value ?? ''}
-                                id="full_name"
-                                type="text"
-                                placeholder="Masukan Nama Lengkap"
-                                className="h-10"
-                                required
-                            />
+                            <div className="flex items-center justify-between">
+                                <FieldLabel htmlFor="full_name">Nama Lengkap *</FieldLabel>
+                                {isCheckingName && (
+                                    <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                                        <Loader2 className="size-3 animate-spin text-primary" />
+                                        Mengecek ketersediaan nama...
+                                    </span>
+                                )}
+                                {!isCheckingName && existingStudent && (
+                                    <Badge variant="warning" className="gap-1 text-[10px] font-medium">
+                                        <UserCheck className="size-3" /> Siswa Sudah Terdaftar (ID: #{existingStudent.id})
+                                    </Badge>
+                                )}
+                            </div>
+                            <div className="relative">
+                                <Input
+                                    {...field}
+                                    value={field.value ?? ''}
+                                    id="full_name"
+                                    type="text"
+                                    placeholder="Masukan Nama Lengkap"
+                                    className={`h-10 ${
+                                        existingStudent
+                                            ? 'border-amber-500 focus-visible:ring-amber-500 bg-amber-50/40 dark:bg-amber-950/20'
+                                            : ''
+                                    }`}
+                                    required
+                                />
+                                {isCheckingName && (
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Alert Banner when student already exists */}
+                            {existingStudent && (
+                                <div className="mt-2 p-3 rounded-sm border border-amber-300 bg-amber-50/90 text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200 text-xs space-y-2">
+                                    <div className="flex items-start gap-2.5">
+                                        <AlertCircle className="size-4 text-amber-600 shrink-0 mt-0.5" />
+                                        <div className="flex-1 space-y-1">
+                                            <p className="font-semibold text-xs">
+                                                Siswa &quot;{existingStudent.full_name}&quot; sudah ada di database (ID: #{existingStudent.id})
+                                            </p>
+                                            <p className="text-[11px] text-amber-800 dark:text-amber-300">
+                                                Data siswa ini telah dimuat otomatis agar tidak terjadi duplikasi data. Anda dapat langsung melanjutkan ke pendaftaran program siswa atau memperbarui profilnya.
+                                            </p>
+                                            <div className="pt-1.5 flex items-center gap-2 flex-wrap">
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    className="h-7 text-xs gap-1 bg-amber-600 hover:bg-amber-700 text-white font-medium"
+                                                    onClick={() => onSuccess(existingStudent)}
+                                                >
+                                                    <UserCheck className="size-3" />
+                                                    Lanjut ke Assign Program untuk Siswa Ini
+                                                    <ArrowRight className="size-3" />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="h-7 text-xs bg-background"
+                                                    onClick={() => {
+                                                        setExistingStudent(null);
+                                                        form.reset(defaultValues);
+                                                    }}
+                                                >
+                                                    Reset / Input Siswa Lain
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}
@@ -374,9 +510,33 @@ export default function StudentForm({ type, student, studentId, onSuccess }: Stu
                         </FieldGroup>
                     )}
                 />
-                <Button type="submit" className="h-10">
-                    {type === 'create' ? 'Simpan' : 'Update'}
-                </Button>
+                <div className="flex items-center gap-3 pt-2 flex-wrap">
+                    <Button type="submit" className="h-10 gap-2">
+                        {existingStudent ? (
+                            <>
+                                <UserCheck className="size-4" />
+                                Simpan Perubahan & Lanjut ke Program
+                            </>
+                        ) : type === 'create' ? (
+                            'Simpan & Lanjut ke Program'
+                        ) : (
+                            'Update'
+                        )}
+                    </Button>
+                    {existingStudent && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="h-10 text-xs"
+                            onClick={() => {
+                                setExistingStudent(null);
+                                form.reset(defaultValues);
+                            }}
+                        >
+                            Batalkan & Input Nama Lain
+                        </Button>
+                    )}
+                </div>
             </FieldGroup>
         </form>
     );

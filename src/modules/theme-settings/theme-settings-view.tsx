@@ -44,6 +44,7 @@ export function ThemeSettingsView() {
     const [activeTab, setActiveTab] = useState<
         'presets' | 'colors' | 'logo' | 'radius' | 'components'
     >('presets');
+    const [previewInputText, setPreviewInputText] = useState('Bimbel Cabang Utama');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleSave = async () => {
@@ -1039,7 +1040,8 @@ export function ThemeSettingsView() {
                                 </span>
                                 <Input
                                     placeholder="Contoh input teks dengan fokus ring tema..."
-                                    defaultValue={logo.text || 'Bimbel Cabang Utama'}
+                                    value={previewInputText}
+                                    onChange={(e) => setPreviewInputText(e.target.value)}
                                     className="text-xs"
                                     style={{ borderRadius: theme.radius }}
                                 />

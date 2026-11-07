@@ -22,10 +22,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { IconPicker } from '@/components/icon-picker';
 import { MENU_ACTIVE_OPTIONS, MENU_TYPE_OPTIONS } from '@/lib/ems-constants';
 
 const formSchema = z.object({
-    parent_id: z.number().optional(),
+    parent_id: z.number().nullable().optional(),
     name: z.string().trim().min(1, { message: 'Name is required' }),
     type: z.enum(['GROUP', 'ITEM']),
     icon: z.string().optional(),
@@ -99,13 +100,27 @@ export default function MenuForm({ type, slug, onSuccess }: MenuFormProps) {
         try {
             const response = await http.get(`menus?slug=${slug}`);
             const { data } = response.data;
-            form.setValue('name', data.name || '');
-            form.setValue('type', data.type || 'GROUP');
-            form.setValue('icon', data.icon || '');
-            form.setValue('url', data.url || '');
-            form.setValue('description', data.description || '');
-            form.setValue('sort_order', data.sort_order || 0);
-            form.setValue('is_active', data.is_active ?? true);
+            if (data) {
+                const isActive =
+                    data.is_active === 1 ||
+                    data.is_active === true ||
+                    data.is_active === '1' ||
+                    data.is_active === 'true';
+
+                form.reset({
+                    parent_id:
+                        data.parent_id !== null && data.parent_id !== undefined
+                            ? Number(data.parent_id)
+                            : undefined,
+                    name: data.name || '',
+                    type: data.type || 'GROUP',
+                    icon: data.icon || '',
+                    url: data.url || '',
+                    description: data.description || '-',
+                    sort_order: Number(data.sort_order ?? 0),
+                    is_active: isActive,
+                });
+            }
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({
@@ -120,6 +135,7 @@ export default function MenuForm({ type, slug, onSuccess }: MenuFormProps) {
         if (slug) {
             getMenu();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slug]);
 
     return (
@@ -156,7 +172,9 @@ export default function MenuForm({ type, slug, onSuccess }: MenuFormProps) {
                                     items={MENU_TYPE_OPTIONS}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Pilih Tipe" />
+                                        <SelectValue placeholder="Pilih Tipe">
+                                            {field.value === 'GROUP' ? 'Group' : 'Item'}
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="GROUP">Group</SelectItem>
@@ -172,12 +190,12 @@ export default function MenuForm({ type, slug, onSuccess }: MenuFormProps) {
                         control={form.control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor="icon">Ikon</FieldLabel>
-                                <Input
-                                    {...field}
+                                <FieldLabel htmlFor="icon">Ikon (Iconify)</FieldLabel>
+                                <IconPicker
                                     id="icon"
-                                    placeholder="Masukan Ikon"
-                                    className="h-10"
+                                    value={field.value || ''}
+                                    onChange={field.onChange}
+                                    placeholder="Pilih atau cari ikon (mis. bxs:dashboard)"
                                 />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
@@ -229,7 +247,9 @@ export default function MenuForm({ type, slug, onSuccess }: MenuFormProps) {
                                     items={MENU_ACTIVE_OPTIONS}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Pilih Status" />
+                                        <SelectValue placeholder="Pilih Status">
+                                            {field.value ? 'Aktif' : 'Tidak Aktif'}
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="true">Aktif</SelectItem>

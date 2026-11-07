@@ -86,6 +86,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
     const [menuTree, setMenuTree] = useState<MenuItem[]>([]);
+    const [currentUser, setCurrentUser] = useState<{
+        id?: number | string;
+        full_name?: string;
+        email?: string;
+        role?: string;
+        avatar?: string | null;
+    } | null>(null);
 
     const buildTree = (rawMenu: any[]): MenuItem[] => {
         const tree: MenuItem[] = [];
@@ -112,6 +119,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             localStorage.removeItem('token');
             localStorage.removeItem('role');
+            localStorage.removeItem('user');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('menu');
 
             toast.add({
                 title: 'Berhasil keluar',
@@ -135,6 +145,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const menuData = localStorage.getItem('menu');
         const role = localStorage.getItem('role');
+
+        // Load cached user profile or fetch fresh from /auth/me
+        const cachedUser = localStorage.getItem('user');
+        if (cachedUser) {
+            try {
+                setCurrentUser(JSON.parse(cachedUser));
+            } catch {}
+        }
+
+        http.get('/auth/me')
+            .then((res) => {
+                const userData = res.data?.data;
+                if (userData) {
+                    setCurrentUser(userData);
+                    localStorage.setItem('user', JSON.stringify(userData));
+                }
+            })
+            .catch(() => {});
 
         const isSuperAdmin = role === 'super-admin' || role === 'super admin';
 
@@ -266,26 +294,52 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarContent>
                 <SidebarFooter>
                     <div className="flex items-center gap-3 rounded-sm px-2 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-                        <Avatar className="h-9 w-9 rounded-sm">
-                            <AvatarImage src="/assets/img/user.jpg" alt="User" />
+                        <Avatar className="h-9 w-9 rounded-sm shrink-0">
+                            <AvatarImage
+                                src={
+                                    currentUser?.avatar
+                                        ? currentUser.avatar.startsWith('http')
+                                            ? currentUser.avatar
+                                            : `/storage/${currentUser.avatar.replace(/^\/+/, '').replace('storage/', '')}`
+                                        : undefined
+                                }
+                                alt={currentUser?.full_name || 'User'}
+                            />
                             <AvatarFallback className="rounded-sm bg-brand-gradient text-primary-foreground text-xs font-semibold">
-                                U
+                                {currentUser?.full_name
+                                    ? currentUser.full_name
+                                          .trim()
+                                          .split(/\s+/)
+                                          .map((n) => n[0])
+                                          .slice(0, 2)
+                                          .join('')
+                                          .toUpperCase()
+                                    : 'U'}
                             </AvatarFallback>
                         </Avatar>
-                        <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                            <span className="truncate text-sm font-medium">Pengguna</span>
-                            <span className="truncate text-xs text-muted-foreground">
-                                user@gmail.com
+                        <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden min-w-0">
+                            <span
+                                className="truncate text-sm font-medium capitalize"
+                                title={currentUser?.full_name || 'Pengguna'}
+                            >
+                                {currentUser?.full_name || 'Pengguna'}
+                            </span>
+                            <span
+                                className="truncate text-xs text-muted-foreground"
+                                title={currentUser?.email || ''}
+                            >
+                                {currentUser?.email || (currentUser?.role ? `Role: ${currentUser.role}` : 'user@example.com')}
                             </span>
                         </div>
                         <Button
                             variant="ghost"
                             size="icon-sm"
-                            className="text-muted-foreground hover:text-destructive group-data-[collapsible=icon]:hidden"
+                            className="text-muted-foreground hover:text-destructive group-data-[collapsible=icon]:hidden shrink-0"
                             onClick={() => logout()}
                             aria-label="Keluar"
+                            title="Keluar / Logout"
                         >
-                            <LogOut />
+                            <LogOut className="size-4" />
                         </Button>
                     </div>
                 </SidebarFooter>

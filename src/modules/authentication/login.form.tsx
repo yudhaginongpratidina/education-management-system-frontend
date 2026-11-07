@@ -38,13 +38,16 @@ export default function LoginForm() {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
             const response = await http.post('/auth/login', values);
-            const { access_token } = response.data.data;
+            const { access_token, user } = response.data.data;
             const decoded = decodeJWT(access_token);
             console.log('decoded', decoded?.sub);
 
             localStorage.setItem('token', access_token);
             localStorage.setItem('role', decoded?.role || '');
             localStorage.setItem('user_id', decoded?.sub || '');
+            if (user) {
+                localStorage.setItem('user', JSON.stringify(user));
+            }
 
             const roleMenu = await http.get(`/role-menus/${decoded?.role}`);
             let menuData = roleMenu.data.data;
