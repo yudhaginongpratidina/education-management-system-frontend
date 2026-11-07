@@ -180,13 +180,20 @@ export default function StudentForm({ type, student, studentId, onSuccess }: Stu
         try {
             if (existingStudent?.id) {
                 // If student already exists, update their record instead of creating duplicate
-                const response = await http.put(`/students/${existingStudent.id}`, buildPayload(values));
+                const response = await http.put(
+                    `/students/${existingStudent.id}`,
+                    buildPayload(values),
+                );
                 toast.add({
                     title: 'Data Siswa Dimuat',
                     type: 'success',
                     description: `Menggunakan data siswa "${values.full_name}" (ID: #${existingStudent.id}). Melanjutkan ke assign program...`,
                 });
-                onSuccess({ ...values, id: existingStudent.id, ...(response.data?.data ?? response.data ?? {}) });
+                onSuccess({
+                    ...values,
+                    id: existingStudent.id,
+                    ...(response.data?.data ?? response.data ?? {}),
+                });
             } else if (type === 'create') {
                 const response = await http.post('/students', buildPayload(values));
                 toast.add({
@@ -227,8 +234,12 @@ export default function StudentForm({ type, student, studentId, onSuccess }: Stu
                                     </span>
                                 )}
                                 {!isCheckingName && existingStudent && (
-                                    <Badge variant="warning" className="gap-1 text-[10px] font-medium">
-                                        <UserCheck className="size-3" /> Siswa Sudah Terdaftar (ID: #{existingStudent.id})
+                                    <Badge
+                                        variant="warning"
+                                        className="gap-1 text-[10px] font-medium"
+                                    >
+                                        <UserCheck className="size-3" /> Siswa Sudah Terdaftar (ID:
+                                        #{existingStudent.id})
                                     </Badge>
                                 )}
                             </div>
@@ -260,10 +271,14 @@ export default function StudentForm({ type, student, studentId, onSuccess }: Stu
                                         <AlertCircle className="size-4 text-amber-600 shrink-0 mt-0.5" />
                                         <div className="flex-1 space-y-1">
                                             <p className="font-semibold text-xs">
-                                                Siswa &quot;{existingStudent.full_name}&quot; sudah ada di database (ID: #{existingStudent.id})
+                                                Siswa &quot;{existingStudent.full_name}&quot; sudah
+                                                ada di database (ID: #{existingStudent.id})
                                             </p>
                                             <p className="text-[11px] text-amber-800 dark:text-amber-300">
-                                                Data siswa ini telah dimuat otomatis agar tidak terjadi duplikasi data. Anda dapat langsung melanjutkan ke pendaftaran program siswa atau memperbarui profilnya.
+                                                Data siswa ini telah dimuat otomatis agar tidak
+                                                terjadi duplikasi data. Anda dapat langsung
+                                                melanjutkan ke pendaftaran program siswa atau
+                                                memperbarui profilnya.
                                             </p>
                                             <div className="pt-1.5 flex items-center gap-2 flex-wrap">
                                                 <Button

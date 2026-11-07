@@ -328,7 +328,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 className="truncate text-xs text-muted-foreground"
                                 title={currentUser?.email || ''}
                             >
-                                {currentUser?.email || (currentUser?.role ? `Role: ${currentUser.role}` : 'user@example.com')}
+                                {currentUser?.email ||
+                                    (currentUser?.role
+                                        ? `Role: ${currentUser.role}`
+                                        : 'user@example.com')}
                             </span>
                         </div>
                         <Button

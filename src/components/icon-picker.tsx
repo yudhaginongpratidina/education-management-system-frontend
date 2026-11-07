@@ -2,15 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Icon } from '@iconify/react';
-import {
-    Search,
-    Grid,
-    Check,
-    X,
-    Sparkles,
-    HelpCircle,
-    Loader2,
-} from 'lucide-react';
+import { Search, Grid, Check, X, Sparkles, HelpCircle, Loader2 } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -303,7 +295,8 @@ export function IconPicker({
                                 Pilih Ikon Menu (Iconify)
                             </DialogTitle>
                             <DialogDescription className="text-xs">
-                                Pilih ikon dari koleksi siap pakai atau cari dari ribuan ikon Iconify berdasarkan kata kunci.
+                                Pilih ikon dari koleksi siap pakai atau cari dari ribuan ikon
+                                Iconify berdasarkan kata kunci.
                             </DialogDescription>
 
                             {/* Search Bar */}
@@ -395,7 +388,9 @@ export function IconPicker({
                                                 <Icon
                                                     icon={iconName}
                                                     className={`size-6 transition-transform group-hover:scale-115 ${
-                                                        isSelected ? 'text-primary' : 'text-foreground'
+                                                        isSelected
+                                                            ? 'text-primary'
+                                                            : 'text-foreground'
                                                     }`}
                                                 />
                                                 <span className="mt-1.5 w-full text-[9px] font-mono text-muted-foreground truncate text-center group-hover:text-foreground">
@@ -417,7 +412,8 @@ export function IconPicker({
                                         Tidak ada ikon yang cocok
                                     </p>
                                     <p className="text-[11px] text-muted-foreground">
-                                        Coba gunakan kata kunci dalam bahasa Inggris (misal: home, user, book, chart, money, star).
+                                        Coba gunakan kata kunci dalam bahasa Inggris (misal: home,
+                                        user, book, chart, money, star).
                                     </p>
                                 </div>
                             )}
@@ -428,7 +424,10 @@ export function IconPicker({
                             <div className="flex items-center gap-2 min-w-0">
                                 {tempSelected ? (
                                     <div className="flex items-center gap-1.5 text-xs truncate">
-                                        <Icon icon={tempSelected} className="size-4 text-primary shrink-0" />
+                                        <Icon
+                                            icon={tempSelected}
+                                            className="size-4 text-primary shrink-0"
+                                        />
                                         <span className="font-mono text-[11px] text-foreground font-semibold truncate">
                                             {tempSelected}
                                         </span>
@@ -503,7 +502,11 @@ export function IconPicker({
             {/* Quick helper tip */}
             <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                 <span>
-                    Format: <code className="font-mono text-[10px] bg-muted/60 px-1 py-0.5 rounded">koleksi:nama-ikon</code> (misal: <code>bxs:dashboard</code>)
+                    Format:{' '}
+                    <code className="font-mono text-[10px] bg-muted/60 px-1 py-0.5 rounded">
+                        koleksi:nama-ikon
+                    </code>{' '}
+                    (misal: <code>bxs:dashboard</code>)
                 </span>
                 {value && (
                     <span className="flex items-center gap-1 text-primary font-medium text-[10px]">

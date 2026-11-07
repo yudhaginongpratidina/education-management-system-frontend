@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
-import { Camera, CameraOff, Maximize2, ExternalLink, Search, UserCheck, X, RefreshCw } from 'lucide-react';
+import {
+    Camera,
+    CameraOff,
+    Maximize2,
+    ExternalLink,
+    Search,
+    UserCheck,
+    X,
+    RefreshCw,
+} from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -844,7 +853,10 @@ export default function ReportsDashboard() {
                                 {isExportingPdf ? (
                                     <RefreshCw className="size-4 animate-spin text-rose-600" />
                                 ) : (
-                                    <Icon icon="mdi:file-pdf-box" className="text-rose-600 text-lg" />
+                                    <Icon
+                                        icon="mdi:file-pdf-box"
+                                        className="text-rose-600 text-lg"
+                                    />
                                 )}
                                 <span>
                                     {isExportingPdf
