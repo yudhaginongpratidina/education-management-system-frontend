@@ -56,7 +56,7 @@ export default function StudentProgramSummary({ id }: { id: number }) {
 
     return (
         <div className="space-y-4">
-            <div className="bg-muted/40 rounded-lg border p-3">
+            <div className="bg-muted/40 rounded-sm border p-3">
                 <p className="flex items-center gap-1.5 text-sm font-medium">
                     <Icon icon="mdi:package-variant-closed-check" className="text-primary" />
                     Ketentuan Paket
@@ -103,7 +103,7 @@ export default function StudentProgramSummary({ id }: { id: number }) {
                 {rows.map((row) => (
                     <div
                         key={row.label}
-                        className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2 text-sm"
+                        className="flex items-center justify-between rounded-sm border border-border/60 px-3 py-2 text-sm"
                     >
                         <span className="text-muted-foreground">{row.label}</span>
                         <span className="font-medium tabular-nums">{row.value}</span>

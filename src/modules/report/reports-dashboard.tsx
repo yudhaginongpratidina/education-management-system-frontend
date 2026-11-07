@@ -245,7 +245,7 @@ export default function ReportsDashboard() {
                         <CardContent className="flex items-center gap-3">
                             <span
                                 className={cn(
-                                    'flex size-11 items-center justify-center rounded-xl bg-muted',
+                                    'flex size-11 items-center justify-center rounded-sm bg-muted',
                                     card.tone,
                                 )}
                             >
@@ -302,7 +302,7 @@ export default function ReportsDashboard() {
                             <Icon icon="mdi:file-excel" /> Export
                         </Button>
                     </div>
-                    <div className="overflow-auto rounded-md border">
+                    <div className="overflow-auto rounded-sm border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -388,7 +388,7 @@ export default function ReportsDashboard() {
                     </div>
 
                     {studentView === 'rekap' ? (
-                        <div className="overflow-auto rounded-md border">
+                        <div className="overflow-auto rounded-sm border">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -447,7 +447,7 @@ export default function ReportsDashboard() {
                             </Table>
                         </div>
                     ) : (
-                        <div className="max-h-150 overflow-auto rounded-md border">
+                        <div className="max-h-150 overflow-auto rounded-sm border">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -514,7 +514,7 @@ export default function ReportsDashboard() {
                             <Icon icon="mdi:file-excel" /> Export
                         </Button>
                     </div>
-                    <div className="max-h-150 overflow-auto rounded-md border">
+                    <div className="max-h-150 overflow-auto rounded-sm border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -590,7 +590,7 @@ export default function ReportsDashboard() {
                             <Icon icon="mdi:file-excel" /> Export
                         </Button>
                     </div>
-                    <div className="max-h-150 overflow-auto rounded-md border">
+                    <div className="max-h-150 overflow-auto rounded-sm border">
                         <Table>
                             <TableHeader>
                                 <TableRow>

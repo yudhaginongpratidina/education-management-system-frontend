@@ -64,9 +64,7 @@ export default function StudentAssignDialog({
     const [selectedLevelId, setSelectedLevelId] = useState<string>('');
     const [selectedPackageId, setSelectedPackageId] = useState<string>('');
     const [status, setStatus] = useState<string>('ACTIVE');
-    const [startedAt, setStartedAt] = useState<string>(
-        new Date().toISOString().slice(0, 10),
-    );
+    const [startedAt, setStartedAt] = useState<string>(new Date().toISOString().slice(0, 10));
     const [notes, setNotes] = useState<string>('');
 
     // Metadata state
@@ -339,15 +337,19 @@ export default function StudentAssignDialog({
                         Assign Siswa ke Cabang & Pelajaran
                     </DialogTitle>
                     <DialogDescription className="text-sm">
-                        Tugaskan satu atau banyak siswa sekaligus ke cabang belajar, program pelajaran, level, dan paket pembelajaran.
+                        Tugaskan satu atau banyak siswa sekaligus ke cabang belajar, program
+                        pelajaran, level, dan paket pembelajaran.
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 space-y-5 overflow-hidden">
+                <form
+                    onSubmit={handleSubmit}
+                    className="flex-1 flex flex-col min-h-0 space-y-5 overflow-hidden"
+                >
                     {/* Main content grid: Left side (Students) & Right side (Branch & Program Details) */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0 overflow-y-auto pr-1">
                         {/* LEFT COLUMN: Student Multi-Select (col-span-5) */}
-                        <div className="lg:col-span-5 flex flex-col rounded-xl border bg-muted/20 p-4 space-y-3">
+                        <div className="lg:col-span-5 flex flex-col rounded-sm border bg-muted/20 p-4 space-y-3">
                             <div className="flex items-center justify-between gap-2">
                                 <div className="space-y-0.5">
                                     <span className="text-sm font-bold text-foreground">
@@ -407,7 +409,7 @@ export default function StudentAssignDialog({
                             </div>
 
                             {/* Students list */}
-                            <div className="flex-1 min-h-[220px] max-h-[300px] overflow-y-auto divide-y rounded-lg border bg-background">
+                            <div className="flex-1 min-h-[220px] max-h-[300px] overflow-y-auto divide-y rounded-sm border bg-background">
                                 {filteredStudents.length === 0 ? (
                                     <div className="p-6 text-center text-xs text-muted-foreground">
                                         Tidak ada siswa yang sesuai pencarian.
@@ -427,7 +429,7 @@ export default function StudentAssignDialog({
                                                     type="checkbox"
                                                     checked={isSelected}
                                                     onChange={() => {}}
-                                                    className="h-4 w-4 rounded border-gray-300 text-primary cursor-pointer mt-0.5 shrink-0"
+                                                    className="h-4 w-4 rounded-sm border-gray-300 text-primary cursor-pointer mt-0.5 shrink-0"
                                                 />
                                                 <div className="flex-1 min-w-0 space-y-0.5">
                                                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -450,7 +452,9 @@ export default function StudentAssignDialog({
                                                     {s.branch_name && (
                                                         <div className="text-[11px] text-primary/80">
                                                             Cabang: {s.branch_name}
-                                                            {s.program_name ? ` • ${s.program_name}` : ''}
+                                                            {s.program_name
+                                                                ? ` • ${s.program_name}`
+                                                                : ''}
                                                         </div>
                                                     )}
                                                 </div>
@@ -472,11 +476,11 @@ export default function StudentAssignDialog({
                                     <span className="text-[11px] text-muted-foreground font-medium">
                                         Daftar Nama Terpilih ({selectedStudentsList.length}):
                                     </span>
-                                    <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto p-1.5 rounded-md border bg-background/50">
+                                    <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto p-1.5 rounded-sm border bg-background/50">
                                         {selectedStudentsList.map((s) => (
                                             <span
                                                 key={s.id}
-                                                className="inline-flex items-center gap-1 rounded-md bg-primary/10 border border-primary/20 px-2 py-0.5 text-xs text-primary font-medium"
+                                                className="inline-flex items-center gap-1 rounded-sm bg-primary/10 border border-primary/20 px-2 py-0.5 text-xs text-primary font-medium"
                                             >
                                                 <span>{s.full_name}</span>
                                                 <button
@@ -496,13 +500,14 @@ export default function StudentAssignDialog({
 
                         {/* RIGHT COLUMN: Branch, Program, Level, Package (col-span-7) */}
                         <div className="lg:col-span-7 flex flex-col space-y-4">
-                            <div className="rounded-xl border p-4 space-y-4 bg-card shadow-xs">
+                            <div className="rounded-sm border p-4 space-y-4 bg-card shadow-xs">
                                 <div className="border-b pb-2">
                                     <h4 className="text-sm font-bold text-foreground">
                                         Pilihan Cabang & Kurikulum Belajar
                                     </h4>
                                     <p className="text-xs text-muted-foreground">
-                                        Pilih cabang dan pelajaran yang akan diikuti oleh siswa terpilih.
+                                        Pilih cabang dan pelajaran yang akan diikuti oleh siswa
+                                        terpilih.
                                     </p>
                                 </div>
 
@@ -642,13 +647,16 @@ export default function StudentAssignDialog({
 
                                 {/* Package snapshot card */}
                                 {selectedPackage && (
-                                    <div className="rounded-lg border border-primary/25 bg-primary/5 p-3.5 text-xs space-y-1.5">
+                                    <div className="rounded-sm border border-primary/25 bg-primary/5 p-3.5 text-xs space-y-1.5">
                                         <div className="font-semibold text-primary flex items-center justify-between">
                                             <span className="flex items-center gap-1.5">
-                                                <Icon icon="mdi:tag-outline" className="text-base" />
+                                                <Icon
+                                                    icon="mdi:tag-outline"
+                                                    className="text-base"
+                                                />
                                                 Paket: <strong>{selectedPackage.name}</strong>
                                             </span>
-                                            <span className="text-primary font-bold text-sm bg-primary/10 px-2 py-0.5 rounded">
+                                            <span className="text-primary font-bold text-sm bg-primary/10 px-2 py-0.5 rounded-sm">
                                                 {formatCurrency(selectedPackage.selling_price)}
                                             </span>
                                         </div>
@@ -662,7 +670,8 @@ export default function StudentAssignDialog({
                                             <div>
                                                 <span>Pertemuan:</span>{' '}
                                                 <strong className="text-foreground">
-                                                    {selectedPackage.sessions_per_period}x / {selectedPackage.session_period}
+                                                    {selectedPackage.sessions_per_period}x /{' '}
+                                                    {selectedPackage.session_period}
                                                 </strong>
                                             </div>
                                             <div>
@@ -694,7 +703,7 @@ export default function StudentAssignDialog({
                             </div>
 
                             {/* Summary bar */}
-                            <div className="rounded-xl border bg-muted/40 p-3.5 text-xs flex flex-wrap items-center justify-between gap-2">
+                            <div className="rounded-sm border bg-muted/40 p-3.5 text-xs flex flex-wrap items-center justify-between gap-2">
                                 <div className="space-y-0.5">
                                     <span className="text-muted-foreground font-medium">
                                         Ringkasan Penugasan:
@@ -753,7 +762,8 @@ export default function StudentAssignDialog({
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <Icon icon="mdi:loading" className="animate-spin" /> Menyimpan...
+                                        <Icon icon="mdi:loading" className="animate-spin" />{' '}
+                                        Menyimpan...
                                     </>
                                 ) : (
                                     <>

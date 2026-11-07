@@ -27,12 +27,12 @@ export default function LearningMethod() {
                     {steps.map((step, index) => (
                         <div
                             key={step.id ?? step.title}
-                            className="relative rounded-2xl border border-border/60 bg-card p-6 shadow-card"
+                            className="relative rounded-sm border border-border/60 bg-card p-6 shadow-card"
                         >
                             <span className="font-heading absolute top-5 right-5 text-3xl font-bold text-muted-foreground/25">
                                 {String(index + 1).padStart(2, '0')}
                             </span>
-                            <div className="bg-brand-gradient-soft text-primary mb-5 flex size-12 items-center justify-center rounded-2xl">
+                            <div className="bg-brand-gradient-soft text-primary mb-5 flex size-12 items-center justify-center rounded-sm">
                                 <Icon icon={step.icon} className="text-2xl" />
                             </div>
                             <h3 className="font-heading mb-1 text-lg font-semibold">

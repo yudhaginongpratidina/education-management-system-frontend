@@ -30,7 +30,7 @@ export default function Schedule() {
                     </p>
                 </div>
 
-                <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
+                <div className="overflow-hidden rounded-sm border border-border/60 bg-card shadow-card">
                     <Table>
                         <TableHeader>
                             <TableRow>

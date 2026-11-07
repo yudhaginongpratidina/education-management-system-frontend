@@ -262,7 +262,7 @@ export default function SessionForm({ type, classId, session, onSuccess }: Sessi
             {type === 'create' && classId && members.length > 0 && (
                 <Field>
                     <FieldLabel>Peserta Sesi</FieldLabel>
-                    <div className="max-h-40 space-y-2 overflow-auto rounded-md border p-2">
+                    <div className="max-h-40 space-y-2 overflow-auto rounded-sm border p-2">
                         {members.map((member) => (
                             <div
                                 key={member.student_program_id}

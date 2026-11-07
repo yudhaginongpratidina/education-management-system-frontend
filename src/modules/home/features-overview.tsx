@@ -14,9 +14,9 @@ export default function FeaturesOverview() {
                     {features.map((feature) => (
                         <div
                             key={feature.id ?? feature.title}
-                            className="group hover:border-primary/30 rounded-2xl border border-border/60 bg-card p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
+                            className="group hover:border-primary/30 rounded-sm border border-border/60 bg-card p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
                         >
-                            <div className="bg-brand-gradient-soft text-primary mb-5 flex size-12 items-center justify-center rounded-2xl">
+                            <div className="bg-brand-gradient-soft text-primary mb-5 flex size-12 items-center justify-center rounded-sm">
                                 <Icon icon={feature.icon} className="text-2xl" />
                             </div>
                             <h3 className="font-heading mb-2 text-lg font-semibold">

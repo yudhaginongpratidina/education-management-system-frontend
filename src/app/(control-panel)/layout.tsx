@@ -59,7 +59,7 @@ function Brand() {
         <SidebarMenu>
             <SidebarMenuItem>
                 <SidebarMenuButton size="lg" tooltip="EMS — Bimbel Management">
-                    <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-brand-gradient text-primary-foreground shadow-brand">
+                    <div className="flex aspect-square size-9 items-center justify-center rounded-sm bg-brand-gradient text-primary-foreground shadow-brand">
                         <GraduationCap className="size-5" />
                     </div>
                     <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
@@ -207,7 +207,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                 <Icon
                                                                     icon={
                                                                         child.icon ||
-                                                                        'material-symbols:menu-rounded'
+                                                                        'material-symbols:menu-rounded-sm'
                                                                     }
                                                                 />
                                                                 <span className="capitalize group-data-[collapsible=icon]:hidden">
@@ -236,7 +236,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                         <Icon
                                                             icon={
                                                                 item.icon ||
-                                                                'material-symbols:menu-rounded'
+                                                                'material-symbols:menu-rounded-sm'
                                                             }
                                                         />
                                                         <span className="capitalize group-data-[collapsible=icon]:hidden">
@@ -254,10 +254,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     })}
                 </SidebarContent>
                 <SidebarFooter>
-                    <div className="flex items-center gap-3 rounded-xl px-2 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-                        <Avatar className="h-9 w-9 rounded-lg">
+                    <div className="flex items-center gap-3 rounded-sm px-2 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+                        <Avatar className="h-9 w-9 rounded-sm">
                             <AvatarImage src="/assets/img/user.jpg" alt="User" />
-                            <AvatarFallback className="rounded-lg bg-brand-gradient text-primary-foreground text-xs font-semibold">
+                            <AvatarFallback className="rounded-sm bg-brand-gradient text-primary-foreground text-xs font-semibold">
                                 U
                             </AvatarFallback>
                         </Avatar>
@@ -299,7 +299,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             <input
                                 type="search"
                                 placeholder="Cari..."
-                                className="h-9 w-56 rounded-lg border border-input bg-card/70 pr-3 pl-9 text-sm outline-none transition-[box-shadow,border-color] placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+                                className="h-9 w-56 rounded-sm border border-input bg-card/70 pr-3 pl-9 text-sm outline-none transition-[box-shadow,border-color] placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
                             />
                         </div>
                         <Button

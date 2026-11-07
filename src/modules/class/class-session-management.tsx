@@ -359,7 +359,7 @@ export default function ClassSessionManagement({
                 </div>
             </div>
 
-            <div className="max-h-150 overflow-auto rounded-md border">
+            <div className="max-h-150 overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>

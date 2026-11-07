@@ -29,7 +29,7 @@ export default function Pricing() {
                     {plans.map((plan) => (
                         <div
                             key={plan.id ?? plan.name}
-                            className={`relative flex flex-col rounded-3xl border p-8 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft ${
+                            className={`relative flex flex-col rounded-sm border p-8 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft ${
                                 plan.featured
                                     ? 'border-primary/40 bg-card ring-2 ring-primary/20'
                                     : 'border-border/60 bg-card'
@@ -81,7 +81,7 @@ export default function Pricing() {
                 </div>
 
                 {pricing.discounts.length > 0 && (
-                    <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-border/60 bg-card p-5 text-sm text-muted-foreground shadow-card">
+                    <div className="mx-auto mt-8 max-w-3xl rounded-sm border border-border/60 bg-card p-5 text-sm text-muted-foreground shadow-card">
                         <p className="mb-2 flex items-center gap-2 font-medium text-foreground">
                             <Icon icon="mdi:tag-outline" className="text-primary text-lg" />
                             Potongan yang tersedia

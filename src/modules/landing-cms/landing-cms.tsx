@@ -277,7 +277,7 @@ export function LandingCms() {
             <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                     <div className="flex items-center gap-2">
-                        <span className="bg-brand-gradient text-primary-foreground flex size-9 items-center justify-center rounded-xl shadow-brand">
+                        <span className="bg-brand-gradient text-primary-foreground flex size-9 items-center justify-center rounded-sm shadow-brand">
                             <Icon icon="mdi:monitor-dashboard" className="text-xl" />
                         </span>
                         <h1 className="font-heading text-2xl font-bold tracking-tight">
@@ -307,7 +307,7 @@ export function LandingCms() {
             <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
                 {/* Nav */}
                 <aside className="lg:sticky lg:top-6 lg:self-start">
-                    <div className="flex gap-1 overflow-x-auto rounded-xl border border-border/70 bg-card p-2 shadow-card lg:flex-col lg:overflow-visible">
+                    <div className="flex gap-1 overflow-x-auto rounded-sm border border-border/70 bg-card p-2 shadow-card lg:flex-col lg:overflow-visible">
                         {groups.map(([group, items]) => (
                             <div key={group} className="contents lg:block">
                                 <p className="hidden px-2.5 pt-3 pb-1 text-[0.6875rem] font-semibold tracking-wider text-muted-foreground uppercase lg:block">
@@ -319,7 +319,7 @@ export function LandingCms() {
                                         type="button"
                                         onClick={() => setActive(item.key)}
                                         className={cn(
-                                            'flex shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium whitespace-nowrap transition-colors lg:w-full',
+                                            'flex shrink-0 items-center gap-2.5 rounded-sm px-2.5 py-2 text-sm font-medium whitespace-nowrap transition-colors lg:w-full',
                                             active === item.key
                                                 ? 'bg-accent text-accent-foreground'
                                                 : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
@@ -509,10 +509,10 @@ function Overview({
                             key={row.key}
                             type="button"
                             onClick={() => onEdit(row.key)}
-                            className="hover:border-primary/40 group flex flex-col rounded-xl border border-border/70 bg-card p-4 text-left shadow-card transition-all hover:-translate-y-0.5 hover:shadow-soft"
+                            className="hover:border-primary/40 group flex flex-col rounded-sm border border-border/70 bg-card p-4 text-left shadow-card transition-all hover:-translate-y-0.5 hover:shadow-soft"
                         >
                             <div className="mb-3 flex items-center justify-between">
-                                <span className="bg-brand-gradient-soft text-primary flex size-9 items-center justify-center rounded-xl">
+                                <span className="bg-brand-gradient-soft text-primary flex size-9 items-center justify-center rounded-sm">
                                     <Icon
                                         icon={navItem?.icon ?? 'mdi:file-outline'}
                                         className="text-lg"
@@ -535,7 +535,7 @@ function Overview({
                 })}
             </div>
 
-            <div className="bg-brand-gradient-soft flex items-start gap-3 rounded-xl p-4">
+            <div className="bg-brand-gradient-soft flex items-start gap-3 rounded-sm p-4">
                 <Icon icon="mdi:information-outline" className="text-primary mt-0.5 text-lg" />
                 <p className="text-sm text-muted-foreground">
                     Setiap perubahan disimpan ke backend melalui tombol Simpan, lalu langsung

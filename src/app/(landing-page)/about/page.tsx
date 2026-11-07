@@ -39,9 +39,9 @@ export default function AboutPage() {
                             <img
                                 src="/assets/img/about-2.jpg"
                                 alt="Tentang kami"
-                                className="w-full rounded-3xl shadow-soft"
+                                className="w-full rounded-sm shadow-soft"
                             />
-                            <div className="bg-brand-gradient text-primary-foreground absolute -right-6 -bottom-6 hidden rounded-2xl p-7 shadow-brand md:block">
+                            <div className="bg-brand-gradient text-primary-foreground absolute -right-6 -bottom-6 hidden rounded-sm p-7 shadow-brand md:block">
                                 <p className="font-heading text-4xl font-bold">10+</p>
                                 <p className="text-sm text-primary-foreground/85">
                                     Tahun pengalaman

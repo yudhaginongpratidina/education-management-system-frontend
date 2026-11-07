@@ -23,7 +23,7 @@ export default function Header() {
         <header className="glass sticky top-0 z-50 border-b border-border/60">
             <div className="container mx-auto flex items-center justify-between px-4 py-3">
                 <Link href="/" className="flex items-center gap-2.5">
-                    <span className="flex size-10 items-center justify-center rounded-xl bg-brand-gradient text-primary-foreground shadow-brand">
+                    <span className="flex size-10 items-center justify-center rounded-sm bg-brand-gradient text-primary-foreground shadow-brand">
                         <GraduationCap className="size-5" />
                     </span>
                     <span className="leading-tight">
@@ -46,7 +46,7 @@ export default function Header() {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                                    'rounded-sm px-3 py-2 text-sm font-medium transition-colors',
                                     active
                                         ? 'bg-accent text-accent-foreground'
                                         : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
@@ -90,7 +90,7 @@ export default function Header() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                                className="rounded-sm px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 {item.label}

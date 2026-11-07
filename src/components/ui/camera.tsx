@@ -218,7 +218,7 @@ export function Camera({
                     <Button
                         type="button"
                         onClick={handleRetake}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
                     >
                         Ambil Ulang (Retake)
                     </Button>
@@ -226,7 +226,7 @@ export function Camera({
                     <Button
                         type="button"
                         onClick={startCamera}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
                     >
                         Start Camera
                     </Button>

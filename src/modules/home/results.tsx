@@ -36,7 +36,7 @@ export default function Results() {
                             {stats.map((stat) => (
                                 <div
                                     key={stat.label}
-                                    className="rounded-2xl border border-border/60 bg-card p-5 shadow-card"
+                                    className="rounded-sm border border-border/60 bg-card p-5 shadow-card"
                                 >
                                     <p className="font-heading text-primary text-3xl font-bold">
                                         {stat.value}
@@ -48,7 +48,7 @@ export default function Results() {
                         </div>
                     </div>
 
-                    <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-card md:p-8">
+                    <div className="rounded-sm border border-border/60 bg-card p-6 shadow-card md:p-8">
                         <h3 className="font-heading mb-1 text-lg font-semibold">
                             Rata-rata kenaikan nilai
                         </h3>
@@ -73,7 +73,7 @@ export default function Results() {
                                 </div>
                             ))}
                         </div>
-                        <div className="bg-brand-gradient-soft mt-6 flex items-start gap-3 rounded-2xl p-4">
+                        <div className="bg-brand-gradient-soft mt-6 flex items-start gap-3 rounded-sm p-4">
                             <Icon
                                 icon="mdi:lightbulb-on-outline"
                                 className="text-primary mt-0.5 text-xl"

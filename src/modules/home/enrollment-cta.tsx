@@ -13,7 +13,7 @@ export default function EnrollmentCta() {
     return (
         <section className="bg-muted/40 py-20">
             <div className="container mx-auto px-4">
-                <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-6 shadow-card md:p-10">
+                <div className="relative overflow-hidden rounded-sm border border-border/60 bg-card p-6 shadow-card md:p-10">
                     <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
                         <div>
                             <span className="text-primary mb-3 inline-block text-sm font-semibold tracking-wide uppercase">

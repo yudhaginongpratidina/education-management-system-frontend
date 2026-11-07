@@ -16,9 +16,9 @@ export default function About() {
                         <img
                             src={formatImageUrl(about.image || '/assets/img/about.jpg')}
                             alt="Suasana belajar"
-                            className="w-full rounded-3xl object-cover shadow-soft"
+                            className="w-full rounded-sm object-cover shadow-soft"
                         />
-                        <div className="bg-brand-gradient absolute -right-4 -bottom-6 hidden rounded-2xl p-6 text-primary-foreground shadow-brand md:block">
+                        <div className="bg-brand-gradient absolute -right-4 -bottom-6 hidden rounded-sm p-6 text-primary-foreground shadow-brand md:block">
                             <p className="font-heading text-3xl font-bold">{about.badgeYear}</p>
                             <p className="text-sm text-primary-foreground/85">{about.badgeLabel}</p>
                         </div>
@@ -50,7 +50,7 @@ export default function About() {
                     {about.milestones.map((milestone) => (
                         <li
                             key={milestone.id ?? milestone.year}
-                            className="rounded-2xl border border-border/60 bg-card p-5 shadow-card"
+                            className="rounded-sm border border-border/60 bg-card p-5 shadow-card"
                         >
                             <p className="font-heading text-primary text-2xl font-bold">
                                 {milestone.year}

@@ -14,7 +14,7 @@ export default function MySessionDashboard() {
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-brand-gradient p-2.5 text-primary-foreground shadow-brand">
+                <div className="rounded-sm bg-brand-gradient p-2.5 text-primary-foreground shadow-brand">
                     <Icon icon="mdi:teach" className="size-5" />
                 </div>
                 <div>

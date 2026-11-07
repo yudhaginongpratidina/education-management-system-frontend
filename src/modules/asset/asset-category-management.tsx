@@ -115,7 +115,7 @@ export default function AssetCategoryManagement({ onChanged }: { onChanged?: () 
                 </Dialog>
             </div>
 
-            <div className="overflow-auto rounded-md border">
+            <div className="overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>

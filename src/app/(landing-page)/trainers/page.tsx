@@ -60,9 +60,9 @@ export default function TrainersPage() {
                         {standards.map((item) => (
                             <div
                                 key={item.title}
-                                className="hover:border-primary/30 rounded-2xl border border-border/60 bg-card p-6 shadow-card transition-colors"
+                                className="hover:border-primary/30 rounded-sm border border-border/60 bg-card p-6 shadow-card transition-colors"
                             >
-                                <div className="bg-brand-gradient-soft text-primary mb-5 flex size-12 items-center justify-center rounded-2xl">
+                                <div className="bg-brand-gradient-soft text-primary mb-5 flex size-12 items-center justify-center rounded-sm">
                                     <Icon icon={item.icon} className="text-2xl" />
                                 </div>
                                 <h3 className="font-heading mb-2 font-semibold">{item.title}</h3>

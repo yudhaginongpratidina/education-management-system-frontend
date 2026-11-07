@@ -335,7 +335,7 @@ export default function AttendancePage() {
                                     className={cn(
                                         'py-2 text-sm font-semibold rounded-sm transition-all cursor-pointer capitalize',
                                         attendanceType === tab
-                                            ? 'bg-white text-indigo-700 shadow-sm'
+                                            ? 'bg-white text-primary shadow-sm'
                                             : 'text-slate-600 hover:text-slate-900',
                                     )}
                                 >

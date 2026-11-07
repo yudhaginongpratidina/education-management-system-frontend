@@ -28,7 +28,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div className="pointer-events-none absolute -bottom-32 -left-16 size-80 rounded-full bg-black/10 blur-3xl" />
 
                 <div className="relative flex items-center gap-3">
-                    <div className="flex size-11 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                    <div className="flex size-11 items-center justify-center rounded-sm bg-white/15 backdrop-blur">
                         <GraduationCap className="size-6" />
                     </div>
                     <div className="leading-tight">
@@ -48,7 +48,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <ul className="space-y-4">
                         {highlights.map((item) => (
                             <li key={item.title} className="flex items-start gap-3">
-                                <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/15 backdrop-blur">
+                                <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-sm bg-white/15 backdrop-blur">
                                     <item.icon className="size-4.5" />
                                 </div>
                                 <div>
@@ -70,7 +70,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div className="gradient-mesh flex flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
                 <div className="flex w-full max-w-sm flex-col gap-6">
                     <div className="flex items-center gap-2 self-center lg:hidden">
-                        <div className="flex size-9 items-center justify-center rounded-xl bg-brand-gradient text-primary-foreground">
+                        <div className="flex size-9 items-center justify-center rounded-sm bg-brand-gradient text-primary-foreground">
                             <GraduationCap className="size-5" />
                         </div>
                         <span className="font-heading text-lg font-semibold">EMS</span>

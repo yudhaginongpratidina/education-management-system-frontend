@@ -50,7 +50,7 @@ export function StatsCard({
                 <CardDescription className="flex items-center gap-2.5 text-sm font-medium">
                     <span
                         className={cn(
-                            'flex size-9 items-center justify-center rounded-xl',
+                            'flex size-9 items-center justify-center rounded-sm',
                             toneClasses[tone],
                         )}
                     >
@@ -62,7 +62,7 @@ export function StatsCard({
                     {value}
                 </CardTitle>
                 <CardAction>
-                    <span className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/12 group-hover:text-primary">
+                    <span className="flex size-8 items-center justify-center rounded-sm bg-muted text-muted-foreground transition-colors group-hover:bg-primary/12 group-hover:text-primary">
                         <ArrowUpRight className="size-4" />
                     </span>
                 </CardAction>

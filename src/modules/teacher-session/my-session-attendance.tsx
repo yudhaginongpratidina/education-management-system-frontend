@@ -136,7 +136,7 @@ export default function MySessionAttendance({
     return (
         <div className="space-y-4">
             {locked && (
-                <div className="rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
+                <div className="rounded-sm border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning">
                     Sesi sudah {sessionStatus}. Kehadiran tidak dapat diubah lagi.
                 </div>
             )}
@@ -155,7 +155,7 @@ export default function MySessionAttendance({
                 </Button>
             </div>
 
-            <div className="max-h-100 overflow-auto rounded-md border">
+            <div className="max-h-100 overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>

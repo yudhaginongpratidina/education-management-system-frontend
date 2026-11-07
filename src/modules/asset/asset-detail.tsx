@@ -293,7 +293,7 @@ export default function AssetDetail({ id }: { id: number }) {
 
             <div>
                 <p className="font-heading mb-2 text-sm font-semibold">Riwayat Perpindahan Aset</p>
-                <div className="max-h-70 overflow-auto rounded-md border">
+                <div className="max-h-70 overflow-auto rounded-sm border">
                     <Table>
                         <TableHeader>
                             <TableRow>

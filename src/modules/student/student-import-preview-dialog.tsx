@@ -176,15 +176,18 @@ export default function StudentImportPreviewDialog({
 
                 {/* Summary badges */}
                 <div className="grid grid-cols-3 gap-3 my-2">
-                    <div className="flex items-center justify-between rounded-lg border bg-muted/40 p-3">
+                    <div className="flex items-center justify-between rounded-sm border bg-muted/40 p-3">
                         <div className="space-y-0.5">
                             <p className="text-xs text-muted-foreground font-medium">Total Data</p>
                             <p className="text-xl font-bold">{previewData?.total_rows ?? 0}</p>
                         </div>
-                        <Icon icon="mdi:format-list-numbered" className="text-2xl text-muted-foreground" />
+                        <Icon
+                            icon="mdi:format-list-numbered"
+                            className="text-2xl text-muted-foreground"
+                        />
                     </div>
 
-                    <div className="flex items-center justify-between rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 dark:bg-emerald-950/20">
+                    <div className="flex items-center justify-between rounded-sm border border-emerald-500/20 bg-emerald-500/5 p-3 dark:bg-emerald-950/20">
                         <div className="space-y-0.5">
                             <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                                 Siap Diimpor
@@ -196,7 +199,7 @@ export default function StudentImportPreviewDialog({
                         <Icon icon="mdi:check-circle" className="text-2xl text-emerald-600" />
                     </div>
 
-                    <div className="flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 dark:bg-amber-950/20">
+                    <div className="flex items-center justify-between rounded-sm border border-amber-500/20 bg-amber-500/5 p-3 dark:bg-amber-950/20">
                         <div className="space-y-0.5">
                             <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
                                 Bermasalah / Duplikat
@@ -210,7 +213,7 @@ export default function StudentImportPreviewDialog({
                 </div>
 
                 {/* Table container with scroll */}
-                <div className="flex-1 overflow-auto rounded-md border min-h-[260px] max-h-[380px]">
+                <div className="flex-1 overflow-auto rounded-sm border min-h-[260px] max-h-[380px]">
                     <Table>
                         <TableHeader className="sticky top-0 bg-background z-10 shadow-xs">
                             <TableRow>
@@ -218,10 +221,11 @@ export default function StudentImportPreviewDialog({
                                     <input
                                         type="checkbox"
                                         checked={
-                                            rows.length > 0 && selectedIndexes.length === rows.length
+                                            rows.length > 0 &&
+                                            selectedIndexes.length === rows.length
                                         }
                                         onChange={toggleSelectAll}
-                                        className="h-4 w-4 rounded border-gray-300 cursor-pointer"
+                                        className="h-4 w-4 rounded-sm border-gray-300 cursor-pointer"
                                         title="Pilih Semua"
                                     />
                                 </TableHead>
@@ -239,7 +243,10 @@ export default function StudentImportPreviewDialog({
                         <TableBody>
                             {rows.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                                    <TableCell
+                                        colSpan={10}
+                                        className="text-center py-8 text-muted-foreground"
+                                    >
                                         Tidak ada data yang terbaca dari file Excel.
                                     </TableCell>
                                 </TableRow>
@@ -263,7 +270,7 @@ export default function StudentImportPreviewDialog({
                                                     type="checkbox"
                                                     checked={isSelected}
                                                     onChange={() => toggleSelectRow(idx)}
-                                                    className="h-4 w-4 rounded border-gray-300 cursor-pointer"
+                                                    className="h-4 w-4 rounded-sm border-gray-300 cursor-pointer"
                                                 />
                                             </TableCell>
                                             <TableCell className="font-mono text-xs text-muted-foreground">
@@ -285,7 +292,11 @@ export default function StudentImportPreviewDialog({
                                                 )}
                                             </TableCell>
                                             <TableCell className="font-semibold">
-                                                {row.full_name || <span className="text-destructive">(Kosong)</span>}
+                                                {row.full_name || (
+                                                    <span className="text-destructive">
+                                                        (Kosong)
+                                                    </span>
+                                                )}
                                             </TableCell>
                                             <TableCell>{row.school_level || '-'}</TableCell>
                                             <TableCell className="text-xs">
@@ -293,19 +304,28 @@ export default function StudentImportPreviewDialog({
                                                 {row.birth_date ? `, ${row.birth_date}` : ''}
                                             </TableCell>
                                             <TableCell className="text-xs">
-                                                <div className="font-medium">{row.guardian_name || '-'}</div>
+                                                <div className="font-medium">
+                                                    {row.guardian_name || '-'}
+                                                </div>
                                                 <div className="text-muted-foreground">
                                                     {row.guardian_phone_number || '-'}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-xs max-w-[200px] truncate" title={row.address}>
+                                            <TableCell
+                                                className="text-xs max-w-[200px] truncate"
+                                                title={row.address}
+                                            >
                                                 {row.address || '-'}
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 {row.photos_of_children_may_be_posted ? (
-                                                    <span className="text-emerald-600 font-medium text-xs">Ya</span>
+                                                    <span className="text-emerald-600 font-medium text-xs">
+                                                        Ya
+                                                    </span>
                                                 ) : (
-                                                    <span className="text-muted-foreground text-xs">Tidak</span>
+                                                    <span className="text-muted-foreground text-xs">
+                                                        Tidak
+                                                    </span>
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-xs">
@@ -316,7 +336,9 @@ export default function StudentImportPreviewDialog({
                                                         ))}
                                                     </ul>
                                                 ) : (
-                                                    <span className="text-emerald-600 text-xs">Siap disimpan</span>
+                                                    <span className="text-emerald-600 text-xs">
+                                                        Siap disimpan
+                                                    </span>
                                                 )}
                                             </TableCell>
                                         </TableRow>
@@ -358,7 +380,8 @@ export default function StudentImportPreviewDialog({
                         >
                             {isSubmitting ? (
                                 <>
-                                    <Icon icon="mdi:loading" className="animate-spin" /> Mengimpor...
+                                    <Icon icon="mdi:loading" className="animate-spin" />{' '}
+                                    Mengimpor...
                                 </>
                             ) : (
                                 <>

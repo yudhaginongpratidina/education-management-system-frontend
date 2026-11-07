@@ -128,12 +128,16 @@ export function ImageField({
                 const res = await http.post('/landing/upload', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 });
-                uploadedUrl = res.data?.data?.url || (res.data?.data?.slug ? `/storage/${res.data.data.slug}` : '');
+                uploadedUrl =
+                    res.data?.data?.url ||
+                    (res.data?.data?.slug ? `/storage/${res.data.data.slug}` : '');
             } catch {
                 const fallbackRes = await http.post('/storage', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 });
-                uploadedUrl = fallbackRes.data?.data?.slug ? `/storage/${fallbackRes.data.data.slug}` : '';
+                uploadedUrl = fallbackRes.data?.data?.slug
+                    ? `/storage/${fallbackRes.data.data.slug}`
+                    : '';
             }
 
             if (uploadedUrl) {
@@ -170,12 +174,12 @@ export function ImageField({
                 ) : null}
             </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl border border-border/70 bg-card/60 p-3 shadow-xs">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-sm border border-border/70 bg-card/60 p-3 shadow-xs">
                 {/* Preview Thumbnail / Click to Upload */}
                 <div
                     onClick={() => !isUploading && fileInputRef.current?.click()}
                     className={cn(
-                        'group relative size-20 shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted/60 transition-all hover:border-primary/50 flex items-center justify-center',
+                        'group relative size-20 shrink-0 cursor-pointer overflow-hidden rounded-sm border-2 border-dashed border-border bg-muted/60 transition-all hover:border-primary/50 flex items-center justify-center',
                         value && 'border-solid border-border/80 bg-background',
                     )}
                     title="Klik untuk memilih gambar"
@@ -190,7 +194,9 @@ export function ImageField({
                     ) : (
                         <div className="flex flex-col items-center justify-center p-1 text-center text-muted-foreground group-hover:text-primary">
                             <Icon icon="mdi:cloud-upload-outline" className="text-2xl" />
-                            <span className="text-[10px] font-medium leading-none mt-1">Upload</span>
+                            <span className="text-[10px] font-medium leading-none mt-1">
+                                Upload
+                            </span>
                         </div>
                     )}
 
@@ -273,7 +279,7 @@ export function ItemCard({
     badge?: React.ReactNode;
 }) {
     return (
-        <div className="rounded-xl border border-border/70 bg-card p-4 shadow-card">
+        <div className="rounded-sm border border-border/70 bg-card p-4 shadow-card">
             <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2 text-sm font-semibold">
                     {title}
@@ -338,7 +344,7 @@ export function ToggleField({
             type="button"
             onClick={() => onChange(!checked)}
             className={cn(
-                'flex w-full items-center justify-between rounded-lg border border-border/70 bg-background px-3 py-2 text-sm transition-colors hover:bg-accent/50',
+                'flex w-full items-center justify-between rounded-sm border border-border/70 bg-background px-3 py-2 text-sm transition-colors hover:bg-accent/50',
             )}
         >
             <span className="font-medium">{label}</span>

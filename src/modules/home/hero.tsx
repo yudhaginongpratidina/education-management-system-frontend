@@ -85,9 +85,9 @@ export default function Hero() {
                 </div>
 
                 <div className="relative hidden lg:block">
-                    <div className="animate-float relative mx-auto w-full max-w-md rounded-3xl border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
+                    <div className="animate-float relative mx-auto w-full max-w-md rounded-sm border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
                         <div className="flex items-center gap-3">
-                            <span className="flex size-11 items-center justify-center rounded-2xl bg-brand-gradient">
+                            <span className="flex size-11 items-center justify-center rounded-sm bg-brand-gradient">
                                 <Sparkles className="size-5" />
                             </span>
                             <div>

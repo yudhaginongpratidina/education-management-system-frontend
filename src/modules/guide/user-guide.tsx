@@ -28,7 +28,7 @@ function Info({ children, tone = 'info' }: { children: React.ReactNode; tone?: s
         success: 'border-success/30 bg-success/5 text-success',
     };
     return (
-        <div className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${tones[tone]}`}>
+        <div className={`flex items-start gap-2 rounded-sm border p-3 text-xs ${tones[tone]}`}>
             <Icon icon="mdi:information-outline" className="mt-0.5 shrink-0 text-base" />
             <span className="text-foreground/80">{children}</span>
         </div>
@@ -49,9 +49,9 @@ function GuideLink({
     return (
         <Link
             href={href}
-            className="hover:border-primary/40 group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-soft"
+            className="hover:border-primary/40 group flex items-start gap-3 rounded-sm border border-border/70 bg-card p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-soft"
         >
-            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
+            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-sm">
                 <Icon icon={icon} className="text-xl" />
             </span>
             <div className="min-w-0">
@@ -68,7 +68,7 @@ function GuideLink({
 
 function FlowStep({ label }: { label: string }) {
     return (
-        <span className="bg-muted rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap">
+        <span className="bg-muted rounded-sm px-2.5 py-1 text-xs font-medium whitespace-nowrap">
             {label}
         </span>
     );
@@ -78,7 +78,7 @@ export default function UserGuide() {
     return (
         <div className="mx-auto w-full max-w-5xl space-y-6">
             {/* HEADER */}
-            <div className="relative overflow-hidden rounded-2xl bg-brand-gradient p-6 text-primary-foreground shadow-brand md:p-8">
+            <div className="relative overflow-hidden rounded-sm bg-brand-gradient p-6 text-primary-foreground shadow-brand md:p-8">
                 <div className="grid-pattern absolute inset-0 opacity-15" />
                 <div className="relative space-y-2">
                     <div className="flex items-center gap-2">

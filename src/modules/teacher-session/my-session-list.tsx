@@ -156,7 +156,7 @@ export default function MySessionList() {
                 {cards.map((card) => (
                     <Card key={card.key} size="sm">
                         <CardContent className="flex items-center gap-3">
-                            <div className={`rounded-lg bg-muted p-2 ${card.tone}`}>
+                            <div className={`rounded-sm bg-muted p-2 ${card.tone}`}>
                                 <Icon icon={card.icon} className="size-5" />
                             </div>
                             <div className="leading-tight">
@@ -222,7 +222,7 @@ export default function MySessionList() {
                 )}
             </div>
 
-            <div className="max-h-150 overflow-auto rounded-md border">
+            <div className="max-h-150 overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>

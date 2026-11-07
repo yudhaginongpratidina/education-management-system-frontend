@@ -26,10 +26,10 @@ export default function Branches() {
                     {branches.map((branch) => (
                         <div
                             key={branch.id ?? branch.city}
-                            className="rounded-2xl border border-border/60 bg-card p-6 shadow-card transition-colors hover:border-primary/30"
+                            className="rounded-sm border border-border/60 bg-card p-6 shadow-card transition-colors hover:border-primary/30"
                         >
                             <div className="mb-4 flex items-start gap-4">
-                                <div className="bg-brand-gradient-soft text-primary flex size-11 shrink-0 items-center justify-center rounded-2xl">
+                                <div className="bg-brand-gradient-soft text-primary flex size-11 shrink-0 items-center justify-center rounded-sm">
                                     <Icon
                                         icon="mdi:office-building-marker-outline"
                                         className="text-2xl"
@@ -70,14 +70,14 @@ export default function Branches() {
                                         href={`https://wa.me/${branch.wa}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="hover:bg-brand-gradient inline-flex items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-xs font-medium transition-colors hover:border-transparent hover:text-primary-foreground"
+                                        className="hover:bg-brand-gradient inline-flex items-center gap-1.5 rounded-sm border border-border/60 px-3 py-1.5 text-xs font-medium transition-colors hover:border-transparent hover:text-primary-foreground"
                                     >
                                         <Icon icon="mdi:whatsapp" className="text-base" />
                                         WhatsApp
                                     </a>
                                     <a
                                         href="#"
-                                        className="hover:bg-brand-gradient inline-flex items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-xs font-medium transition-colors hover:border-transparent hover:text-primary-foreground"
+                                        className="hover:bg-brand-gradient inline-flex items-center gap-1.5 rounded-sm border border-border/60 px-3 py-1.5 text-xs font-medium transition-colors hover:border-transparent hover:text-primary-foreground"
                                     >
                                         <Icon icon="mdi:map-marker-outline" className="text-base" />
                                         Lihat peta

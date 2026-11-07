@@ -122,7 +122,7 @@ export function PricingEditor({
                 ))}
             </div>
 
-            <div className="rounded-xl border border-border/70 bg-card p-4 shadow-card">
+            <div className="rounded-sm border border-border/70 bg-card p-4 shadow-card">
                 <StringListEditor
                     label="Potongan harga"
                     values={value.discounts}

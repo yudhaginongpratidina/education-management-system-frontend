@@ -29,7 +29,7 @@ export default function FAQ() {
                         return (
                             <div
                                 key={faq.id ?? faq.question}
-                                className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card"
+                                className="overflow-hidden rounded-sm border border-border/60 bg-card shadow-card"
                             >
                                 <button
                                     className="hover:bg-accent/50 font-heading flex w-full items-center justify-between gap-4 p-5 text-left font-semibold transition-colors"

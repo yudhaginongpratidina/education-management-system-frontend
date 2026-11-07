@@ -322,7 +322,7 @@ export default function AssetDashboard() {
                     </div>
 
                     {/* TABLE */}
-                    <div className="overflow-auto rounded-md border">
+                    <div className="overflow-auto rounded-sm border">
                         <Table>
                             <TableHeader>
                                 <TableRow>

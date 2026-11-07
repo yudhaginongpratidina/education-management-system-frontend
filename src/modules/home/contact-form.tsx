@@ -31,9 +31,9 @@ export default function ContactForm() {
                         {contactInfo.map((item) => (
                             <div
                                 key={item.title}
-                                className="hover:border-primary/30 flex gap-4 rounded-2xl border border-border/60 bg-card p-5 shadow-card transition-colors"
+                                className="hover:border-primary/30 flex gap-4 rounded-sm border border-border/60 bg-card p-5 shadow-card transition-colors"
                             >
-                                <div className="bg-brand-gradient-soft text-primary flex size-11 shrink-0 items-center justify-center rounded-2xl">
+                                <div className="bg-brand-gradient-soft text-primary flex size-11 shrink-0 items-center justify-center rounded-sm">
                                     <Icon icon={item.icon} className="text-2xl" />
                                 </div>
                                 <div>
@@ -45,7 +45,7 @@ export default function ContactForm() {
                     </div>
 
                     {/* Form */}
-                    <form className="space-y-5 rounded-3xl border border-border/60 bg-card p-6 shadow-card lg:col-span-2 lg:p-8">
+                    <form className="space-y-5 rounded-sm border border-border/60 bg-card p-6 shadow-card lg:col-span-2 lg:p-8">
                         <div className="grid gap-5 md:grid-cols-2">
                             <div className="space-y-2">
                                 <label htmlFor="contact-name" className="text-sm font-medium">

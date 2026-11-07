@@ -25,7 +25,7 @@ export default function WhyUs() {
         <section className="bg-background py-20">
             <div className="container mx-auto px-4">
                 <div className="grid gap-6 lg:grid-cols-3">
-                    <div className="bg-brand-gradient flex flex-col justify-between rounded-3xl p-8 text-primary-foreground shadow-brand">
+                    <div className="bg-brand-gradient flex flex-col justify-between rounded-sm p-8 text-primary-foreground shadow-brand">
                         <div>
                             <h3 className="font-heading mb-4 text-2xl font-bold">
                                 Kenapa memilih Bimbel Cerdas?
@@ -48,9 +48,9 @@ export default function WhyUs() {
                         {items.map((item) => (
                             <div
                                 key={item.title}
-                                className="hover:border-primary/30 rounded-2xl border border-border/60 bg-card p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
+                                className="hover:border-primary/30 rounded-sm border border-border/60 bg-card p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
                             >
-                                <div className="bg-brand-gradient-soft text-primary mb-4 flex size-12 items-center justify-center rounded-2xl">
+                                <div className="bg-brand-gradient-soft text-primary mb-4 flex size-12 items-center justify-center rounded-sm">
                                     <Icon icon={item.icon} className="text-2xl" />
                                 </div>
                                 <h4 className="font-heading mb-2 font-semibold">{item.title}</h4>

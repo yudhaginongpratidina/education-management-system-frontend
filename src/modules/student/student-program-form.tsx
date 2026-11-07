@@ -410,7 +410,7 @@ export default function StudentProgramForm({
                     />
                 </div>
                 {packageInfo && (
-                    <div className="bg-muted/40 rounded-lg border p-3">
+                    <div className="bg-muted/40 rounded-sm border p-3">
                         <p className="flex items-center gap-1.5 text-sm font-medium">
                             <Icon
                                 icon="mdi:package-variant-closed-check"

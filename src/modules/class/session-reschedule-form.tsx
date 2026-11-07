@@ -102,7 +102,7 @@ export default function SessionRescheduleForm({
 
     return (
         <FieldGroup>
-            <div className="bg-muted/40 rounded-lg border p-3 text-xs text-muted-foreground">
+            <div className="bg-muted/40 rounded-sm border p-3 text-xs text-muted-foreground">
                 Sesi ini memiliki peserta. Tanggal baru harus berada dalam periode paket setiap
                 siswa agar sesi tidak melewati masa berlaku program.
             </div>

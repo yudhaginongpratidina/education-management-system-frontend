@@ -90,7 +90,7 @@ export default function SessionSubstituteForm({
 
     return (
         <FieldGroup>
-            <div className="bg-muted/40 rounded-lg border p-3 text-xs text-muted-foreground">
+            <div className="bg-muted/40 rounded-sm border p-3 text-xs text-muted-foreground">
                 Daftar guru pengganti berisi guru yang ditugaskan sebagai SUBSTITUTE untuk kelas ini
                 dan aktif pada tanggal sesi.
             </div>

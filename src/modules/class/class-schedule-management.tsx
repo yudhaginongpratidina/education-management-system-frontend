@@ -159,7 +159,7 @@ export default function ClassScheduleManagement({ classId }: { classId: number }
 
     return (
         <div className="space-y-4">
-            <div className="rounded-md border p-3">
+            <div className="rounded-sm border p-3">
                 <FieldGroup>
                     <div className="grid gap-4 md:grid-cols-3">
                         <Field>
@@ -236,7 +236,7 @@ export default function ClassScheduleManagement({ classId }: { classId: number }
                 </FieldGroup>
             </div>
 
-            <div className="max-h-100 overflow-auto rounded-md border">
+            <div className="max-h-100 overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>

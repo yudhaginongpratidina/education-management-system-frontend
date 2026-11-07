@@ -27,7 +27,7 @@ export default function Footer() {
                 <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
                     <div>
                         <Link href="/" className="mb-4 flex items-center gap-2.5">
-                            <span className="bg-brand-gradient text-primary-foreground flex size-10 items-center justify-center rounded-xl shadow-brand">
+                            <span className="bg-brand-gradient text-primary-foreground flex size-10 items-center justify-center rounded-sm shadow-brand">
                                 <GraduationCap className="size-5" />
                             </span>
                             <span className="font-heading text-lg font-bold">{footer.brand}</span>
@@ -44,7 +44,7 @@ export default function Footer() {
                                 <Link
                                     key={social.id ?? social.icon}
                                     href={social.href}
-                                    className="hover:bg-brand-gradient flex size-9 items-center justify-center rounded-lg border border-border/60 bg-card text-muted-foreground transition-colors hover:text-primary-foreground"
+                                    className="hover:bg-brand-gradient flex size-9 items-center justify-center rounded-sm border border-border/60 bg-card text-muted-foreground transition-colors hover:text-primary-foreground"
                                 >
                                     <Icon icon={social.icon} className="text-lg" />
                                 </Link>

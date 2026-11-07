@@ -35,7 +35,7 @@ export default function Testimonials() {
                     {testimonials.map((t) => (
                         <figure
                             key={t.id ?? `${t.name}-${t.result}`}
-                            className="hover:border-primary/30 flex flex-col rounded-2xl border border-border/60 bg-card p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
+                            className="hover:border-primary/30 flex flex-col rounded-sm border border-border/60 bg-card p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
                         >
                             <div className="mb-3 flex items-center justify-between">
                                 <div className="text-warning flex gap-0.5">

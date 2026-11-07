@@ -241,7 +241,10 @@ export default function Page() {
                         onClick={downloadTemplate}
                         title="Download Template Format Excel"
                     >
-                        <Icon icon="mdi:file-download-outline" className="text-lg mr-1 text-emerald-600" />
+                        <Icon
+                            icon="mdi:file-download-outline"
+                            className="text-lg mr-1 text-emerald-600"
+                        />
                         Template Excel
                     </Button>
 
@@ -299,7 +302,8 @@ export default function Page() {
                         <DialogTrigger
                             render={
                                 <Button className="h-10 gap-1.5">
-                                    <Icon icon="mdi:account-plus" className="text-lg" /> Tambah Siswa
+                                    <Icon icon="mdi:account-plus" className="text-lg" /> Tambah
+                                    Siswa
                                 </Button>
                             }
                         />
@@ -315,7 +319,7 @@ export default function Page() {
             </div>
 
             {/* Students Table */}
-            <div className="overflow-auto rounded-md border">
+            <div className="overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -360,8 +364,14 @@ export default function Page() {
                                         {hasProgram ? (
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-1.5">
-                                                    <Badge variant="outline" className="text-xs font-normal">
-                                                        <Icon icon="mdi:office-building" className="mr-0.5 text-xs text-muted-foreground" />
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="text-xs font-normal"
+                                                    >
+                                                        <Icon
+                                                            icon="mdi:office-building"
+                                                            className="mr-0.5 text-xs text-muted-foreground"
+                                                        />
                                                         {student.branch_name || 'Cabang -'}
                                                     </Badge>
                                                     {student.program_status && (
@@ -369,7 +379,8 @@ export default function Page() {
                                                             variant={
                                                                 student.program_status === 'ACTIVE'
                                                                     ? 'success'
-                                                                    : student.program_status === 'TRIAL'
+                                                                    : student.program_status ===
+                                                                        'TRIAL'
                                                                       ? 'info'
                                                                       : 'secondary'
                                                             }
@@ -380,9 +391,14 @@ export default function Page() {
                                                     )}
                                                 </div>
                                                 <div className="text-xs font-medium text-primary flex items-center gap-1">
-                                                    <Icon icon="mdi:book-open-variant" className="text-xs" />
+                                                    <Icon
+                                                        icon="mdi:book-open-variant"
+                                                        className="text-xs"
+                                                    />
                                                     {student.program_name || 'Program'}
-                                                    {student.level_name ? ` • ${student.level_name}` : ''}
+                                                    {student.level_name
+                                                        ? ` • ${student.level_name}`
+                                                        : ''}
                                                 </div>
                                             </div>
                                         ) : (
@@ -399,8 +415,12 @@ export default function Page() {
                                             {student.guardian_phone_number ?? '-'}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-xs">{student.instagram ?? '-'}</TableCell>
-                                    <TableCell className="text-xs">{student.information_source ?? '-'}</TableCell>
+                                    <TableCell className="text-xs">
+                                        {student.instagram ?? '-'}
+                                    </TableCell>
+                                    <TableCell className="text-xs">
+                                        {student.information_source ?? '-'}
+                                    </TableCell>
                                     <TableCell>
                                         <div className="flex items-center justify-center gap-1.5">
                                             {/* Quick Action: Assign Program & Branch */}
@@ -411,7 +431,10 @@ export default function Page() {
                                                 title="Assign ke Cabang, Pelajaran & Level"
                                                 onClick={() => handleOpenAssign(student)}
                                             >
-                                                <Icon icon="mdi:account-arrow-right" className="text-base" />
+                                                <Icon
+                                                    icon="mdi:account-arrow-right"
+                                                    className="text-base"
+                                                />
                                             </Button>
 
                                             {/* Edit Student Dialog */}
@@ -429,7 +452,10 @@ export default function Page() {
                                                             className="h-8 w-8"
                                                             title="Edit Siswa"
                                                         >
-                                                            <Icon icon="mingcute:edit-line" className="text-base" />
+                                                            <Icon
+                                                                icon="mingcute:edit-line"
+                                                                className="text-base"
+                                                            />
                                                         </Button>
                                                     }
                                                 />
@@ -464,7 +490,10 @@ export default function Page() {
                                                             className="h-8 w-8 text-muted-foreground"
                                                             title="Kelola Semua Program Siswa"
                                                         >
-                                                            <Icon icon="mdi:book-education" className="text-base" />
+                                                            <Icon
+                                                                icon="mdi:book-education"
+                                                                className="text-base"
+                                                            />
                                                         </Button>
                                                     }
                                                 />
@@ -472,8 +501,8 @@ export default function Page() {
                                                     <DialogHeader>
                                                         <DialogTitle>PROGRAM SISWA</DialogTitle>
                                                         <DialogDescription>
-                                                            Kelola seluruh riwayat program yang diikuti{' '}
-                                                            {student.full_name}.
+                                                            Kelola seluruh riwayat program yang
+                                                            diikuti {student.full_name}.
                                                         </DialogDescription>
                                                     </DialogHeader>
                                                     <StudentProgramsList studentId={student.id} />
@@ -490,7 +519,10 @@ export default function Page() {
                                                             className="h-8 w-8 text-destructive hover:bg-destructive/10"
                                                             title="Hapus Siswa"
                                                         >
-                                                            <Icon icon="mdi:trash" className="text-base" />
+                                                            <Icon
+                                                                icon="mdi:trash"
+                                                                className="text-base"
+                                                            />
                                                         </Button>
                                                     }
                                                 />
@@ -507,7 +539,9 @@ export default function Page() {
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel>Batal</AlertDialogCancel>
                                                         <AlertDialogAction
-                                                            onClick={() => deleteStudent(student.id)}
+                                                            onClick={() =>
+                                                                deleteStudent(student.id)
+                                                            }
                                                         >
                                                             Ya, Hapus
                                                         </AlertDialogAction>

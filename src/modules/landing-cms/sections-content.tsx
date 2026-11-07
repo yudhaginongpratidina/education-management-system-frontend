@@ -51,7 +51,7 @@ export function HeroEditor({
             />
 
             <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-3 rounded-xl border border-border/70 bg-card p-4">
+                <div className="space-y-3 rounded-sm border border-border/70 bg-card p-4">
                     <p className="text-sm font-semibold">Tombol utama</p>
                     <TextField
                         label="Label"
@@ -69,7 +69,7 @@ export function HeroEditor({
                         placeholder="/course"
                     />
                 </div>
-                <div className="space-y-3 rounded-xl border border-border/70 bg-card p-4">
+                <div className="space-y-3 rounded-sm border border-border/70 bg-card p-4">
                     <p className="text-sm font-semibold">Tombol sekunder</p>
                     <TextField
                         label="Label"
@@ -250,7 +250,7 @@ export function TrustEditor({
                         onRemove={() => onChange(value.filter((t) => t.id !== item.id))}
                     >
                         <div className="flex items-center gap-3">
-                            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
+                            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-sm">
                                 <Icon icon={item.icon || 'mdi:check'} className="text-xl" />
                             </span>
                             <TextField
@@ -312,7 +312,7 @@ export function FeaturesEditor({
                         onRemove={() => onChange(value.filter((f) => f.id !== item.id))}
                     >
                         <div className="flex items-center gap-3">
-                            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
+                            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-sm">
                                 <Icon icon={item.icon || 'mdi:star'} className="text-xl" />
                             </span>
                             <TextField
@@ -592,7 +592,7 @@ export function MethodEditor({
                         onRemove={() => onChange(value.filter((s) => s.id !== step.id))}
                     >
                         <div className="flex items-center gap-3">
-                            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
+                            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-sm">
                                 <Icon icon={step.icon || 'mdi:check'} className="text-xl" />
                             </span>
                             <TextField
@@ -740,7 +740,7 @@ export function FacilitiesEditor({
                         onRemove={() => onChange(value.filter((f) => f.id !== item.id))}
                     >
                         <div className="flex items-center gap-3">
-                            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
+                            <span className="bg-brand-gradient-soft text-primary flex size-10 shrink-0 items-center justify-center rounded-sm">
                                 <Icon icon={item.icon || 'mdi:star'} className="text-xl" />
                             </span>
                             <TextField

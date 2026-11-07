@@ -98,7 +98,7 @@ function Metric({
     tone?: string;
 }) {
     return (
-        <div className="rounded-xl border border-border/60 bg-card p-3">
+        <div className="rounded-sm border border-border/60 bg-card p-3">
             <p className="text-muted-foreground text-xs">{label}</p>
             <p className={cn('font-heading mt-1 text-xl font-bold tabular-nums', tone)}>{value}</p>
         </div>
@@ -152,7 +152,7 @@ function TrendChart({ trend }: { trend: { month: string; label: string; count: n
                 >
                     <div className="flex w-full items-end" style={{ height: 150 }}>
                         <div
-                            className="bg-brand-gradient w-full rounded-t-md transition-all"
+                            className="bg-brand-gradient w-full rounded-t-sm transition-all"
                             style={{
                                 height: `${Math.max(
                                     (item.count / max) * 150,
@@ -174,15 +174,15 @@ function TrendChart({ trend }: { trend: { month: string; label: string; count: n
 function DashboardSkeleton() {
     return (
         <div className="space-y-6">
-            <Skeleton className="h-32 w-full rounded-2xl" />
+            <Skeleton className="h-32 w-full rounded-sm" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 5 }).map((_, index) => (
-                    <Skeleton key={index} className="h-40 w-full rounded-xl" />
+                    <Skeleton key={index} className="h-40 w-full rounded-sm" />
                 ))}
             </div>
             <div className="grid gap-4 lg:grid-cols-2">
-                <Skeleton className="h-72 w-full rounded-xl" />
-                <Skeleton className="h-72 w-full rounded-xl" />
+                <Skeleton className="h-72 w-full rounded-sm" />
+                <Skeleton className="h-72 w-full rounded-sm" />
             </div>
         </div>
     );
@@ -350,7 +350,7 @@ export function DashboardStats() {
     return (
         <div className="space-y-6">
             {/* HERO */}
-            <div className="relative overflow-hidden rounded-2xl bg-brand-gradient p-6 text-primary-foreground shadow-brand md:p-8">
+            <div className="relative overflow-hidden rounded-sm bg-brand-gradient p-6 text-primary-foreground shadow-brand md:p-8">
                 <div className="grid-pattern absolute inset-0 opacity-15" />
                 <div className="pointer-events-none absolute -top-20 -right-10 size-56 rounded-full bg-white/10 blur-2xl" />
                 <div className="relative grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
@@ -365,11 +365,11 @@ export function DashboardStats() {
                         </p>
                     </div>
                     <div className="flex gap-3">
-                        <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
+                        <div className="rounded-sm border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
                             <p className="text-xs text-primary-foreground/80">Kehadiran siswa</p>
                             <p className="font-heading text-2xl font-bold">{student.rate ?? 0}%</p>
                         </div>
-                        <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
+                        <div className="rounded-sm border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
                             <p className="text-xs text-primary-foreground/80">Sesi hari ini</p>
                             <p className="font-heading text-2xl font-bold">{sessions.today ?? 0}</p>
                         </div>
@@ -384,7 +384,7 @@ export function DashboardStats() {
                         <div
                             key={item.code}
                             className={cn(
-                                'flex items-start gap-3 rounded-xl border p-4',
+                                'flex items-start gap-3 rounded-sm border p-4',
                                 SEVERITY_STYLES[item.severity] ?? SEVERITY_STYLES.info,
                             )}
                         >
@@ -548,7 +548,7 @@ export function DashboardStats() {
                 description="Jadwal sesi terdekat yang belum berjalan"
                 icon="mdi:calendar-arrow-right"
             >
-                <div className="overflow-hidden rounded-lg border">
+                <div className="overflow-hidden rounded-sm border">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -608,7 +608,7 @@ export function DashboardStats() {
                     icon="mdi:account-plus-outline"
                     className="lg:col-span-2"
                 >
-                    <div className="overflow-hidden rounded-lg border">
+                    <div className="overflow-hidden rounded-sm border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -671,9 +671,9 @@ export function DashboardStats() {
                         {(data.teacher_leaderboard ?? []).map((teacher: any, index: number) => (
                             <div
                                 key={teacher.id}
-                                className="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-3"
+                                className="flex items-center gap-3 rounded-sm border border-border/60 bg-card p-3"
                             >
-                                <span className="bg-brand-gradient-soft text-primary font-heading flex size-8 shrink-0 items-center justify-center rounded-lg font-semibold">
+                                <span className="bg-brand-gradient-soft text-primary font-heading flex size-8 shrink-0 items-center justify-center rounded-sm font-semibold">
                                     {index + 1}
                                 </span>
                                 <div className="min-w-0 flex-1">
@@ -697,7 +697,7 @@ export function DashboardStats() {
                     icon="mdi:office-building-marker-outline"
                     className="lg:col-span-2"
                 >
-                    <div className="overflow-hidden rounded-lg border">
+                    <div className="overflow-hidden rounded-sm border">
                         <Table>
                             <TableHeader>
                                 <TableRow>

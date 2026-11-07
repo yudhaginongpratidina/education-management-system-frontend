@@ -28,7 +28,7 @@ export default function CoursesList() {
                     {programs.map((course) => (
                         <div
                             key={course.id ?? course.title}
-                            className="group hover:border-primary/30 flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
+                            className="group hover:border-primary/30 flex flex-col overflow-hidden rounded-sm border border-border/60 bg-card shadow-card transition-all hover:-translate-y-1 hover:shadow-soft"
                         >
                             <div className="relative overflow-hidden">
                                 <img

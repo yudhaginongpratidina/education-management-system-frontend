@@ -314,7 +314,7 @@ export default function SessionBulkForm({
             </div>
 
             {/* DATES */}
-            <div className="space-y-2 rounded-lg border p-3">
+            <div className="space-y-2 rounded-sm border p-3">
                 <div className="flex items-center justify-between">
                     <FieldLabel>Tanggal Sesi</FieldLabel>
                     <Badge variant="secondary">{dates.length} tanggal</Badge>
@@ -372,7 +372,7 @@ export default function SessionBulkForm({
             </div>
 
             {/* TIME SLOTS */}
-            <div className="space-y-2 rounded-lg border p-3">
+            <div className="space-y-2 rounded-sm border p-3">
                 <div className="flex items-center justify-between">
                     <FieldLabel>Jam Sesi</FieldLabel>
                     <Badge variant="secondary">{slots.length} jam</Badge>
@@ -418,7 +418,7 @@ export default function SessionBulkForm({
             </div>
 
             {/* STUDENTS */}
-            <div className="space-y-2 rounded-lg border p-3">
+            <div className="space-y-2 rounded-sm border p-3">
                 <div className="flex items-center justify-between">
                     <FieldLabel>Peserta Sesi</FieldLabel>
                     <div className="flex items-center gap-3">
@@ -472,7 +472,7 @@ export default function SessionBulkForm({
             </div>
 
             {result && (
-                <div className="space-y-2 rounded-lg border border-info/30 bg-info/5 p-3">
+                <div className="space-y-2 rounded-sm border border-info/30 bg-info/5 p-3">
                     <p className="text-sm font-medium">
                         {result.created_count} sesi dibuat, {result.skipped_count} dilewati
                     </p>

@@ -214,7 +214,7 @@ export default function CashflowDashboard() {
             <div className="grid gap-4 md:grid-cols-3">
                 <Card size="sm">
                     <CardContent className="flex items-center gap-3">
-                        <span className="flex size-11 items-center justify-center rounded-xl bg-success/12 text-success">
+                        <span className="flex size-11 items-center justify-center rounded-sm bg-success/12 text-success">
                             <ArrowUpCircle className="size-6" />
                         </span>
                         <div>
@@ -227,7 +227,7 @@ export default function CashflowDashboard() {
                 </Card>
                 <Card size="sm">
                     <CardContent className="flex items-center gap-3">
-                        <span className="flex size-11 items-center justify-center rounded-xl bg-destructive/12 text-destructive">
+                        <span className="flex size-11 items-center justify-center rounded-sm bg-destructive/12 text-destructive">
                             <ArrowDownCircle className="size-6" />
                         </span>
                         <div>
@@ -240,7 +240,7 @@ export default function CashflowDashboard() {
                 </Card>
                 <Card size="sm">
                     <CardContent className="flex items-center gap-3">
-                        <span className="bg-brand-gradient-soft text-primary flex size-11 items-center justify-center rounded-xl">
+                        <span className="bg-brand-gradient-soft text-primary flex size-11 items-center justify-center rounded-sm">
                             <Wallet className="size-6" />
                         </span>
                         <div>
@@ -288,7 +288,7 @@ export default function CashflowDashboard() {
                                         style={{ height: 170 }}
                                     >
                                         <div
-                                            className="w-1/2 rounded-t bg-success/80"
+                                            className="w-1/2 rounded-t-sm bg-success/80"
                                             style={{
                                                 height: `${Math.max(
                                                     (item.income / maxSeries) * 170,
@@ -298,7 +298,7 @@ export default function CashflowDashboard() {
                                             title={`Masuk ${item.label}: Rp ${formatCurrency(item.income)}`}
                                         />
                                         <div
-                                            className="w-1/2 rounded-t bg-destructive/80"
+                                            className="w-1/2 rounded-t-sm bg-destructive/80"
                                             style={{
                                                 height: `${Math.max(
                                                     (item.expense / maxSeries) * 170,
@@ -317,10 +317,10 @@ export default function CashflowDashboard() {
                     )}
                     <div className="text-muted-foreground mt-3 flex items-center gap-4 text-xs">
                         <span className="inline-flex items-center gap-1.5">
-                            <span className="bg-success/80 size-2.5 rounded" /> Masuk
+                            <span className="bg-success/80 size-2.5 rounded-sm" /> Masuk
                         </span>
                         <span className="inline-flex items-center gap-1.5">
-                            <span className="bg-destructive/80 size-2.5 rounded" /> Keluar
+                            <span className="bg-destructive/80 size-2.5 rounded-sm" /> Keluar
                         </span>
                     </div>
                 </CardContent>
@@ -396,7 +396,7 @@ export default function CashflowDashboard() {
             </div>
 
             {/* TABLE */}
-            <div className="overflow-auto rounded-md border">
+            <div className="overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>

@@ -123,7 +123,9 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                                         type="number"
                                         className="h-10"
                                     />
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                    {fieldState.invalid && (
+                                        <FieldError errors={[fieldState.error]} />
+                                    )}
                                 </Field>
                             )}
                         />
@@ -146,7 +148,9 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                                             <SelectItem value="INACTIVE">Tidak Aktif</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                    {fieldState.invalid && (
+                                        <FieldError errors={[fieldState.error]} />
+                                    )}
                                 </Field>
                             )}
                         />
@@ -212,7 +216,7 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                 </FieldGroup>
             </form>
 
-            <div className="rounded-lg border border-border/60 overflow-hidden">
+            <div className="rounded-sm border border-border/60 overflow-hidden">
                 <div className="max-h-60 overflow-y-auto">
                     <Table>
                         <TableHeader>
@@ -227,14 +231,19 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                         <TableBody>
                             {programLevels.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="py-6 text-center text-muted-foreground">
+                                    <TableCell
+                                        colSpan={5}
+                                        className="py-6 text-center text-muted-foreground"
+                                    >
                                         Belum ada data level
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 programLevels.map((item) => (
                                     <TableRow key={item.id ?? item.level}>
-                                        <TableCell className="text-center font-medium">{item.level}</TableCell>
+                                        <TableCell className="text-center font-medium">
+                                            {item.level}
+                                        </TableCell>
                                         <TableCell className="font-medium">{item.name}</TableCell>
                                         <TableCell
                                             className="max-w-[200px] truncate text-muted-foreground"
@@ -254,11 +263,17 @@ export default function ProgramLevelManagement({ program_slug }: { program_slug:
                                                         setEditingLevel(item.level);
                                                         form.setValue('level', item.level);
                                                         form.setValue('name', item.name);
-                                                        form.setValue('description', item.description || '');
+                                                        form.setValue(
+                                                            'description',
+                                                            item.description || '',
+                                                        );
                                                         form.setValue('status', item.status);
                                                     }}
                                                 >
-                                                    <Icon icon="boxicons:pencil-square" className="size-4" />
+                                                    <Icon
+                                                        icon="boxicons:pencil-square"
+                                                        className="size-4"
+                                                    />
                                                 </Button>
                                                 <Button
                                                     size="icon-sm"

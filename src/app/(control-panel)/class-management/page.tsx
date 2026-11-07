@@ -199,7 +199,7 @@ export default function Page() {
                 </div>
             </div>
 
-            <div className="overflow-auto rounded-md border">
+            <div className="overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>

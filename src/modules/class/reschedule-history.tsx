@@ -114,7 +114,7 @@ export default function RescheduleHistory({ classId }: { classId?: number }) {
                 </Select>
             </div>
 
-            <div className="max-h-125 overflow-auto rounded-md border">
+            <div className="max-h-125 overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>

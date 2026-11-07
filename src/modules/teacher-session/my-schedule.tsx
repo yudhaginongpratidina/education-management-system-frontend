@@ -43,7 +43,7 @@ export default function MySchedule() {
     return (
         <div className="space-y-4">
             {!loading && schedule.length === 0 && (
-                <div className="rounded-md border p-6 text-center text-muted-foreground">
+                <div className="rounded-sm border p-6 text-center text-muted-foreground">
                     Belum ada jadwal mengajar yang terdaftar.
                 </div>
             )}
@@ -63,7 +63,7 @@ export default function MySchedule() {
                                 {day.items.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="rounded-lg border border-border/70 bg-card p-3"
+                                        className="rounded-sm border border-border/70 bg-card p-3"
                                     >
                                         <div className="flex items-center justify-between gap-2">
                                             <span className="font-medium">

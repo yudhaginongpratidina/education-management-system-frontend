@@ -27,9 +27,9 @@ export default function Facilities() {
                     {facilities.map((item) => (
                         <div
                             key={item.id ?? item.title}
-                            className="flex gap-4 rounded-2xl border border-border/60 bg-card p-5 shadow-card transition-colors hover:border-primary/30"
+                            className="flex gap-4 rounded-sm border border-border/60 bg-card p-5 shadow-card transition-colors hover:border-primary/30"
                         >
-                            <div className="bg-brand-gradient-soft text-primary flex size-11 shrink-0 items-center justify-center rounded-2xl">
+                            <div className="bg-brand-gradient-soft text-primary flex size-11 shrink-0 items-center justify-center rounded-sm">
                                 <Icon icon={item.icon} className="text-2xl" />
                             </div>
                             <div>

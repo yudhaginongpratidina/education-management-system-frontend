@@ -154,7 +154,7 @@ export default function StudentProgramsList({ studentId }: { studentId: number }
                 </div>
             </div>
 
-            <div className="max-h-100 overflow-auto rounded-md border">
+            <div className="max-h-100 overflow-auto rounded-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>
