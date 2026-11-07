@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
                 hostname: 'lh3.googleusercontent.com',
             },
             {
+                protocol: 'https',
+                hostname: 'ems-api.ynvara.com',
+            },
+            {
                 protocol: 'http',
                 hostname: 'localhost',
                 port: '4000',

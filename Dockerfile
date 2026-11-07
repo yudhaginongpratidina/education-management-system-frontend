@@ -20,6 +20,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG API_URL=https://ems-api.ynvara.com
+ARG NEXT_API_URL=https://ems-api.ynvara.com
+ENV API_URL=$API_URL
+ENV NEXT_API_URL=$NEXT_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN bun run build
@@ -34,6 +38,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV API_URL=https://ems-api.ynvara.com
+ENV NEXT_API_URL=https://ems-api.ynvara.com
 
 # Next.js standalone server
 ENV HOSTNAME=0.0.0.0
