@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { GraduationCap, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { AppLogo } from '@/components/app-logo';
 
 const navItems = [
     { href: '/', label: 'Beranda' },
@@ -23,17 +24,7 @@ export default function Header() {
         <header className="glass sticky top-0 z-50 border-b border-border/60">
             <div className="container mx-auto flex items-center justify-between px-4 py-3">
                 <Link href="/" className="flex items-center gap-2.5">
-                    <span className="flex size-10 items-center justify-center rounded-sm bg-brand-gradient text-primary-foreground shadow-brand">
-                        <GraduationCap className="size-5" />
-                    </span>
-                    <span className="leading-tight">
-                        <span className="block font-heading text-lg font-bold tracking-tight">
-                            Bimbel Cerdas
-                        </span>
-                        <span className="block text-[0.6875rem] text-muted-foreground">
-                            Belajar jadi menyenangkan
-                        </span>
-                    </span>
+                    <AppLogo size="md" />
                 </Link>
 
                 {/* Desktop Nav */}

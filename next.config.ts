@@ -20,11 +20,15 @@ const nextConfig: NextConfig = {
         ],
     },
     async rewrites() {
-        const apiUrl = process.env.API_URL || 'http://localhost:4000';
+        const apiUrl = process.env.API_URL || process.env.NEXT_API_URL || 'http://localhost:4000';
         return [
             {
                 source: '/storage/:path*',
                 destination: `${apiUrl}/storage/:path*`,
+            },
+            {
+                source: '/uploads/:path*',
+                destination: `${apiUrl}/uploads/:path*`,
             },
         ];
     },

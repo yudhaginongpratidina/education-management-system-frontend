@@ -43,9 +43,18 @@ export default function BranchForm({ type, slug, onSuccess }: BranchFormProps) {
         },
     });
 
+    const sanitizeValues = (values: z.infer<typeof formSchema>) => ({
+        name: values.name.trim(),
+        address: values.address?.trim() || null,
+        latitude: values.latitude?.trim() || null,
+        longitude: values.longitude?.trim() || null,
+        radius: values.radius?.trim() || null,
+    });
+
     const onCreate = async (values: z.infer<typeof formSchema>) => {
         try {
-            const response = await http.post('/branches', values);
+            const payload = sanitizeValues(values);
+            const response = await http.post('/branches', payload);
             console.log(response.data);
             toast.add({
                 title: 'Success',
@@ -65,7 +74,8 @@ export default function BranchForm({ type, slug, onSuccess }: BranchFormProps) {
 
     const onUpdate = async (values: z.infer<typeof formSchema>) => {
         try {
-            const response = await http.patch(`branches/${branchId}`, values);
+            const payload = sanitizeValues(values);
+            const response = await http.patch(`branches/${branchId}`, payload);
             toast.add({
                 title: 'Success',
                 type: 'success',
@@ -87,11 +97,16 @@ export default function BranchForm({ type, slug, onSuccess }: BranchFormProps) {
             const response = await http.get(`branches?slug=${slug}`);
             const { id, name, address, latitude, longitude, radius } = response.data.data;
             setBranchId(id);
-            form.setValue('name', name);
-            form.setValue('address', address);
-            form.setValue('latitude', latitude);
-            form.setValue('longitude', longitude);
-            form.setValue('radius', parseFloat(radius).toFixed(0));
+            form.setValue('name', name ?? '');
+            form.setValue('address', address ?? '');
+            form.setValue('latitude', latitude ? String(latitude) : '');
+            form.setValue('longitude', longitude ? String(longitude) : '');
+            form.setValue(
+                'radius',
+                radius !== null && radius !== undefined && !isNaN(Number(radius))
+                    ? parseFloat(radius).toFixed(0)
+                    : '',
+            );
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({

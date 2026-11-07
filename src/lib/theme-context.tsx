@@ -24,6 +24,15 @@ export interface ThemeColors {
     sidebarPrimary?: string;
 }
 
+export interface ThemeLogo {
+    url?: string;
+    darkUrl?: string;
+    text?: string;
+    subtitle?: string;
+    type?: 'image' | 'text' | 'image_text' | 'icon';
+    iconName?: string;
+}
+
 export interface AppThemeConfig {
     preset: string;
     themeName: string;
@@ -33,6 +42,7 @@ export interface AppThemeConfig {
     buttonStyle: 'gradient' | 'solid' | 'soft' | 'outline';
     shadowStyle: 'none' | 'soft' | 'medium' | 'strong';
     fontFamily: string;
+    logo?: ThemeLogo;
 }
 
 export interface ThemePreset {
@@ -46,6 +56,15 @@ export interface ThemePreset {
     };
     config: AppThemeConfig;
 }
+
+export const DEFAULT_LOGO: ThemeLogo = {
+    url: '',
+    darkUrl: '',
+    text: 'BANYAN',
+    subtitle: 'Bimbel Management',
+    type: 'image_text',
+    iconName: 'mdi:school',
+};
 
 export const THEME_PRESETS: ThemePreset[] = [
     {
@@ -85,6 +104,13 @@ export const THEME_PRESETS: ThemePreset[] = [
             buttonStyle: 'gradient',
             shadowStyle: 'soft',
             fontFamily: 'plus-jakarta',
+            logo: {
+                url: '',
+                text: 'BANYAN',
+                subtitle: 'Bimbel Management',
+                type: 'image_text',
+                iconName: 'mdi:school',
+            },
         },
     },
     {
@@ -124,12 +150,20 @@ export const THEME_PRESETS: ThemePreset[] = [
             buttonStyle: 'gradient',
             shadowStyle: 'soft',
             fontFamily: 'plus-jakarta',
+            logo: {
+                url: '',
+                text: 'Emerald EMS',
+                subtitle: 'Bimbel Unggulan',
+                type: 'image_text',
+                iconName: 'mdi:leaf',
+            },
         },
     },
     {
         id: 'sapphire',
         name: 'Ocean Sapphire',
-        description: 'Biru laut cerah berenergi tinggi yang cocok untuk aplikasi modern dan profesional.',
+        description:
+            'Biru laut cerah berenergi tinggi yang cocok untuk aplikasi modern dan profesional.',
         preview: {
             primary: '#2563EB',
             accent: '#06B6D4',
@@ -163,6 +197,13 @@ export const THEME_PRESETS: ThemePreset[] = [
             buttonStyle: 'gradient',
             shadowStyle: 'soft',
             fontFamily: 'plus-jakarta',
+            logo: {
+                url: '',
+                text: 'Sapphire Academy',
+                subtitle: 'Bimbel Management',
+                type: 'image_text',
+                iconName: 'mdi:school',
+            },
         },
     },
     {
@@ -202,6 +243,13 @@ export const THEME_PRESETS: ThemePreset[] = [
             buttonStyle: 'gradient',
             shadowStyle: 'medium',
             fontFamily: 'plus-jakarta',
+            logo: {
+                url: '',
+                text: 'Sunset Bimbel',
+                subtitle: 'Kreatif & Inspiratif',
+                type: 'image_text',
+                iconName: 'mdi:white-balance-sunny',
+            },
         },
     },
     {
@@ -241,12 +289,20 @@ export const THEME_PRESETS: ThemePreset[] = [
             buttonStyle: 'gradient',
             shadowStyle: 'soft',
             fontFamily: 'plus-jakarta',
+            logo: {
+                url: '',
+                text: 'Royal Academy',
+                subtitle: 'Education Excellence',
+                type: 'image_text',
+                iconName: 'mdi:crown-outline',
+            },
         },
     },
     {
         id: 'slate',
         name: 'Slate Minimalist',
-        description: 'Tampilan monokromatik abu-abu gelap dengan sudut kotak tajam ala dev-tool modern.',
+        description:
+            'Tampilan monokromatik abu-abu gelap dengan sudut kotak tajam ala dev-tool modern.',
         preview: {
             primary: '#334155',
             accent: '#64748B',
@@ -280,6 +336,13 @@ export const THEME_PRESETS: ThemePreset[] = [
             buttonStyle: 'solid',
             shadowStyle: 'none',
             fontFamily: 'plus-jakarta',
+            logo: {
+                url: '',
+                text: 'Slate EMS',
+                subtitle: 'System Platform',
+                type: 'image_text',
+                iconName: 'mdi:cube-outline',
+            },
         },
     },
 ];
@@ -291,8 +354,11 @@ interface CustomThemeContextType {
     isDirty: boolean;
     isLoading: boolean;
     isSaving: boolean;
+    isUploadingLogo: boolean;
     updateTheme: (newTheme: Partial<AppThemeConfig>) => void;
     updateColors: (colors: Partial<ThemeColors>) => void;
+    updateLogo: (logo: Partial<ThemeLogo>) => void;
+    uploadLogo: (file: File) => Promise<string | null>;
     applyPreset: (presetId: string) => void;
     saveTheme: () => Promise<boolean>;
     resetTheme: () => Promise<boolean>;
@@ -386,6 +452,7 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
     const [savedTheme, setSavedTheme] = useState<AppThemeConfig>(DEFAULT_THEME);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isUploadingLogo, setIsUploadingLogo] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
 
     // Initial load: read cache first to prevent flash, then fetch from API
@@ -394,9 +461,17 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
             const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (cached) {
                 const parsed = JSON.parse(cached);
-                setThemeState(parsed);
-                setSavedTheme(parsed);
-                applyThemeToDocument(parsed);
+                const merged = {
+                    ...DEFAULT_THEME,
+                    ...parsed,
+                    logo: {
+                        ...DEFAULT_LOGO,
+                        ...(parsed.logo ?? {}),
+                    },
+                };
+                setThemeState(merged);
+                setSavedTheme(merged);
+                applyThemeToDocument(merged);
             }
         } catch {
             // Ignore storage parse error
@@ -407,10 +482,18 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
                 const response = await http.get('/theme');
                 if (response.data?.success && response.data?.data) {
                     const remoteTheme = response.data.data as AppThemeConfig;
-                    setThemeState(remoteTheme);
-                    setSavedTheme(remoteTheme);
-                    applyThemeToDocument(remoteTheme);
-                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(remoteTheme));
+                    const merged = {
+                        ...DEFAULT_THEME,
+                        ...remoteTheme,
+                        logo: {
+                            ...DEFAULT_LOGO,
+                            ...(remoteTheme.logo ?? {}),
+                        },
+                    };
+                    setThemeState(merged);
+                    setSavedTheme(merged);
+                    applyThemeToDocument(merged);
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(merged));
                 }
             } catch (err) {
                 console.warn('Could not load remote theme, using default/cached theme:', err);
@@ -430,6 +513,10 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
                 colors: {
                     ...prev.colors,
                     ...(newTheme.colors ?? {}),
+                },
+                logo: {
+                    ...(prev.logo ?? DEFAULT_LOGO),
+                    ...(newTheme.logo ?? {}),
                 },
             };
             applyThemeToDocument(next);
@@ -454,12 +541,67 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
         });
     }, []);
 
+    const updateLogo = useCallback((logo: Partial<ThemeLogo>) => {
+        setThemeState((prev) => {
+            const next: AppThemeConfig = {
+                ...prev,
+                logo: {
+                    ...(prev.logo ?? DEFAULT_LOGO),
+                    ...logo,
+                },
+            };
+            setIsDirty(true);
+            return next;
+        });
+    }, []);
+
+    const uploadLogo = useCallback(
+        async (file: File): Promise<string | null> => {
+            setIsUploadingLogo(true);
+            try {
+                const formData = new FormData();
+                formData.append('logo', file);
+                formData.append('image', file);
+                formData.append('file', file);
+
+                const response = await http.post('/theme/upload-logo', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                if (response.data?.success && response.data?.data?.url) {
+                    const url = response.data.data.url as string;
+                    updateLogo({ url, type: 'image_text' });
+                    return url;
+                }
+                return null;
+            } catch (error) {
+                console.error('Failed to upload logo:', error);
+                return null;
+            } finally {
+                setIsUploadingLogo(false);
+            }
+        },
+        [updateLogo],
+    );
+
     const applyPreset = useCallback((presetId: string) => {
         const found = THEME_PRESETS.find((p) => p.id === presetId);
         if (found) {
-            setThemeState(found.config);
-            applyThemeToDocument(found.config);
-            setIsDirty(true);
+            setThemeState((prev) => {
+                const merged = {
+                    ...found.config,
+                    logo: {
+                        ...(found.config.logo ?? DEFAULT_LOGO),
+                        // Preserve custom uploaded logo URL if already set
+                        url: prev.logo?.url || found.config.logo?.url || '',
+                    },
+                };
+                applyThemeToDocument(merged);
+                setIsDirty(true);
+                return merged;
+            });
         }
     }, []);
 
@@ -469,17 +611,24 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
             const response = await http.put('/theme', theme);
             if (response.data?.success) {
                 const updated = response.data.data;
-                setSavedTheme(updated);
-                setThemeState(updated);
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-                applyThemeToDocument(updated);
+                const merged = {
+                    ...DEFAULT_THEME,
+                    ...updated,
+                    logo: {
+                        ...DEFAULT_LOGO,
+                        ...(updated.logo ?? {}),
+                    },
+                };
+                setSavedTheme(merged);
+                setThemeState(merged);
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(merged));
+                applyThemeToDocument(merged);
                 setIsDirty(false);
                 return true;
             }
             return false;
         } catch (error) {
             console.error('Failed to save theme to backend:', error);
-            // Even if remote save fails (e.g. offline), keep it saved in local storage
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(theme));
             setIsDirty(false);
             return false;
@@ -493,7 +642,7 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
         try {
             await http.post('/theme/reset');
         } catch {
-            // If backend request fails, continue resetting locally
+            // Continue resetting locally
         } finally {
             setThemeState(DEFAULT_THEME);
             setSavedTheme(DEFAULT_THEME);
@@ -512,8 +661,11 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
                 isDirty,
                 isLoading,
                 isSaving,
+                isUploadingLogo,
                 updateTheme,
                 updateColors,
+                updateLogo,
+                uploadLogo,
                 applyPreset,
                 saveTheme,
                 resetTheme,

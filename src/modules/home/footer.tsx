@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { AppLogo } from '@/components/app-logo';
 
 import { useLandingSection } from './landing-content';
 
@@ -26,11 +27,8 @@ export default function Footer() {
             <div className="container mx-auto px-4 py-16">
                 <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
                     <div>
-                        <Link href="/" className="mb-4 flex items-center gap-2.5">
-                            <span className="bg-brand-gradient text-primary-foreground flex size-10 items-center justify-center rounded-sm shadow-brand">
-                                <GraduationCap className="size-5" />
-                            </span>
-                            <span className="font-heading text-lg font-bold">{footer.brand}</span>
+                        <Link href="/" className="mb-4 inline-block">
+                            <AppLogo size="md" />
                         </Link>
                         <p className="mb-4 text-sm text-muted-foreground">{footer.address}</p>
                         <p className="text-sm text-muted-foreground">

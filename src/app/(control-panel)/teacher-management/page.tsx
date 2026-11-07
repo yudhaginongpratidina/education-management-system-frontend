@@ -119,6 +119,28 @@ export default function Page() {
         }
     };
 
+    const handleResetPassword = async (teacher: any) => {
+        try {
+            const response = await http.post(`/teachers/${teacher.slug}/reset-password`, {
+                password: 'password123',
+            });
+            toast.add({
+                title: 'Password Direset',
+                type: 'success',
+                description:
+                    response.data?.message ||
+                    `Password untuk guru ${teacher.full_name} berhasil direset ke "password123".`,
+            });
+        } catch (error) {
+            const { message } = parseAxiosError(error);
+            toast.add({
+                title: 'Gagal Reset Password',
+                type: 'error',
+                description: message,
+            });
+        }
+    };
+
     const handleSuccess = () => {
         setIsCreateOpen(false);
         setOpenEditId(null);
@@ -181,6 +203,7 @@ export default function Page() {
                     <TableRow>
                         <TableHead className="hidden md:table-cell">Foto</TableHead>
                         <TableHead>Nama</TableHead>
+                        <TableHead>Email</TableHead>
                         <TableHead>Posisi</TableHead>
                         <TableHead className="hidden md:table-cell">Pendidikan Terakhir</TableHead>
                         <TableHead className="hidden md:table-cell">Nomor Telepon</TableHead>
@@ -196,6 +219,19 @@ export default function Page() {
                                 </TableCell>
                                 <TableCell className="font-medium capitalize">
                                     {teacher.full_name}
+                                </TableCell>
+                                <TableCell className="font-mono text-xs text-muted-foreground lowercase">
+                                    {teacher.email ? (
+                                        <span className="flex items-center gap-1.5">
+                                            <Icon
+                                                icon="mdi:email-outline"
+                                                className="size-3.5 shrink-0 text-primary/70"
+                                            />
+                                            <span>{teacher.email}</span>
+                                        </span>
+                                    ) : (
+                                        '-'
+                                    )}
                                 </TableCell>
                                 <TableCell className="font-medium capitalize">
                                     {teacher.position}
@@ -315,6 +351,55 @@ export default function Page() {
                                             />
                                         </DialogContent>
                                     </Dialog>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger
+                                            render={
+                                                <Button
+                                                    size="icon"
+                                                    variant="outline"
+                                                    className="h-10 text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/20"
+                                                    title="Reset password guru ke password123"
+                                                >
+                                                    <Icon
+                                                        icon="mdi:lock-reset"
+                                                        className="size-5"
+                                                    />
+                                                </Button>
+                                            }
+                                        />
+                                        <AlertDialogContent className="rounded-sm max-w-sm">
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle className="text-base font-bold font-heading">
+                                                    RESET PASSWORD GURU
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription className="text-xs">
+                                                    Apakah Anda yakin ingin mereset password akun
+                                                    guru{' '}
+                                                    <span className="font-semibold text-foreground">
+                                                        {teacher.full_name}
+                                                    </span>
+                                                    ?
+                                                    <br />
+                                                    <br />
+                                                    Password akan dikembalikan ke standar bawaan:{' '}
+                                                    <span className="font-mono font-bold text-foreground bg-muted px-1.5 py-0.5 rounded-sm">
+                                                        password123
+                                                    </span>
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel className="text-xs rounded-sm">
+                                                    Batal
+                                                </AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={() => handleResetPassword(teacher)}
+                                                    className="text-xs rounded-sm bg-amber-600 text-white hover:bg-amber-700"
+                                                >
+                                                    Reset ke password123
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                     <AlertDialog>
                                         <AlertDialogTrigger
                                             render={

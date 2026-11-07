@@ -32,6 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // components
 import { ThemeToggle } from '@/components/theme-toggle';
+import { AppLogo } from '@/components/app-logo';
 
 // icons
 import { GraduationCap, LogOut, Search } from 'lucide-react';
@@ -59,15 +60,7 @@ function Brand() {
         <SidebarMenu>
             <SidebarMenuItem>
                 <SidebarMenuButton size="lg" tooltip="EMS — Bimbel Management">
-                    <div className="flex aspect-square size-9 items-center justify-center rounded-sm bg-brand-gradient text-primary-foreground shadow-brand">
-                        <GraduationCap className="size-5" />
-                    </div>
-                    <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                        <span className="truncate font-heading text-sm font-semibold">EMS</span>
-                        <span className="truncate text-xs text-muted-foreground">
-                            Bimbel Management
-                        </span>
-                    </div>
+                    <AppLogo size="md" />
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>
@@ -141,6 +134,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const menuData = localStorage.getItem('menu');
+        const role = localStorage.getItem('role');
+
+        const isSuperAdmin = role === 'super-admin' || role === 'super admin';
+
+        // Refresh menu from backend in background to keep sidebar synchronized
+        if (role) {
+            http.get(`/role-menus/${role}`)
+                .then((res) => {
+                    const freshMenu = res.data?.data;
+                    if (freshMenu && Array.isArray(freshMenu)) {
+                        localStorage.setItem('menu', JSON.stringify(freshMenu));
+                        setMenuTree(buildTree(freshMenu));
+                    }
+                })
+                .catch(() => {});
+        }
+
         if (menuData) {
             const rawMenu = JSON.parse(menuData);
 
@@ -153,6 +163,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 '/reports',
                 '/asset-management',
                 '/guide',
+                ...(isSuperAdmin ? ['/manual-attendance', '/theme-settings'] : []),
             ];
 
             // Authorization check

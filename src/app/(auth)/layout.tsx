@@ -1,5 +1,6 @@
 // icons
 import { GraduationCap, ShieldCheck, Sparkles, Users } from 'lucide-react';
+import { AppLogo } from '@/components/app-logo';
 
 const highlights = [
     {
@@ -27,14 +28,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-white/10 blur-2xl" />
                 <div className="pointer-events-none absolute -bottom-32 -left-16 size-80 rounded-full bg-black/10 blur-3xl" />
 
-                <div className="relative flex items-center gap-3">
-                    <div className="flex size-11 items-center justify-center rounded-sm bg-white/15 backdrop-blur">
-                        <GraduationCap className="size-6" />
-                    </div>
-                    <div className="leading-tight">
-                        <p className="font-heading text-lg font-semibold">EMS</p>
-                        <p className="text-sm text-primary-foreground/80">Bimbel Management</p>
-                    </div>
+                <div className="relative">
+                    <AppLogo size="lg" textClassName="text-primary-foreground" />
                 </div>
 
                 <div className="relative max-w-md space-y-6">
@@ -70,10 +65,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div className="gradient-mesh flex flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
                 <div className="flex w-full max-w-sm flex-col gap-6">
                     <div className="flex items-center gap-2 self-center lg:hidden">
-                        <div className="flex size-9 items-center justify-center rounded-sm bg-brand-gradient text-primary-foreground">
-                            <GraduationCap className="size-5" />
-                        </div>
-                        <span className="font-heading text-lg font-semibold">EMS</span>
+                        <AppLogo size="md" />
                     </div>
                     {children}
                 </div>
