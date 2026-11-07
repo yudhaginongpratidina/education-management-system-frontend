@@ -312,6 +312,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         >
                             <Icon icon="mdi:book-open-page-variant-outline" />
                         </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            nativeButton={false}
+                            render={<Link href="/theme-settings" />}
+                            aria-label="Kustomisasi tema"
+                            title="Kustomisasi tema & tampilan"
+                        >
+                            <Icon icon="mdi:palette-outline" />
+                        </Button>
                         <ThemeToggle />
                         <Button
                             variant="outline"

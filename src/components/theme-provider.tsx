@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { CustomThemeProvider } from '@/lib/theme-context';
 
 export function ThemeProvider({
     children,
@@ -15,7 +16,7 @@ export function ThemeProvider({
             disableTransitionOnChange
             {...props}
         >
-            {children}
+            <CustomThemeProvider>{children}</CustomThemeProvider>
         </NextThemesProvider>
     );
 }
