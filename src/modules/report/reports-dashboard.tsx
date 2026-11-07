@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
-import { Camera, CameraOff, Maximize2, ExternalLink, Search, UserCheck, X } from 'lucide-react';
+import { Camera, CameraOff, Maximize2, ExternalLink, Search, UserCheck, X, RefreshCw } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 import { http } from '@/lib/http';
 import { parseAxiosError } from '@/lib/parse-axios-error';
@@ -314,6 +316,352 @@ export default function ReportsDashboard() {
         }
     };
 
+    const [isExportingPdf, setIsExportingPdf] = useState<boolean>(false);
+
+    const exportTeacherPdf = async () => {
+        try {
+            setIsExportingPdf(true);
+            toast.add({
+                title: 'Menyiapkan PDF',
+                type: 'info',
+                description: 'Sedang memuat data dan foto bukti absensi guru...',
+            });
+
+            // Fetch current filtered report records
+            const params = buildParams();
+            params.set('limit', '500');
+            const res = await http.get(`/reports/teacher-attendance?${params.toString()}`);
+            const reportData: any[] = res.data?.data || teacherReport?.data || [];
+            const stats = res.data?.stats || teacherReport?.stats || {};
+
+            if (reportData.length === 0) {
+                toast.add({
+                    title: 'Data Kosong',
+                    type: 'warning',
+                    description: 'Tidak ada data absensi guru pada filter yang dipilih.',
+                });
+                setIsExportingPdf(false);
+                return;
+            }
+
+            // Helper to load image as JPEG data URL via canvas
+            const loadImgDataUrl = (url: string): Promise<string | null> => {
+                return new Promise((resolve) => {
+                    let fullUrl = url;
+                    if (
+                        !fullUrl.startsWith('http://') &&
+                        !fullUrl.startsWith('https://') &&
+                        !fullUrl.startsWith('data:')
+                    ) {
+                        if (typeof window !== 'undefined') {
+                            fullUrl = `${window.location.origin}${fullUrl.startsWith('/') ? '' : '/'}${fullUrl}`;
+                        } else {
+                            fullUrl = `http://localhost:4000${fullUrl.startsWith('/') ? '' : '/'}${fullUrl}`;
+                        }
+                    }
+
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            const maxDim = 320;
+                            let w = img.width;
+                            let h = img.height;
+                            if (w > maxDim || h > maxDim) {
+                                if (w > h) {
+                                    h = Math.round((h * maxDim) / w);
+                                    w = maxDim;
+                                } else {
+                                    w = Math.round((w * maxDim) / h);
+                                    h = maxDim;
+                                }
+                            }
+                            canvas.width = Math.max(w, 1);
+                            canvas.height = Math.max(h, 1);
+                            const ctx = canvas.getContext('2d');
+                            if (ctx) {
+                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                resolve(canvas.toDataURL('image/jpeg', 0.85));
+                            } else {
+                                resolve(null);
+                            }
+                        } catch {
+                            resolve(null);
+                        }
+                    };
+                    img.onerror = () => {
+                        // fallback to direct backend url
+                        if (!fullUrl.includes(':4000')) {
+                            const directUrl = `http://localhost:4000${url.startsWith('/') ? '' : '/'}${url}`;
+                            const fallbackImg = new Image();
+                            fallbackImg.crossOrigin = 'anonymous';
+                            fallbackImg.onload = () => {
+                                try {
+                                    const canvas = document.createElement('canvas');
+                                    canvas.width = fallbackImg.width;
+                                    canvas.height = fallbackImg.height;
+                                    const ctx = canvas.getContext('2d');
+                                    if (ctx) {
+                                        ctx.drawImage(fallbackImg, 0, 0);
+                                        resolve(canvas.toDataURL('image/jpeg', 0.85));
+                                        return;
+                                    }
+                                } catch {
+                                    // ignore
+                                }
+                                resolve(null);
+                            };
+                            fallbackImg.onerror = () => resolve(null);
+                            fallbackImg.src = directUrl;
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    img.src = fullUrl;
+                });
+            };
+
+            // Pre-load all checkin and checkout photos in parallel
+            const rowsWithPhotos = await Promise.all(
+                reportData.map(async (row) => {
+                    let checkInImg: string | null = null;
+                    let checkOutImg: string | null = null;
+
+                    const inUrl = resolveAttendancePhotoUrl(row.check_in_photo);
+                    if (inUrl) {
+                        checkInImg = await loadImgDataUrl(inUrl);
+                    }
+
+                    const outUrl = resolveAttendancePhotoUrl(row.check_out_photo);
+                    if (outUrl) {
+                        checkOutImg = await loadImgDataUrl(outUrl);
+                    }
+
+                    return {
+                        ...row,
+                        checkInImg,
+                        checkOutImg,
+                    };
+                }),
+            );
+
+            // Translate status
+            const translateStatus = (s: string) => {
+                switch (s) {
+                    case 'PRESENT':
+                        return 'HADIR';
+                    case 'LATE':
+                        return 'TERLAMBAT';
+                    case 'LEAVE':
+                        return 'IZIN';
+                    case 'ABSENT':
+                        return 'ALFA';
+                    default:
+                        return s || '-';
+                }
+            };
+
+            // Prepare table rows for autoTable
+            const tableBodyData = rowsWithPhotos.map((row, idx) => [
+                String(idx + 1),
+                formatDate(row.attendance_date),
+                row.teacher_name || '-',
+                row.branch_name || '-',
+                translateStatus(row.status),
+                timeOf(row.check_in_at),
+                timeOf(row.check_out_at),
+                formatDuration(row.duration_minutes),
+                row.notes && row.notes !== '-' ? row.notes : '-',
+            ]);
+
+            // Create jsPDF Document (Landscape A4)
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+            // Title & Header
+            doc.setFontSize(15);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('LAPORAN PRESENSI GURU & BUKTI FOTO', 10, 14);
+
+            doc.setFontSize(8.5);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 116, 139);
+            doc.text('Education Management System (EMS)', 10, 19);
+
+            // Metadata Filters
+            const currentSelectedTeacher = teachers.find((t) => String(t.id) === teacherId);
+            const selectedBranchName =
+                branches.find((b) => String(b.id) === branchId)?.name || 'Semua Cabang';
+            const selectedTeacherName = currentSelectedTeacher?.full_name || 'Semua Guru';
+
+            doc.setFontSize(8);
+            doc.setTextColor(71, 85, 105);
+            doc.text(`Periode: ${dateFrom} s/d ${dateTo}`, 10, 25);
+            doc.text(`Cabang: ${selectedBranchName}`, 75, 25);
+            doc.text(`Guru: ${selectedTeacherName}`, 145, 25);
+            doc.text(
+                `Dicetak: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`,
+                225,
+                25,
+            );
+
+            // KPI Summary banner
+            const summaryY = 28;
+            doc.setFillColor(241, 245, 249);
+            doc.roundedRect(10, summaryY, 277, 7, 1, 1, 'F');
+            doc.setFontSize(7.5);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(51, 65, 85);
+
+            const kpiText = `Ringkasan: Total Absensi: ${stats.total ?? reportData.length} | Hadir: ${stats.by_status?.PRESENT ?? 0} | Terlambat: ${stats.by_status?.LATE ?? 0} | Izin: ${stats.by_status?.LEAVE ?? 0} | Alfa: ${stats.by_status?.ABSENT ?? 0} | Total Jam Kerja: ${stats.total_hours ?? 0} jam`;
+            doc.text(kpiText, 14, summaryY + 4.7);
+
+            // Generate Table
+            autoTable(doc, {
+                startY: 38,
+                margin: { left: 10, right: 10, bottom: 12 },
+                head: [
+                    [
+                        'No',
+                        'Tanggal',
+                        'Nama Guru',
+                        'Cabang',
+                        'Status',
+                        'Datang (Foto & Jam)',
+                        'Keluar (Foto & Jam)',
+                        'Durasi',
+                        'Catatan',
+                    ],
+                ],
+                body: tableBodyData,
+                styles: {
+                    minCellHeight: 22,
+                    valign: 'middle',
+                    fontSize: 8,
+                    textColor: [51, 65, 85],
+                    lineColor: [226, 232, 240],
+                    lineWidth: 0.2,
+                },
+                headStyles: {
+                    fillColor: [30, 41, 59],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    fontSize: 8,
+                    halign: 'center',
+                    minCellHeight: 8,
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 250, 252],
+                },
+                columnStyles: {
+                    0: { cellWidth: 10, halign: 'center' },
+                    1: { cellWidth: 22 },
+                    2: { cellWidth: 38 },
+                    3: { cellWidth: 26 },
+                    4: { cellWidth: 20, halign: 'center' },
+                    5: {
+                        cellWidth: 45,
+                        cellPadding: { left: 22, top: 4, bottom: 2, right: 2 },
+                    },
+                    6: {
+                        cellWidth: 45,
+                        cellPadding: { left: 22, top: 4, bottom: 2, right: 2 },
+                    },
+                    7: { cellWidth: 22, halign: 'center' },
+                    8: { cellWidth: 49 },
+                },
+                didDrawCell: (data) => {
+                    if (data.section === 'body') {
+                        const item = rowsWithPhotos[data.row.index];
+                        if (!item) return;
+
+                        // Check-in photo
+                        if (data.column.index === 5) {
+                            if (item.checkInImg) {
+                                const imgSize = 18;
+                                const imgX = data.cell.x + 2;
+                                const imgY = data.cell.y + (data.cell.height - imgSize) / 2;
+                                try {
+                                    doc.addImage(
+                                        item.checkInImg,
+                                        'JPEG',
+                                        imgX,
+                                        imgY,
+                                        imgSize,
+                                        imgSize,
+                                    );
+                                    doc.setDrawColor(203, 213, 225);
+                                    doc.setLineWidth(0.2);
+                                    doc.rect(imgX, imgY, imgSize, imgSize);
+                                } catch (e) {
+                                    console.warn('Failed to embed checkin img', e);
+                                }
+                            }
+                        }
+
+                        // Check-out photo
+                        if (data.column.index === 6) {
+                            if (item.checkOutImg) {
+                                const imgSize = 18;
+                                const imgX = data.cell.x + 2;
+                                const imgY = data.cell.y + (data.cell.height - imgSize) / 2;
+                                try {
+                                    doc.addImage(
+                                        item.checkOutImg,
+                                        'JPEG',
+                                        imgX,
+                                        imgY,
+                                        imgSize,
+                                        imgSize,
+                                    );
+                                    doc.setDrawColor(203, 213, 225);
+                                    doc.setLineWidth(0.2);
+                                    doc.rect(imgX, imgY, imgSize, imgSize);
+                                } catch (e) {
+                                    console.warn('Failed to embed checkout img', e);
+                                }
+                            }
+                        }
+                    }
+                },
+                didDrawPage: () => {
+                    const totalPages = doc.getNumberOfPages();
+                    doc.setFontSize(7.5);
+                    doc.setTextColor(148, 163, 184);
+                    doc.text(
+                        'Dokumen Resmi • Dicetak otomatis dari Education Management System (EMS)',
+                        10,
+                        204,
+                    );
+                    doc.text(`Halaman ${totalPages}`, 287, 204, { align: 'right' });
+                },
+            });
+
+            // Save the PDF
+            const teacherPdfFilename = currentSelectedTeacher
+                ? `laporan-absensi-guru-${currentSelectedTeacher.full_name.toLowerCase().replace(/\s+/g, '-')}-${dateFrom}-sd-${dateTo}.pdf`
+                : `laporan-absensi-guru-${dateFrom}-sd-${dateTo}.pdf`;
+
+            doc.save(teacherPdfFilename);
+            toast.add({
+                title: 'Export PDF Berhasil',
+                type: 'success',
+                description: `File PDF ${teacherPdfFilename} berhasil diunduh lengkap dengan foto bukti presensi.`,
+            });
+        } catch (error) {
+            console.error('PDF Export Error:', error);
+            const { message } = parseAxiosError(error);
+            toast.add({
+                title: 'Gagal Export PDF',
+                type: 'error',
+                description: message || 'Terjadi kesalahan saat memproses dokumen PDF.',
+            });
+        } finally {
+            setIsExportingPdf(false);
+        }
+    };
+
     const kpis = overview?.kpis ?? {};
     const branchItems = [
         { value: 'all', label: 'Semua Cabang' },
@@ -486,19 +834,44 @@ export default function ReportsDashboard() {
                             )}
                         </div>
 
-                        <Button
-                            variant="outline"
-                            className="h-9 gap-1.5"
-                            onClick={() => exportExcel('teacher-attendance', teacherExportFilename)}
-                        >
-                            <Icon icon="mdi:file-excel" className="text-emerald-600 text-base" />
-                            <span>
-                                Export{' '}
-                                {selectedTeacher
-                                    ? `(${selectedTeacher.full_name})`
-                                    : 'Absensi Guru'}
-                            </span>
-                        </Button>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <Button
+                                variant="outline"
+                                className="h-9 gap-1.5"
+                                disabled={isExportingPdf}
+                                onClick={exportTeacherPdf}
+                            >
+                                {isExportingPdf ? (
+                                    <RefreshCw className="size-4 animate-spin text-rose-600" />
+                                ) : (
+                                    <Icon icon="mdi:file-pdf-box" className="text-rose-600 text-lg" />
+                                )}
+                                <span>
+                                    {isExportingPdf
+                                        ? 'Memproses PDF...'
+                                        : `Export PDF ${selectedTeacher ? `(${selectedTeacher.full_name})` : 'Absensi Guru'}`}
+                                </span>
+                            </Button>
+
+                            <Button
+                                variant="outline"
+                                className="h-9 gap-1.5"
+                                onClick={() =>
+                                    exportExcel('teacher-attendance', teacherExportFilename)
+                                }
+                            >
+                                <Icon
+                                    icon="mdi:file-excel"
+                                    className="text-emerald-600 text-base"
+                                />
+                                <span>
+                                    Export Excel{' '}
+                                    {selectedTeacher
+                                        ? `(${selectedTeacher.full_name})`
+                                        : 'Absensi Guru'}
+                                </span>
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="overflow-auto rounded-sm border">
