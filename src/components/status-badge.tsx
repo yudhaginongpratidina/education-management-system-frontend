@@ -8,11 +8,12 @@ const STATUS_MAP: Record<string, { label: string; variant: Variant }> = {
     PENDING: { label: 'Menunggu', variant: 'warning' },
     TRIAL: { label: 'Trial', variant: 'info' },
     ACTIVE: { label: 'Aktif', variant: 'success' },
+    ON_LEAVE: { label: 'Cuti', variant: 'warning' },
     COMPLETED: { label: 'Selesai', variant: 'info' },
     CANCELLED: { label: 'Dibatalkan', variant: 'destructive' },
     EXPIRED: { label: 'Kedaluwarsa', variant: 'destructive' },
-    // Class
-    INACTIVE: { label: 'Tidak Aktif', variant: 'secondary' },
+    // Class / Student
+    INACTIVE: { label: 'Non Aktif', variant: 'secondary' },
     // Session
     SCHEDULED: { label: 'Terjadwal', variant: 'info' },
     ONGOING: { label: 'Berlangsung', variant: 'default' },

@@ -42,9 +42,10 @@ interface StudentAssignDialogProps {
 }
 
 const statusOptions = [
-    { value: 'ACTIVE', label: 'ACTIVE (Aktif Belajar)' },
-    { value: 'TRIAL', label: 'TRIAL (Uji Coba)' },
-    { value: 'PENDING', label: 'PENDING (Menunggu)' },
+    { value: 'ACTIVE', label: 'Aktif (Sedang Belajar)' },
+    { value: 'ON_LEAVE', label: 'Cuti (Izin Sementara)' },
+    { value: 'INACTIVE', label: 'Non Aktif' },
+    { value: 'TRIAL', label: 'Trial (Uji Coba)' },
 ];
 
 export default function StudentAssignDialog({
@@ -65,6 +66,9 @@ export default function StudentAssignDialog({
     const [selectedPackageId, setSelectedPackageId] = useState<string>('');
     const [status, setStatus] = useState<string>('ACTIVE');
     const [startedAt, setStartedAt] = useState<string>(new Date().toISOString().slice(0, 10));
+    const [lastActiveAt, setLastActiveAt] = useState<string>('');
+    const [leaveUntil, setLeaveUntil] = useState<string>('');
+    const [reason, setReason] = useState<string>('');
     const [notes, setNotes] = useState<string>('');
 
     // Metadata state
@@ -303,6 +307,9 @@ export default function StudentAssignDialog({
                 program_package_id: selectedPackageId ? Number(selectedPackageId) : undefined,
                 status,
                 started_at: startedAt,
+                last_active_at: lastActiveAt || undefined,
+                leave_until: status === 'ON_LEAVE' ? leaveUntil || undefined : undefined,
+                reason: reason || undefined,
                 notes: notes || undefined,
             };
 
@@ -330,7 +337,7 @@ export default function StudentAssignDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="min-w-5xl w-full max-h-[92vh] flex flex-col p-6 sm:p-8">
+            <DialogContent className="max-w-5xl sm:max-w-5xl lg:max-w-6xl w-full max-h-[92vh] flex flex-col p-6 sm:p-8">
                 <DialogHeader className="pb-2">
                     <DialogTitle className="flex items-center gap-2 text-xl font-bold">
                         <Icon icon="mdi:account-multiple-plus" className="text-primary text-2xl" />
@@ -612,12 +619,29 @@ export default function StudentAssignDialog({
                                         </Select>
                                     </Field>
 
-                                    {/* Status */}
+                                    {/* Status Siswa (Aktif / Cuti / Non Aktif) */}
                                     <Field>
-                                        <FieldLabel>Status Pendaftaran</FieldLabel>
+                                        <FieldLabel>Status Siswa *</FieldLabel>
                                         <Select
                                             value={status}
-                                            onValueChange={(val) => setStatus(val ?? 'ACTIVE')}
+                                            onValueChange={(val) => {
+                                                const next = val ?? 'ACTIVE';
+                                                setStatus(next);
+                                                if (next === 'ON_LEAVE' && !leaveUntil) {
+                                                    // Default 1 month leave
+                                                    const d = new Date();
+                                                    d.setMonth(d.getMonth() + 1);
+                                                    setLeaveUntil(d.toISOString().slice(0, 10));
+                                                }
+                                                if (
+                                                    (next === 'ON_LEAVE' || next === 'INACTIVE') &&
+                                                    !lastActiveAt
+                                                ) {
+                                                    setLastActiveAt(
+                                                        new Date().toISOString().slice(0, 10),
+                                                    );
+                                                }
+                                            }}
                                             items={statusOptions}
                                         >
                                             <SelectTrigger className="h-10 w-full">
@@ -633,14 +657,75 @@ export default function StudentAssignDialog({
                                         </Select>
                                     </Field>
 
-                                    {/* Start Date */}
+                                    {/* Tanggal Mulai Belajar */}
                                     <Field>
-                                        <FieldLabel>Tanggal Mulai Belajar</FieldLabel>
+                                        <FieldLabel>Tanggal Mulai Belajar *</FieldLabel>
                                         <Input
                                             type="date"
                                             className="h-10"
                                             value={startedAt}
                                             onChange={(e) => setStartedAt(e.target.value)}
+                                        />
+                                    </Field>
+
+                                    {/* Tanggal Terakhir Aktif */}
+                                    <Field>
+                                        <FieldLabel>
+                                            Tanggal Terakhir Aktif
+                                            <span className="text-[11px] font-normal text-muted-foreground ml-1">
+                                                {status === 'ACTIVE'
+                                                    ? '(Bila pernah cuti/nonaktif)'
+                                                    : '(Wajib diisi bila cuti/nonaktif)'}
+                                            </span>
+                                        </FieldLabel>
+                                        <Input
+                                            type="date"
+                                            className="h-10"
+                                            value={lastActiveAt}
+                                            onChange={(e) => setLastActiveAt(e.target.value)}
+                                        />
+                                    </Field>
+
+                                    {/* If ON_LEAVE: Cuti Sampai Kapan */}
+                                    {status === 'ON_LEAVE' && (
+                                        <Field>
+                                            <FieldLabel className="text-warning font-semibold flex items-center gap-1">
+                                                <Icon icon="mdi:calendar-clock" />
+                                                Cuti Sampai Kapan (Tanggal Selesai) *
+                                            </FieldLabel>
+                                            <Input
+                                                type="date"
+                                                className="h-10 border-warning/50 bg-warning/5"
+                                                value={leaveUntil}
+                                                onChange={(e) => setLeaveUntil(e.target.value)}
+                                            />
+                                        </Field>
+                                    )}
+
+                                    {/* Alasan Status (Cuti / Non Aktif / Catatan Khusus) */}
+                                    <Field className="sm:col-span-2">
+                                        <FieldLabel>
+                                            Alasan{' '}
+                                            {status === 'ON_LEAVE'
+                                                ? 'Cuti'
+                                                : status === 'INACTIVE'
+                                                  ? 'Non Aktif'
+                                                  : 'Status'}
+                                            <span className="text-[11px] font-normal text-muted-foreground ml-1">
+                                                (Akan tercatat di riwayat kronologis siswa)
+                                            </span>
+                                        </FieldLabel>
+                                        <Input
+                                            placeholder={
+                                                status === 'ON_LEAVE'
+                                                    ? 'Contoh: Sakit, Libur semester sekolah, Ujian keluar kota...'
+                                                    : status === 'INACTIVE'
+                                                      ? 'Contoh: Pindah domisili, Lulus, Mengundurkan diri...'
+                                                      : 'Contoh: Pendaftaran baru tahun ajaran baru...'
+                                            }
+                                            className="h-10"
+                                            value={reason}
+                                            onChange={(e) => setReason(e.target.value)}
                                         />
                                     </Field>
                                 </div>

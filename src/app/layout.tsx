@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Sora } from 'next/font/google';
 import './globals.css';
+import './fonts.css';
 import { cn } from '@/lib/utils';
 
 import { ThemeProvider } from '@/components/theme-provider';

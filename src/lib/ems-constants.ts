@@ -1,9 +1,11 @@
 // Shared option lists and helpers for the Education Management System features.
 
 export const STUDENT_PROGRAM_STATUS_OPTIONS = [
-    { value: 'PENDING', label: 'Menunggu' },
-    { value: 'TRIAL', label: 'Trial' },
     { value: 'ACTIVE', label: 'Aktif' },
+    { value: 'ON_LEAVE', label: 'Cuti' },
+    { value: 'INACTIVE', label: 'Non Aktif' },
+    { value: 'TRIAL', label: 'Trial' },
+    { value: 'PENDING', label: 'Menunggu' },
     { value: 'COMPLETED', label: 'Selesai' },
     { value: 'CANCELLED', label: 'Dibatalkan' },
     { value: 'EXPIRED', label: 'Kedaluwarsa' },

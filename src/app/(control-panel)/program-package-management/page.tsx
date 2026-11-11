@@ -137,6 +137,7 @@ export default function Page() {
                             <ProgramPackageForm
                                 type={editingPackage ? 'update' : 'create'}
                                 slug={editingPackage ? editingPackage.slug : selectedProgram}
+                                programSlug={selectedProgram}
                                 initialData={editingPackage}
                                 onSuccess={() => {
                                     setIsDialogOpen(false);

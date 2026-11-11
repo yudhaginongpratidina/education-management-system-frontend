@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { http } from '@/lib/http';
+import { getFontConfig } from '@/lib/font-config';
 
 export interface ThemeColors {
     primary: string;
@@ -31,6 +32,16 @@ export interface ThemeLogo {
     subtitle?: string;
     type?: 'image' | 'text' | 'image_text' | 'icon';
     iconName?: string;
+    hasBorder?: boolean;
+    borderWidth?: number | string;
+    borderColor?: string;
+    borderStyle?: 'solid' | 'dashed' | 'dotted';
+    borderRadius?: string;
+    padding?: number | string;
+    hasBackground?: boolean;
+    backgroundColor?: string;
+    aspectRatio?: 'square' | 'wide' | 'auto';
+    imageFit?: 'contain' | 'cover';
 }
 
 export interface AppThemeConfig {
@@ -64,6 +75,16 @@ export const DEFAULT_LOGO: ThemeLogo = {
     subtitle: 'Bimbel Management',
     type: 'image_text',
     iconName: 'mdi:school',
+    hasBorder: false,
+    borderWidth: 1,
+    borderColor: '',
+    borderStyle: 'solid',
+    borderRadius: 'inherit',
+    padding: 0,
+    hasBackground: false,
+    backgroundColor: 'transparent',
+    aspectRatio: 'square',
+    imageFit: 'contain',
 };
 
 export const THEME_PRESETS: ThemePreset[] = [
@@ -441,6 +462,26 @@ function applyThemeToDocument(theme: AppThemeConfig) {
     root.style.setProperty('--radius-2xl', r);
     root.style.setProperty('--radius-3xl', r);
     root.style.setProperty('--radius-4xl', r);
+
+    // Apply Font Family
+    if (!theme.fontFamily || theme.fontFamily === 'plus-jakarta') {
+        root.style.removeProperty('--font-sans');
+        root.style.removeProperty('--font-heading');
+        root.style.removeProperty('font-family');
+        if (typeof document !== 'undefined' && document.body) {
+            document.body.style.removeProperty('font-family');
+        }
+    } else {
+        const fontCfg = getFontConfig(theme.fontFamily);
+        if (fontCfg) {
+            root.style.setProperty('--font-sans', fontCfg.fontFamily);
+            root.style.setProperty('--font-heading', fontCfg.fontFamily);
+            root.style.setProperty('font-family', fontCfg.fontFamily);
+            if (typeof document !== 'undefined' && document.body) {
+                document.body.style.setProperty('font-family', fontCfg.fontFamily);
+            }
+        }
+    }
 
     // Button style class on root
     root.dataset.buttonStyle = theme.buttonStyle || 'gradient';

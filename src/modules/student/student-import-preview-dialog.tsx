@@ -158,7 +158,7 @@ export default function StudentImportPreviewDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col p-6">
+            <DialogContent className="max-w-5xl sm:max-w-5xl max-h-[90vh] flex flex-col p-6">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-lg font-bold">
                         <Icon icon="mdi:file-excel" className="text-emerald-600 text-2xl" />

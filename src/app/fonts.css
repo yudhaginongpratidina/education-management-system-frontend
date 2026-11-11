@@ -1,0 +1,183 @@
+/* ==========================================================================
+   OFFLINE FONTS - Education Management System
+   All fonts stored locally in /public/fonts/ for 100% offline usage.
+   ========================================================================== */
+
+/* Times New Roman (Liberation Serif metric-compatible) */
+@font-face {
+    font-family: 'Times New Roman Local';
+    src: url('/fonts/TimesNewRoman-LiberationSerif-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Times New Roman Local';
+    src: url('/fonts/TimesNewRoman-LiberationSerif-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Arial (Liberation Sans metric-compatible) */
+@font-face {
+    font-family: 'Arial Local';
+    src: url('/fonts/Arial-LiberationSans-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Arial Local';
+    src: url('/fonts/Arial-LiberationSans-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Handwriting & Script Fonts */
+@font-face {
+    font-family: 'Caveat Local';
+    src: url('/fonts/Caveat-Regular.ttf') format('truetype');
+    font-weight: 400 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Dancing Script Local';
+    src: url('/fonts/DancingScript-Regular.ttf') format('truetype');
+    font-weight: 400 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pacifico Local';
+    src: url('/fonts/Pacifico-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Patrick Hand Local';
+    src: url('/fonts/PatrickHand-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Kalam Local';
+    src: url('/fonts/Kalam-Regular.ttf') format('truetype');
+    font-weight: 400 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Shadows Into Light Local';
+    src: url('/fonts/ShadowsIntoLight-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Great Vibes Local';
+    src: url('/fonts/GreatVibes-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Marck Script Local';
+    src: url('/fonts/MarckScript-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Indie Flower Local';
+    src: url('/fonts/IndieFlower-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sacramento Local';
+    src: url('/fonts/Sacramento-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Courgette Local';
+    src: url('/fonts/Courgette-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Amatic SC Local';
+    src: url('/fonts/AmaticSC-Regular.ttf') format('truetype');
+    font-weight: 400 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Sans-Serif Fonts */
+@font-face {
+    font-family: 'Inter Local';
+    src: url('/fonts/Inter-Regular.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto Local';
+    src: url('/fonts/Roboto-Regular.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Open Sans Local';
+    src: url('/fonts/OpenSans-Regular.ttf') format('truetype');
+    font-weight: 300 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins Local';
+    src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+    font-weight: 400 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Serif Fonts */
+@font-face {
+    font-family: 'Merriweather Local';
+    src: url('/fonts/Merriweather-Regular.ttf') format('truetype');
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Playfair Display Local';
+    src: url('/fonts/PlayfairDisplay-Regular.ttf') format('truetype');
+    font-weight: 400 900;
+    font-style: normal;
+    font-display: swap;
+}

@@ -36,6 +36,7 @@ import { toast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { StatusBadge } from '@/components/status-badge';
 
 const CLOSED_STATUSES = ['COMPLETED', 'CANCELLED', 'RESCHEDULED'];
 
@@ -60,7 +61,21 @@ export default function MySessionAttendance({
         setLoading(true);
         try {
             const response = await http.get(`/teacher/sessions/${sessionId}/students`);
-            setParticipants(extractList(response.data));
+            const list = extractList(response.data).map((item: any) => {
+                // When student is ON_LEAVE, attendance automatically defaults to PERMISSION (Izin)
+                if (
+                    item.program_status === 'ON_LEAVE' &&
+                    (!item.attendance_status || item.attendance_status === 'ABSENT')
+                ) {
+                    return {
+                        ...item,
+                        attendance_status: 'PERMISSION',
+                        notes: item.notes || 'Siswa Sedang Cuti',
+                    };
+                }
+                return item;
+            });
+            setParticipants(list);
         } catch (error) {
             const { message } = parseAxiosError(error);
             toast.add({ title: 'Error', type: 'error', description: message });
@@ -74,7 +89,7 @@ export default function MySessionAttendance({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionId]);
 
-    const updateAttendance = async (studentProgramId: number, status: string) => {
+    const updateAttendance = async (studentProgramId: number, status: string | null) => {
         try {
             await http.patch(
                 `/teacher/sessions/${sessionId}/students/${studentProgramId}/attendance`,
@@ -97,10 +112,19 @@ export default function MySessionAttendance({
             await http.patch(`/teacher/sessions/${sessionId}/attendance`, {
                 records: participants.map((item) => ({
                     student_program_id: item.student_program_id,
-                    attendance_status: 'PRESENT',
+                    attendance_status:
+                        item.program_status === 'ON_LEAVE' ? 'PERMISSION' : 'PRESENT',
+                    notes:
+                        item.program_status === 'ON_LEAVE'
+                            ? item.notes || 'Siswa Sedang Cuti'
+                            : item.notes,
                 })),
             });
-            toast.add({ title: 'Success', type: 'success', description: 'Semua ditandai hadir' });
+            toast.add({
+                title: 'Success',
+                type: 'success',
+                description: 'Presensi diperbarui (siswa cuti otomatis izin)',
+            });
             getParticipants();
             onChanged?.();
         } catch (error) {
@@ -115,7 +139,7 @@ export default function MySessionAttendance({
             await http.patch(
                 `/teacher/sessions/${sessionId}/students/${notesItem.student_program_id}/attendance`,
                 {
-                    attendance_status: notesAttendance,
+                    attendance_status: notesAttendance ? notesAttendance : null,
                     notes: notesValue || null,
                 },
             );
@@ -178,7 +202,27 @@ export default function MySessionAttendance({
                         )}
                         {participants.map((item) => (
                             <TableRow key={item.student_program_id}>
-                                <TableCell className="font-medium">{item.student_name}</TableCell>
+                                <TableCell className="font-medium">
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <span>{item.student_name}</span>
+                                            {item.program_status && (
+                                                <StatusBadge status={item.program_status} />
+                                            )}
+                                        </div>
+                                        {item.program_status === 'ON_LEAVE' && item.leave_until && (
+                                            <span className="text-[11px] text-amber-600 dark:text-amber-400 font-normal">
+                                                Cuti s.d. {String(item.leave_until).slice(0, 10)}
+                                            </span>
+                                        )}
+                                        {item.last_active_at && (
+                                            <span className="text-[10px] text-muted-foreground font-normal">
+                                                Terakhir aktif:{' '}
+                                                {String(item.last_active_at).slice(0, 10)}
+                                            </span>
+                                        )}
+                                    </div>
+                                </TableCell>
                                 <TableCell>
                                     <div className="flex flex-col">
                                         <span>{item.package_name ?? '-'}</span>
@@ -188,22 +232,45 @@ export default function MySessionAttendance({
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <div className="w-40">
+                                    <div className="w-44">
                                         <Select
-                                            value={item.attendance_status}
+                                            value={item.attendance_status || 'NONE'}
                                             onValueChange={(value) =>
                                                 updateAttendance(
                                                     item.student_program_id,
-                                                    value ?? 'PRESENT',
+                                                    value === 'NONE' ? null : value ?? null,
                                                 )
                                             }
-                                            items={ATTENDANCE_STATUS_OPTIONS}
+                                            items={[
+                                                {
+                                                    value: 'NONE',
+                                                    label: '— Belum Presensi (Kosong) —',
+                                                },
+                                                ...ATTENDANCE_STATUS_OPTIONS,
+                                            ]}
                                             disabled={locked}
                                         >
-                                            <SelectTrigger size="h-10">
-                                                <SelectValue />
+                                            <SelectTrigger className="h-10 text-xs">
+                                                <SelectValue placeholder="— Pilih Kehadiran —">
+                                                    {item.attendance_status ? (
+                                                        ATTENDANCE_STATUS_OPTIONS.find(
+                                                            (o) =>
+                                                                o.value === item.attendance_status,
+                                                        )?.label ?? item.attendance_status
+                                                    ) : (
+                                                        <span className="text-muted-foreground font-normal italic">
+                                                            Belum Presensi (Kosong)
+                                                        </span>
+                                                    )}
+                                                </SelectValue>
                                             </SelectTrigger>
                                             <SelectContent>
+                                                <SelectItem value="NONE">
+                                                    <span className="text-muted-foreground text-xs italic flex items-center gap-1.5">
+                                                        <span className="size-2 rounded-full border border-dashed border-muted-foreground" />
+                                                        Belum Presensi (Kosong)
+                                                    </span>
+                                                </SelectItem>
                                                 {ATTENDANCE_STATUS_OPTIONS.map((option) => (
                                                     <SelectItem
                                                         key={option.value}
@@ -228,7 +295,7 @@ export default function MySessionAttendance({
                                             onClick={() => {
                                                 setNotesItem(item);
                                                 setNotesValue(item.notes ?? '');
-                                                setNotesAttendance(item.attendance_status);
+                                                setNotesAttendance(item.attendance_status || '');
                                             }}
                                         >
                                             <Icon icon="mingcute:edit-line" />
@@ -250,14 +317,34 @@ export default function MySessionAttendance({
                         <Field>
                             <FieldLabel htmlFor="teacher_notes_attendance">Kehadiran</FieldLabel>
                             <Select
-                                value={notesAttendance}
-                                onValueChange={(value) => setNotesAttendance(value ?? 'PRESENT')}
-                                items={ATTENDANCE_STATUS_OPTIONS}
+                                value={notesAttendance || 'NONE'}
+                                onValueChange={(value) =>
+                                    setNotesAttendance(value === 'NONE' ? '' : value ?? '')
+                                }
+                                items={[
+                                    { value: 'NONE', label: '— Belum Presensi (Kosong) —' },
+                                    ...ATTENDANCE_STATUS_OPTIONS,
+                                ]}
                             >
-                                <SelectTrigger className="h-10">
-                                    <SelectValue />
+                                <SelectTrigger className="h-10 text-xs">
+                                    <SelectValue placeholder="— Pilih Kehadiran —">
+                                        {notesAttendance ? (
+                                            ATTENDANCE_STATUS_OPTIONS.find(
+                                                (o) => o.value === notesAttendance,
+                                            )?.label ?? notesAttendance
+                                        ) : (
+                                            <span className="text-muted-foreground font-normal italic">
+                                                Belum Presensi (Kosong)
+                                            </span>
+                                        )}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="NONE">
+                                        <span className="text-muted-foreground text-xs italic">
+                                            — Belum Presensi (Kosong) —
+                                        </span>
+                                    </SelectItem>
                                     {ATTENDANCE_STATUS_OPTIONS.map((option) => (
                                         <SelectItem key={option.value} value={option.value}>
                                             {option.label}

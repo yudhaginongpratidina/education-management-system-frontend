@@ -717,7 +717,7 @@ export default function ReportsDashboard() {
             label: 'Reschedule',
             value: kpis.reschedules_total ?? 0,
             sub: 'Sesi, guru, siswa',
-            icon: 'mdi:calendar-swap',
+            icon: 'mdi:calendar-sync',
             tone: 'text-warning',
         },
     ];
@@ -1050,6 +1050,8 @@ export default function ReportsDashboard() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Siswa</TableHead>
+                                        <TableHead>Status Siswa</TableHead>
+                                        <TableHead>Terakhir Aktif</TableHead>
                                         <TableHead>Cabang</TableHead>
                                         <TableHead className="text-right">Total</TableHead>
                                         <TableHead className="text-right">Hadir</TableHead>
@@ -1064,7 +1066,7 @@ export default function ReportsDashboard() {
                                     {!loading && (studentSummary ?? []).length === 0 && (
                                         <TableRow>
                                             <TableCell
-                                                colSpan={9}
+                                                colSpan={11}
                                                 className="text-center text-muted-foreground py-8"
                                             >
                                                 Tidak ada data.
@@ -1108,6 +1110,29 @@ export default function ReportsDashboard() {
                                                         )}
                                                     </div>
                                                 </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col gap-0.5">
+                                                        {row.student_status ? (
+                                                            <StatusBadge
+                                                                status={row.student_status}
+                                                            />
+                                                        ) : (
+                                                            '-'
+                                                        )}
+                                                        {row.student_status === 'ON_LEAVE' &&
+                                                            row.leave_until && (
+                                                                <span className="text-[10px] text-amber-600 dark:text-amber-400">
+                                                                    s.d.{' '}
+                                                                    {formatDate(row.leave_until)}
+                                                                </span>
+                                                            )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                                                    {row.last_active_at
+                                                        ? formatDate(row.last_active_at)
+                                                        : '-'}
+                                                </TableCell>
                                                 <TableCell>{row.branch_name ?? '-'}</TableCell>
                                                 <TableCell className="text-right tabular-nums">
                                                     {row.total}
@@ -1143,16 +1168,18 @@ export default function ReportsDashboard() {
                                     <TableRow>
                                         <TableHead>Tanggal</TableHead>
                                         <TableHead>Siswa</TableHead>
+                                        <TableHead>Status Siswa</TableHead>
+                                        <TableHead>Terakhir Aktif</TableHead>
                                         <TableHead>Kelas</TableHead>
                                         <TableHead>Guru</TableHead>
-                                        <TableHead>Status</TableHead>
+                                        <TableHead>Kehadiran</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {!loading && (studentReport?.data ?? []).length === 0 && (
                                         <TableRow>
                                             <TableCell
-                                                colSpan={5}
+                                                colSpan={7}
                                                 className="text-center text-muted-foreground py-8"
                                             >
                                                 Tidak ada data.
@@ -1198,6 +1225,29 @@ export default function ReportsDashboard() {
                                                             </Badge>
                                                         )}
                                                     </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col gap-0.5">
+                                                        {row.student_status ? (
+                                                            <StatusBadge
+                                                                status={row.student_status}
+                                                            />
+                                                        ) : (
+                                                            '-'
+                                                        )}
+                                                        {row.student_status === 'ON_LEAVE' &&
+                                                            row.leave_until && (
+                                                                <span className="text-[10px] text-amber-600 dark:text-amber-400">
+                                                                    s.d.{' '}
+                                                                    {formatDate(row.leave_until)}
+                                                                </span>
+                                                            )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                                                    {row.last_active_at
+                                                        ? formatDate(row.last_active_at)
+                                                        : '-'}
                                                 </TableCell>
                                                 <TableCell>{row.class_name}</TableCell>
                                                 <TableCell>{row.teacher_name ?? '-'}</TableCell>

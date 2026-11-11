@@ -443,7 +443,7 @@ export default function ClassSessionManagement({
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent className="sm:max-w-2xl">
+                                            <DialogContent className="max-w-4xl sm:max-w-4xl lg:max-w-5xl w-full max-h-[92vh] flex flex-col p-6">
                                                 <DialogHeader>
                                                     <DialogTitle>PESERTA SESI</DialogTitle>
                                                     <DialogDescription>
@@ -494,22 +494,39 @@ export default function ClassSessionManagement({
                                         >
                                             <DialogTrigger
                                                 render={
-                                                    <Button size="icon" variant="outline">
+                                                    <Button
+                                                        size="icon"
+                                                        variant="outline"
+                                                        disabled={session.status !== 'SCHEDULED'}
+                                                        title={
+                                                            session.status === 'SCHEDULED'
+                                                                ? 'Jadwalkan Ulang Sesi'
+                                                                : 'Hanya sesi Terjadwal yang dapat dijadwalkan ulang'
+                                                        }
+                                                    >
                                                         <Icon icon="mdi:calendar-clock" />
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent>
+                                            <DialogContent className="sm:max-w-md">
                                                 <DialogHeader>
-                                                    <DialogTitle>JADWALKAN ULANG</DialogTitle>
+                                                    <DialogTitle className="flex items-center gap-2">
+                                                        <Icon
+                                                            icon="mdi:calendar-clock"
+                                                            className="size-5 text-primary"
+                                                        />
+                                                        JADWALKAN ULANG SESI
+                                                    </DialogTitle>
                                                 </DialogHeader>
-                                                <SessionRescheduleForm
-                                                    session={session}
-                                                    onSuccess={() => {
-                                                        setRescheduleSession(null);
-                                                        getSessions();
-                                                    }}
-                                                />
+                                                {rescheduleSession?.id === session.id && (
+                                                    <SessionRescheduleForm
+                                                        session={session}
+                                                        onSuccess={() => {
+                                                            setRescheduleSession(null);
+                                                            getSessions();
+                                                        }}
+                                                    />
+                                                )}
                                             </DialogContent>
                                         </Dialog>
 
@@ -521,22 +538,47 @@ export default function ClassSessionManagement({
                                         >
                                             <DialogTrigger
                                                 render={
-                                                    <Button size="icon" variant="outline">
+                                                    <Button
+                                                        size="icon"
+                                                        variant="outline"
+                                                        disabled={[
+                                                            'COMPLETED',
+                                                            'CANCELLED',
+                                                            'RESCHEDULED',
+                                                        ].includes(session.status)}
+                                                        title={
+                                                            [
+                                                                'COMPLETED',
+                                                                'CANCELLED',
+                                                                'RESCHEDULED',
+                                                            ].includes(session.status)
+                                                                ? 'Sesi ini tidak dapat diganti gurunya'
+                                                                : 'Tetapkan Guru Pengganti'
+                                                        }
+                                                    >
                                                         <Icon icon="mdi:account-switch" />
                                                     </Button>
                                                 }
                                             />
-                                            <DialogContent>
+                                            <DialogContent className="sm:max-w-md">
                                                 <DialogHeader>
-                                                    <DialogTitle>GURU PENGGANTI</DialogTitle>
+                                                    <DialogTitle className="flex items-center gap-2">
+                                                        <Icon
+                                                            icon="mdi:account-switch"
+                                                            className="size-5 text-primary"
+                                                        />
+                                                        GURU PENGGANTI
+                                                    </DialogTitle>
                                                 </DialogHeader>
-                                                <SessionSubstituteForm
-                                                    session={session}
-                                                    onSuccess={() => {
-                                                        setSubstituteSession(null);
-                                                        getSessions();
-                                                    }}
-                                                />
+                                                {substituteSession?.id === session.id && (
+                                                    <SessionSubstituteForm
+                                                        session={session}
+                                                        onSuccess={() => {
+                                                            setSubstituteSession(null);
+                                                            getSessions();
+                                                        }}
+                                                    />
+                                                )}
                                             </DialogContent>
                                         </Dialog>
 

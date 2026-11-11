@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useCustomTheme, THEME_PRESETS } from '@/lib/theme-context';
+import { FONT_OPTIONS, getFontConfig } from '@/lib/font-config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -24,6 +25,8 @@ import {
     Image as ImageIcon,
     Trash2,
     Type,
+    CheckCircle2,
+    Search,
 } from 'lucide-react';
 
 export function ThemeSettingsView() {
@@ -42,10 +45,26 @@ export function ThemeSettingsView() {
     } = useCustomTheme();
 
     const [activeTab, setActiveTab] = useState<
-        'presets' | 'colors' | 'logo' | 'radius' | 'components'
+        'presets' | 'colors' | 'fonts' | 'logo' | 'radius' | 'components'
     >('presets');
     const [previewInputText, setPreviewInputText] = useState('Bimbel Cabang Utama');
+    const [logoBgPreview, setLogoBgPreview] = useState<'white' | 'dark' | 'brand'>('white');
+    const [fontFilter, setFontFilter] = useState<'all' | 'handwriting' | 'sans' | 'serif'>('all');
+    const [fontSearch, setFontSearch] = useState('');
+    const [fontSampleText, setFontSampleText] = useState(
+        'BANYAN EMS — Pendidikan Berkualitas Masa Depan 12345',
+    );
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const filteredFonts = FONT_OPTIONS.filter((f) => {
+        const matchesCategory = fontFilter === 'all' || f.category === fontFilter;
+        const matchesSearch =
+            !fontSearch ||
+            f.name.toLowerCase().includes(fontSearch.toLowerCase()) ||
+            f.description.toLowerCase().includes(fontSearch.toLowerCase()) ||
+            f.category.toLowerCase().includes(fontSearch.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
 
     const handleSave = async () => {
         const success = await saveTheme();
@@ -129,6 +148,30 @@ export function ThemeSettingsView() {
         iconName: 'mdi:school',
     };
 
+    const logoHasBorder =
+        logo.hasBorder !== undefined
+            ? logo.hasBorder
+            : logo.borderWidth !== undefined
+              ? Number(logo.borderWidth) > 0
+              : false;
+
+    const logoBorderWidth =
+        logo.borderWidth !== undefined ? Number(logo.borderWidth) : logoHasBorder ? 1 : 0;
+
+    const logoPadding = logo.padding !== undefined ? Number(logo.padding) : logoHasBorder ? 2 : 0;
+
+    const logoHasBg =
+        logo.hasBackground !== undefined
+            ? logo.hasBackground
+            : Boolean(logo.backgroundColor && logo.backgroundColor !== 'transparent');
+
+    const logoBgColor = logo.backgroundColor || (logoHasBg ? '#ffffff' : 'transparent');
+
+    const logoRadius = logo.borderRadius || 'inherit';
+    const logoBorderStyle = logo.borderStyle || 'solid';
+    const logoAspectRatio = logo.aspectRatio || 'square';
+    const logoImageFit = logo.imageFit || 'contain';
+
     const iconOptions = [
         { id: 'mdi:school', label: 'Sekolah' },
         { id: 'mdi:leaf', label: 'Daun Banyan' },
@@ -202,29 +245,58 @@ export function ThemeSettingsView() {
                 <div className="space-y-6 lg:col-span-7">
                     <Tabs
                         value={activeTab}
-                        onValueChange={(v) => setActiveTab(v as any)}
+                        onValueChange={(v) =>
+                            setActiveTab(
+                                v as
+                                    | 'presets'
+                                    | 'colors'
+                                    | 'fonts'
+                                    | 'logo'
+                                    | 'radius'
+                                    | 'components',
+                            )
+                        }
                         className="w-full"
                     >
-                        <TabsList className="grid w-full grid-cols-5 bg-muted/60 p-1">
-                            <TabsTrigger value="presets" className="gap-1.5 text-xs font-semibold">
+                        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 bg-muted/60 p-1 h-auto gap-1">
+                            <TabsTrigger
+                                value="presets"
+                                className="gap-1.5 text-xs font-semibold py-2"
+                            >
                                 <Sparkles className="size-3.5" />
                                 Preset
                             </TabsTrigger>
-                            <TabsTrigger value="colors" className="gap-1.5 text-xs font-semibold">
+                            <TabsTrigger
+                                value="colors"
+                                className="gap-1.5 text-xs font-semibold py-2"
+                            >
                                 <Palette className="size-3.5" />
                                 Warna
                             </TabsTrigger>
-                            <TabsTrigger value="logo" className="gap-1.5 text-xs font-semibold">
+                            <TabsTrigger
+                                value="fonts"
+                                className="gap-1.5 text-xs font-semibold py-2"
+                            >
+                                <Type className="size-3.5" />
+                                Font
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="logo"
+                                className="gap-1.5 text-xs font-semibold py-2"
+                            >
                                 <ImageIcon className="size-3.5" />
                                 Logo
                             </TabsTrigger>
-                            <TabsTrigger value="radius" className="gap-1.5 text-xs font-semibold">
+                            <TabsTrigger
+                                value="radius"
+                                className="gap-1.5 text-xs font-semibold py-2"
+                            >
                                 <Square className="size-3.5" />
                                 Radius
                             </TabsTrigger>
                             <TabsTrigger
                                 value="components"
-                                className="gap-1.5 text-xs font-semibold"
+                                className="gap-1.5 text-xs font-semibold py-2"
                             >
                                 <Sliders className="size-3.5" />
                                 Gaya UI
@@ -406,7 +478,312 @@ export function ThemeSettingsView() {
                             </Card>
                         </TabsContent>
 
-                        {/* 3. LOGO TAB */}
+                        {/* 3. FONTS & TYPOGRAPHY TAB */}
+                        <TabsContent value="fonts" className="mt-5 space-y-4">
+                            {/* Overview & Offline Status Card */}
+                            <Card className="rounded-sm border-border/70">
+                                <CardHeader className="pb-3">
+                                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                        <div>
+                                            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                                                <Type className="size-4 text-primary" />
+                                                Pilihan Font & Tipografi Sistem
+                                            </CardTitle>
+                                            <CardDescription className="text-xs mt-1">
+                                                Kustomisasi font antarmuka EMS mulai dari Times New
+                                                Roman, Arial, font modern, hingga aneka font tulisan
+                                                tangan artistik.
+                                            </CardDescription>
+                                        </div>
+                                        <Badge
+                                            variant="outline"
+                                            className="w-fit flex items-center gap-1.5 border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs py-1 px-2.5 font-medium"
+                                        >
+                                            <CheckCircle2 className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                                            100% Siap Offline
+                                        </Badge>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-4 pt-0">
+                                    {/* Offline notification banner */}
+                                    <div className="rounded-sm border border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-950/20 p-3 flex items-start gap-3">
+                                        <div className="mt-0.5 rounded-full bg-emerald-500/20 p-1 text-emerald-600 dark:text-emerald-400 shrink-0">
+                                            <Icon icon="mdi:cloud-check" className="size-4" />
+                                        </div>
+                                        <div className="space-y-1 text-xs">
+                                            <p className="font-semibold text-foreground">
+                                                Semua file font telah diunduh di server lokal
+                                            </p>
+                                            <p className="text-muted-foreground leading-relaxed">
+                                                Pengguna dapat berganti font kapan saja tanpa
+                                                memerlukan koneksi internet aktif. Seluruh font
+                                                (Times New Roman, Arial, sans modern, serta font
+                                                bertema tulisan tangan dan kursif) dimuat langsung
+                                                dari penyimpanan lokal aplikasi.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Current Active Font & Quick Reset */}
+                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 rounded-sm border border-border/60 bg-muted/30">
+                                        <div className="space-y-0.5">
+                                            <span className="text-[0.6875rem] font-bold uppercase tracking-wider text-muted-foreground">
+                                                Font Aktif Saat Ini
+                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <span
+                                                    className="text-base font-bold text-foreground"
+                                                    style={{
+                                                        fontFamily: getFontConfig(theme.fontFamily)
+                                                            .fontFamily,
+                                                    }}
+                                                >
+                                                    {getFontConfig(theme.fontFamily).name}
+                                                </span>
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="text-[0.6875rem]"
+                                                >
+                                                    {getFontConfig(theme.fontFamily).badge ||
+                                                        'Aktif'}
+                                                </Badge>
+                                            </div>
+                                            <p className="text-[0.6875rem] text-muted-foreground">
+                                                {getFontConfig(theme.fontFamily).description}
+                                            </p>
+                                        </div>
+
+                                        {theme.fontFamily &&
+                                            theme.fontFamily !== 'plus-jakarta' && (
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        updateTheme({ fontFamily: 'plus-jakarta' })
+                                                    }
+                                                    className="text-xs gap-1.5 h-8 shrink-0 self-start sm:self-auto"
+                                                >
+                                                    <RotateCcw className="size-3.5" />
+                                                    Kembali ke Plus Jakarta Sans
+                                                </Button>
+                                            )}
+                                    </div>
+
+                                    {/* Interactive Preview Text Input */}
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                                            <span>Uji Coba Teks Pratinjau:</span>
+                                            <span className="text-[0.6875rem] font-normal text-muted-foreground">
+                                                Ketik kalimat bebas untuk melihat karakter setiap
+                                                font di bawah
+                                            </span>
+                                        </label>
+                                        <Input
+                                            type="text"
+                                            value={fontSampleText}
+                                            onChange={(e) => setFontSampleText(e.target.value)}
+                                            placeholder="Ketik kalimat atau angka untuk melihat karakter font..."
+                                            className="text-xs"
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Filter & Search Bar */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                {/* Category Pills */}
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                    {[
+                                        {
+                                            id: 'all',
+                                            label: 'Semua Font',
+                                            count: FONT_OPTIONS.length,
+                                        },
+                                        {
+                                            id: 'handwriting',
+                                            label: 'Tulisan Tangan',
+                                            count: FONT_OPTIONS.filter(
+                                                (f) => f.category === 'handwriting',
+                                            ).length,
+                                            icon: 'mdi:draw-pen',
+                                        },
+                                        {
+                                            id: 'serif',
+                                            label: 'Serif (Times dsb)',
+                                            count: FONT_OPTIONS.filter(
+                                                (f) => f.category === 'serif',
+                                            ).length,
+                                            icon: 'mdi:format-font',
+                                        },
+                                        {
+                                            id: 'sans',
+                                            label: 'Sans-Serif (Arial dsb)',
+                                            count: FONT_OPTIONS.filter((f) => f.category === 'sans')
+                                                .length,
+                                            icon: 'mdi:format-letter-case',
+                                        },
+                                    ].map((cat) => {
+                                        const isActive = fontFilter === cat.id;
+                                        return (
+                                            <button
+                                                key={cat.id}
+                                                type="button"
+                                                onClick={() =>
+                                                    setFontFilter(
+                                                        cat.id as
+                                                            | 'all'
+                                                            | 'handwriting'
+                                                            | 'sans'
+                                                            | 'serif',
+                                                    )
+                                                }
+                                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold transition-all border ${
+                                                    isActive
+                                                        ? 'bg-primary text-primary-foreground border-primary shadow-xs'
+                                                        : 'bg-card text-muted-foreground hover:text-foreground border-border/70 hover:bg-muted/50'
+                                                }`}
+                                            >
+                                                {cat.icon && (
+                                                    <Icon icon={cat.icon} className="size-3.5" />
+                                                )}
+                                                <span>{cat.label}</span>
+                                                <span
+                                                    className={`ml-0.5 rounded-full px-1.5 py-0.2 text-[0.625rem] font-bold ${
+                                                        isActive
+                                                            ? 'bg-white/20 text-white'
+                                                            : 'bg-muted text-muted-foreground'
+                                                    }`}
+                                                >
+                                                    {cat.count}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Search Input */}
+                                <div className="relative w-full sm:w-56">
+                                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Cari nama font..."
+                                        value={fontSearch}
+                                        onChange={(e) => setFontSearch(e.target.value)}
+                                        className="pl-8 text-xs h-8"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Font Options Grid */}
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                {filteredFonts.map((font) => {
+                                    const isSelected =
+                                        (theme.fontFamily || 'plus-jakarta') === font.id;
+                                    return (
+                                        <div
+                                            key={font.id}
+                                            onClick={() => updateTheme({ fontFamily: font.id })}
+                                            className={`group relative cursor-pointer rounded-sm border p-4 transition-all hover:border-primary/70 hover:shadow-sm ${
+                                                isSelected
+                                                    ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                                                    : 'border-border/70 bg-card hover:bg-muted/20'
+                                            }`}
+                                        >
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                                                            {font.name}
+                                                        </h3>
+                                                        <Badge
+                                                            variant="outline"
+                                                            className={`text-[0.625rem] py-0 px-1.5 font-medium ${
+                                                                font.category === 'handwriting'
+                                                                    ? 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                                                                    : font.category === 'serif'
+                                                                      ? 'border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-300'
+                                                                      : 'border-muted-foreground/30 text-muted-foreground'
+                                                            }`}
+                                                        >
+                                                            {font.badge || font.category}
+                                                        </Badge>
+                                                    </div>
+                                                    <p className="text-[0.6875rem] text-muted-foreground line-clamp-2">
+                                                        {font.description}
+                                                    </p>
+                                                </div>
+
+                                                <div className="flex items-center gap-1.5 shrink-0">
+                                                    {isSelected ? (
+                                                        <span className="flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs shadow-xs">
+                                                            <Check className="size-3" />
+                                                        </span>
+                                                    ) : (
+                                                        <span className="size-5 rounded-full border border-border group-hover:border-primary/60 transition-colors" />
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Font Preview Area rendered in font's own font-family */}
+                                            <div
+                                                className="mt-3.5 rounded-sm border border-border/50 bg-background/80 p-3 transition-colors group-hover:border-border"
+                                                style={{ fontFamily: font.fontFamily }}
+                                            >
+                                                <p className="text-sm font-semibold text-foreground leading-snug break-words">
+                                                    {fontSampleText ||
+                                                        font.sampleText ||
+                                                        'Pendidikan Berkualitas untuk Semua Siswa 12345'}
+                                                </p>
+                                                <p className="mt-1 text-xs text-muted-foreground opacity-80">
+                                                    ABCDEFGHIJKLMNOPQRSTUVWXYZ
+                                                    abcdefghijklmnopqrstuvwxyz 0123456789
+                                                </p>
+                                            </div>
+
+                                            <div className="mt-2.5 flex items-center justify-between text-[0.625rem] text-muted-foreground pt-1.5 border-t border-border/40">
+                                                <span className="flex items-center gap-1">
+                                                    <Icon
+                                                        icon="mdi:server-network"
+                                                        className="size-3 text-emerald-600 dark:text-emerald-400"
+                                                    />
+                                                    Tersimpan Offline
+                                                </span>
+                                                <span className="font-mono text-[0.5625rem] uppercase opacity-70">
+                                                    {font.category}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {filteredFonts.length === 0 && (
+                                <div className="rounded-sm border border-dashed border-border p-8 text-center space-y-2">
+                                    <Type className="size-8 text-muted-foreground mx-auto opacity-50" />
+                                    <p className="text-sm font-semibold text-foreground">
+                                        Font Tidak Ditemukan
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                        Tidak ada font yang cocok dengan kata kunci &ldquo;
+                                        {fontSearch}&rdquo;.
+                                    </p>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                            setFontSearch('');
+                                            setFontFilter('all');
+                                        }}
+                                        className="text-xs mt-2"
+                                    >
+                                        Tampilkan Semua Font
+                                    </Button>
+                                </div>
+                            )}
+                        </TabsContent>
+
+                        {/* 4. LOGO TAB */}
                         <TabsContent value="logo" className="mt-5 space-y-4">
                             {/* Upload Logo Card */}
                             <Card className="rounded-sm border-border/70">
@@ -507,6 +884,815 @@ export function ThemeSettingsView() {
                                             onChange={(e) => updateLogo({ url: e.target.value })}
                                             className="text-xs"
                                         />
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Logo Framing & Spacing Customization Card */}
+                            <Card className="rounded-sm border-border/70">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                                        <Square className="size-4 text-primary" />
+                                        Gaya Bingkai & Jarak Logo (Border & Padding)
+                                    </CardTitle>
+                                    <CardDescription className="text-xs">
+                                        Atur tampilan logo secara fleksibel: bisa berupa gambar
+                                        bersih tanpa border atau padding, atau dengan border dan
+                                        padding yang dapat disesuaikan sesuka Anda.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-5">
+                                    {/* Mini Interactive Preview Box */}
+                                    <div className="rounded-sm border p-4 bg-muted/20 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                                                <Eye className="size-3.5 text-primary" />
+                                                Pratinjau Logo Langsung
+                                            </span>
+                                            {/* Preview Background Switcher */}
+                                            <div className="flex items-center gap-1 bg-background/80 p-0.5 rounded-sm border text-[0.6875rem]">
+                                                <span className="text-muted-foreground px-1.5">
+                                                    Latar:
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setLogoBgPreview('white')}
+                                                    className={`px-2 py-0.5 rounded-sm font-medium transition-colors ${
+                                                        logoBgPreview === 'white'
+                                                            ? 'bg-primary text-primary-foreground'
+                                                            : 'text-muted-foreground hover:text-foreground'
+                                                    }`}
+                                                >
+                                                    Terang
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setLogoBgPreview('dark')}
+                                                    className={`px-2 py-0.5 rounded-sm font-medium transition-colors ${
+                                                        logoBgPreview === 'dark'
+                                                            ? 'bg-primary text-primary-foreground'
+                                                            : 'text-muted-foreground hover:text-foreground'
+                                                    }`}
+                                                >
+                                                    Gelap
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setLogoBgPreview('brand')}
+                                                    className={`px-2 py-0.5 rounded-sm font-medium transition-colors ${
+                                                        logoBgPreview === 'brand'
+                                                            ? 'bg-primary text-primary-foreground'
+                                                            : 'text-muted-foreground hover:text-foreground'
+                                                    }`}
+                                                >
+                                                    Brand
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            className={`p-6 rounded-sm border flex flex-wrap items-center justify-around gap-6 transition-colors ${
+                                                logoBgPreview === 'white'
+                                                    ? 'bg-white border-border/60 text-slate-900'
+                                                    : logoBgPreview === 'dark'
+                                                      ? 'bg-slate-950 border-slate-800 text-white'
+                                                      : 'text-white'
+                                            }`}
+                                            style={
+                                                logoBgPreview === 'brand'
+                                                    ? {
+                                                          backgroundImage: `linear-gradient(135deg, ${theme.colors.brandFrom}, ${theme.colors.brandTo})`,
+                                                      }
+                                                    : undefined
+                                            }
+                                        >
+                                            <div className="text-center space-y-1.5">
+                                                <AppLogo size="sm" showText={false} />
+                                                <span className="text-[0.625rem] text-muted-foreground block">
+                                                    Kecil (sm)
+                                                </span>
+                                            </div>
+                                            <div className="text-center space-y-1.5">
+                                                <AppLogo size="md" showText={false} />
+                                                <span className="text-[0.625rem] text-muted-foreground block font-semibold">
+                                                    Standar (md)
+                                                </span>
+                                            </div>
+                                            <div className="text-center space-y-1.5">
+                                                <AppLogo size="lg" showText={false} />
+                                                <span className="text-[0.625rem] text-muted-foreground block">
+                                                    Besar (lg)
+                                                </span>
+                                            </div>
+                                            <div className="text-center space-y-1.5">
+                                                <AppLogo size="xl" showText={false} />
+                                                <span className="text-[0.625rem] text-muted-foreground block">
+                                                    Ekstra (xl)
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Gaya Cepat (Quick Presets) */}
+                                    <div className="space-y-2">
+                                        <span className="text-xs font-semibold text-foreground block">
+                                            Pilihan Gaya Cepat (Quick Preset):
+                                        </span>
+                                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    updateLogo({
+                                                        hasBorder: false,
+                                                        borderWidth: 0,
+                                                        padding: 0,
+                                                        hasBackground: false,
+                                                        backgroundColor: 'transparent',
+                                                    })
+                                                }
+                                                className={`p-2.5 text-left border rounded-sm transition-all ${
+                                                    !logoHasBorder &&
+                                                    logoPadding === 0 &&
+                                                    !logoHasBg
+                                                        ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                                                        : 'border-border/70 hover:border-primary/50 bg-card'
+                                                }`}
+                                            >
+                                                <span className="text-xs font-bold text-foreground block">
+                                                    🖼️ Gambar Saja (Clean)
+                                                </span>
+                                                <span className="text-[0.625rem] text-muted-foreground mt-0.5 block">
+                                                    Tanpa border, tanpa padding, latar transparan
+                                                </span>
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    updateLogo({
+                                                        hasBorder: true,
+                                                        borderWidth: 1,
+                                                        borderColor: '',
+                                                        borderStyle: 'solid',
+                                                        padding: 2,
+                                                        hasBackground: true,
+                                                        backgroundColor: '#ffffff',
+                                                        borderRadius: 'inherit',
+                                                    })
+                                                }
+                                                className={`p-2.5 text-left border rounded-sm transition-all ${
+                                                    logoHasBorder &&
+                                                    logoPadding === 2 &&
+                                                    logoRadius === 'inherit' &&
+                                                    (!logo.borderColor || logo.borderColor === '')
+                                                        ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                                                        : 'border-border/70 hover:border-primary/50 bg-card'
+                                                }`}
+                                            >
+                                                <span className="text-xs font-bold text-foreground block">
+                                                    🔲 Kotak Kartu (Boxed)
+                                                </span>
+                                                <span className="text-[0.625rem] text-muted-foreground mt-0.5 block">
+                                                    Border 1px halus, padding 2px, latar putih
+                                                </span>
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    updateLogo({
+                                                        hasBorder: true,
+                                                        borderWidth: 1,
+                                                        borderColor: '',
+                                                        borderStyle: 'solid',
+                                                        padding: 4,
+                                                        hasBackground: true,
+                                                        backgroundColor: '#ffffff',
+                                                        borderRadius: '9999px',
+                                                    })
+                                                }
+                                                className={`p-2.5 text-left border rounded-sm transition-all ${
+                                                    logoHasBorder && logoRadius === '9999px'
+                                                        ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                                                        : 'border-border/70 hover:border-primary/50 bg-card'
+                                                }`}
+                                            >
+                                                <span className="text-xs font-bold text-foreground block">
+                                                    🔘 Badge Bulat (Circle)
+                                                </span>
+                                                <span className="text-[0.625rem] text-muted-foreground mt-0.5 block">
+                                                    Lingkaran penuh, border halus, padding 4px
+                                                </span>
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    updateLogo({
+                                                        hasBorder: true,
+                                                        borderWidth: 2,
+                                                        borderColor: theme.colors.primary,
+                                                        borderStyle: 'solid',
+                                                        padding: 3,
+                                                        hasBackground: true,
+                                                        backgroundColor: '#ffffff',
+                                                        borderRadius: '8px',
+                                                    })
+                                                }
+                                                className={`p-2.5 text-left border rounded-sm transition-all ${
+                                                    logoHasBorder &&
+                                                    logoBorderWidth === 2 &&
+                                                    logo.borderColor === theme.colors.primary
+                                                        ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                                                        : 'border-border/70 hover:border-primary/50 bg-card'
+                                                }`}
+                                            >
+                                                <span className="text-xs font-bold text-foreground block">
+                                                    🎨 Aksen Brand
+                                                </span>
+                                                <span className="text-[0.625rem] text-muted-foreground mt-0.5 block">
+                                                    Border tebal 2px warna utama brand
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Detailed Controls: Border Toggle & Configuration */}
+                                    <div className="space-y-4 pt-3 border-t">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <span className="text-xs font-bold text-foreground block">
+                                                    Garis Tepi (Border)
+                                                </span>
+                                                <span className="text-[0.6875rem] text-muted-foreground block">
+                                                    Aktifkan atau nonaktifkan garis pembatas di
+                                                    sekeliling logo
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 p-1 bg-muted/60 rounded-sm border">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        updateLogo({
+                                                            hasBorder: false,
+                                                            borderWidth: 0,
+                                                        })
+                                                    }
+                                                    className={`px-3 py-1 text-xs rounded-sm font-semibold transition-all ${
+                                                        !logoHasBorder
+                                                            ? 'bg-background text-foreground shadow-xs'
+                                                            : 'text-muted-foreground hover:text-foreground'
+                                                    }`}
+                                                >
+                                                    Tanpa Border
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        updateLogo({
+                                                            hasBorder: true,
+                                                            borderWidth:
+                                                                logoBorderWidth > 0
+                                                                    ? logoBorderWidth
+                                                                    : 1,
+                                                        })
+                                                    }
+                                                    className={`px-3 py-1 text-xs rounded-sm font-semibold transition-all ${
+                                                        logoHasBorder
+                                                            ? 'bg-primary text-primary-foreground shadow-xs'
+                                                            : 'text-muted-foreground hover:text-foreground'
+                                                    }`}
+                                                >
+                                                    Dengan Border
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Sub-controls when border is active */}
+                                        {logoHasBorder && (
+                                            <div className="p-3.5 border rounded-sm bg-muted/10 space-y-3.5 animate-in fade-in-50 duration-200">
+                                                {/* Ketebalan Border (Border Width) */}
+                                                <div className="space-y-1.5">
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className="font-medium text-foreground">
+                                                            Ketebalan Border (Border Width)
+                                                        </span>
+                                                        <span className="font-mono text-xs font-bold text-primary">
+                                                            {logoBorderWidth}px
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <input
+                                                            type="range"
+                                                            min="1"
+                                                            max="8"
+                                                            step="1"
+                                                            value={logoBorderWidth}
+                                                            onChange={(e) =>
+                                                                updateLogo({
+                                                                    borderWidth: parseInt(
+                                                                        e.target.value,
+                                                                    ),
+                                                                    hasBorder: true,
+                                                                })
+                                                            }
+                                                            className="w-full accent-primary cursor-pointer"
+                                                        />
+                                                    </div>
+                                                    <div className="flex items-center gap-1 pt-1">
+                                                        {[1, 2, 3, 4, 6].map((w) => (
+                                                            <button
+                                                                key={w}
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    updateLogo({
+                                                                        borderWidth: w,
+                                                                        hasBorder: true,
+                                                                    })
+                                                                }
+                                                                className={`px-2 py-0.5 text-[0.6875rem] rounded-sm border ${
+                                                                    logoBorderWidth === w
+                                                                        ? 'border-primary bg-primary text-primary-foreground font-semibold'
+                                                                        : 'border-border/60 hover:border-primary/50 bg-background text-foreground'
+                                                                }`}
+                                                            >
+                                                                {w}px
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Warna Border (Border Color) */}
+                                                <div className="space-y-1.5 pt-2 border-t border-border/50">
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className="font-medium text-foreground">
+                                                            Warna Border
+                                                        </span>
+                                                        <span className="font-mono text-xs text-muted-foreground">
+                                                            {logo.borderColor ||
+                                                                'Default (Border Tema)'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                updateLogo({ borderColor: '' })
+                                                            }
+                                                            className={`px-2.5 py-1 text-xs rounded-sm border transition-all ${
+                                                                !logo.borderColor
+                                                                    ? 'border-primary ring-2 ring-primary/20 bg-primary/10 font-semibold'
+                                                                    : 'border-border/60 bg-background hover:border-primary/40'
+                                                            }`}
+                                                        >
+                                                            Default Halus
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                updateLogo({
+                                                                    borderColor:
+                                                                        theme.colors.primary,
+                                                                })
+                                                            }
+                                                            className={`flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-sm border transition-all ${
+                                                                logo.borderColor ===
+                                                                theme.colors.primary
+                                                                    ? 'border-primary ring-2 ring-primary/20 font-semibold'
+                                                                    : 'border-border/60 bg-background hover:border-primary/40'
+                                                            }`}
+                                                        >
+                                                            <span
+                                                                className="size-3 rounded-full border shadow-xs"
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        theme.colors.primary,
+                                                                }}
+                                                            />
+                                                            Warna Utama
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                updateLogo({
+                                                                    borderColor: '#FFFFFF',
+                                                                })
+                                                            }
+                                                            className={`flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-sm border transition-all ${
+                                                                logo.borderColor === '#FFFFFF'
+                                                                    ? 'border-primary ring-2 ring-primary/20 font-semibold'
+                                                                    : 'border-border/60 bg-background hover:border-primary/40'
+                                                            }`}
+                                                        >
+                                                            <span className="size-3 rounded-full border bg-white shadow-xs" />
+                                                            Putih
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                updateLogo({
+                                                                    borderColor: '#0F172A',
+                                                                })
+                                                            }
+                                                            className={`flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-sm border transition-all ${
+                                                                logo.borderColor === '#0F172A'
+                                                                    ? 'border-primary ring-2 ring-primary/20 font-semibold'
+                                                                    : 'border-border/60 bg-background hover:border-primary/40'
+                                                            }`}
+                                                        >
+                                                            <span className="size-3 rounded-full border bg-slate-900 shadow-xs" />
+                                                            Gelap
+                                                        </button>
+                                                        <div className="flex items-center gap-1.5 ml-auto">
+                                                            <input
+                                                                type="color"
+                                                                value={
+                                                                    logo.borderColor || '#cbd5e1'
+                                                                }
+                                                                onChange={(e) =>
+                                                                    updateLogo({
+                                                                        borderColor: e.target.value,
+                                                                    })
+                                                                }
+                                                                className="size-7 cursor-pointer rounded-sm border border-border/60 bg-transparent p-0.5"
+                                                                title="Pilih warna kustom"
+                                                            />
+                                                            <Input
+                                                                type="text"
+                                                                value={logo.borderColor || ''}
+                                                                onChange={(e) =>
+                                                                    updateLogo({
+                                                                        borderColor: e.target.value,
+                                                                    })
+                                                                }
+                                                                placeholder="#HEX"
+                                                                className="w-20 font-mono text-[0.6875rem] uppercase h-7 px-1.5"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Gaya Garis Border (Border Style) */}
+                                                <div className="space-y-1.5 pt-2 border-t border-border/50">
+                                                    <span className="text-xs font-medium text-foreground block">
+                                                        Gaya Garis (Border Style)
+                                                    </span>
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        {[
+                                                            {
+                                                                id: 'solid',
+                                                                label: 'Solid (Lurus)',
+                                                            },
+                                                            {
+                                                                id: 'dashed',
+                                                                label: 'Dashed (Putus-putus)',
+                                                            },
+                                                            {
+                                                                id: 'dotted',
+                                                                label: 'Dotted (Titik-titik)',
+                                                            },
+                                                        ].map((s) => (
+                                                            <button
+                                                                key={s.id}
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    updateLogo({
+                                                                        borderStyle: s.id as any,
+                                                                    })
+                                                                }
+                                                                className={`px-2.5 py-1.5 text-xs rounded-sm border text-center transition-all ${
+                                                                    logoBorderStyle === s.id
+                                                                        ? 'border-primary ring-2 ring-primary/20 bg-primary/10 font-semibold'
+                                                                        : 'border-border/60 bg-background hover:border-primary/40'
+                                                                }`}
+                                                            >
+                                                                {s.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Padding Controls */}
+                                        <div className="space-y-2 pt-3 border-t">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <span className="text-xs font-bold text-foreground block">
+                                                        Jarak Ruang Dalam (Padding)
+                                                    </span>
+                                                    <span className="text-[0.6875rem] text-muted-foreground block">
+                                                        Jarak antara gambar logo dengan tepi
+                                                        wadah/border
+                                                    </span>
+                                                </div>
+                                                <span className="font-mono text-xs font-bold text-primary">
+                                                    {logoPadding}px
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center gap-3">
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="24"
+                                                    step="1"
+                                                    value={logoPadding}
+                                                    onChange={(e) =>
+                                                        updateLogo({
+                                                            padding: parseInt(e.target.value),
+                                                        })
+                                                    }
+                                                    className="w-full accent-primary cursor-pointer"
+                                                />
+                                            </div>
+
+                                            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                                {[
+                                                    { v: 0, label: '0px (Tanpa Padding)' },
+                                                    { v: 2, label: '2px (Tipis)' },
+                                                    { v: 4, label: '4px (Sedang)' },
+                                                    { v: 8, label: '8px (Lebar)' },
+                                                    { v: 12, label: '12px (Luas)' },
+                                                    { v: 16, label: '16px (Ekstra)' },
+                                                ].map((p) => (
+                                                    <button
+                                                        key={p.v}
+                                                        type="button"
+                                                        onClick={() => updateLogo({ padding: p.v })}
+                                                        className={`px-2.5 py-1 text-xs rounded-sm border transition-all ${
+                                                            logoPadding === p.v
+                                                                ? 'border-primary bg-primary text-primary-foreground font-semibold'
+                                                                : 'border-border/60 hover:border-primary/50 bg-background text-foreground'
+                                                        }`}
+                                                    >
+                                                        {p.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Sudut Lengkung Logo (Radius) */}
+                                        <div className="space-y-2 pt-3 border-t">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <span className="text-xs font-bold text-foreground block">
+                                                        Sudut Kelengkungan Logo (Radius)
+                                                    </span>
+                                                    <span className="text-[0.6875rem] text-muted-foreground block">
+                                                        Bentuk sudut wadah logo institusi
+                                                    </span>
+                                                </div>
+                                                <span className="font-mono text-xs text-muted-foreground">
+                                                    {logoRadius === 'inherit'
+                                                        ? `Ikuti Tema (${theme.radius})`
+                                                        : logoRadius}
+                                                </span>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-2 sm:grid-cols-6">
+                                                {[
+                                                    {
+                                                        id: 'inherit',
+                                                        label: 'Ikuti Tema',
+                                                        desc: theme.radius,
+                                                    },
+                                                    {
+                                                        id: '0px',
+                                                        label: 'Kotak (0px)',
+                                                        desc: 'Tegas',
+                                                    },
+                                                    {
+                                                        id: '4px',
+                                                        label: 'Halus (4px)',
+                                                        desc: 'Sedikit bulat',
+                                                    },
+                                                    {
+                                                        id: '8px',
+                                                        label: 'Sedang (8px)',
+                                                        desc: 'Modern',
+                                                    },
+                                                    {
+                                                        id: '12px',
+                                                        label: 'Lebar (12px)',
+                                                        desc: 'Membulat',
+                                                    },
+                                                    {
+                                                        id: '9999px',
+                                                        label: 'Bulat Penuh',
+                                                        desc: 'Circle / Pill',
+                                                    },
+                                                ].map((r) => (
+                                                    <button
+                                                        key={r.id}
+                                                        type="button"
+                                                        onClick={() =>
+                                                            updateLogo({ borderRadius: r.id })
+                                                        }
+                                                        className={`p-2 text-center border rounded-sm transition-all ${
+                                                            logoRadius === r.id
+                                                                ? 'border-primary ring-2 ring-primary/20 bg-primary/5 font-semibold'
+                                                                : 'border-border/60 hover:border-primary/50 bg-card'
+                                                        }`}
+                                                    >
+                                                        <span className="text-xs text-foreground block">
+                                                            {r.label}
+                                                        </span>
+                                                        <span className="text-[0.625rem] text-muted-foreground block">
+                                                            {r.desc}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Background Latar Wadah Logo */}
+                                        <div className="space-y-2 pt-3 border-t">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <span className="text-xs font-bold text-foreground block">
+                                                        Warna Latar Belakang Wadah (Background)
+                                                    </span>
+                                                    <span className="text-[0.6875rem] text-muted-foreground block">
+                                                        Berguna bila logo PNG Anda memiliki latar
+                                                        transparan
+                                                    </span>
+                                                </div>
+                                                <span className="font-mono text-xs text-muted-foreground">
+                                                    {!logoHasBg ? 'Transparan' : logoBgColor}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        updateLogo({
+                                                            hasBackground: false,
+                                                            backgroundColor: 'transparent',
+                                                        })
+                                                    }
+                                                    className={`px-3 py-1 text-xs rounded-sm border transition-all ${
+                                                        !logoHasBg
+                                                            ? 'border-primary ring-2 ring-primary/20 bg-primary/10 font-semibold'
+                                                            : 'border-border/60 bg-background hover:border-primary/40'
+                                                    }`}
+                                                >
+                                                    Transparan (Tanpa Latar)
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        updateLogo({
+                                                            hasBackground: true,
+                                                            backgroundColor: '#FFFFFF',
+                                                        })
+                                                    }
+                                                    className={`flex items-center gap-1.5 px-3 py-1 text-xs rounded-sm border transition-all ${
+                                                        logoHasBg && logoBgColor === '#FFFFFF'
+                                                            ? 'border-primary ring-2 ring-primary/20 bg-primary/10 font-semibold'
+                                                            : 'border-border/60 bg-background hover:border-primary/40'
+                                                    }`}
+                                                >
+                                                    <span className="size-3 rounded-full border bg-white shadow-xs" />
+                                                    Putih Bersih
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        updateLogo({
+                                                            hasBackground: true,
+                                                            backgroundColor: '#0F172A',
+                                                        })
+                                                    }
+                                                    className={`flex items-center gap-1.5 px-3 py-1 text-xs rounded-sm border transition-all ${
+                                                        logoHasBg && logoBgColor === '#0F172A'
+                                                            ? 'border-primary ring-2 ring-primary/20 bg-primary/10 font-semibold'
+                                                            : 'border-border/60 bg-background hover:border-primary/40'
+                                                    }`}
+                                                >
+                                                    <span className="size-3 rounded-full border bg-slate-900 shadow-xs" />
+                                                    Gelap Elegan
+                                                </button>
+                                                <div className="flex items-center gap-1.5 ml-auto">
+                                                    <input
+                                                        type="color"
+                                                        value={logoHasBg ? logoBgColor : '#ffffff'}
+                                                        onChange={(e) =>
+                                                            updateLogo({
+                                                                hasBackground: true,
+                                                                backgroundColor: e.target.value,
+                                                            })
+                                                        }
+                                                        className="size-7 cursor-pointer rounded-sm border border-border/60 bg-transparent p-0.5"
+                                                        title="Pilih warna latar kustom"
+                                                    />
+                                                    <Input
+                                                        type="text"
+                                                        value={logoHasBg ? logoBgColor : ''}
+                                                        onChange={(e) =>
+                                                            updateLogo({
+                                                                hasBackground: true,
+                                                                backgroundColor: e.target.value,
+                                                            })
+                                                        }
+                                                        placeholder="#HEX"
+                                                        className="w-20 font-mono text-[0.6875rem] uppercase h-7 px-1.5"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Aspect Ratio & Object Fit */}
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-3 border-t">
+                                            <div className="space-y-1.5">
+                                                <span className="text-xs font-bold text-foreground block">
+                                                    Proporsi Wadah (Aspect Ratio)
+                                                </span>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            updateLogo({ aspectRatio: 'square' })
+                                                        }
+                                                        className={`p-2 text-xs rounded-sm border text-left transition-all ${
+                                                            logoAspectRatio === 'square'
+                                                                ? 'border-primary ring-2 ring-primary/20 bg-primary/5 font-semibold'
+                                                                : 'border-border/60 bg-card hover:border-primary/40'
+                                                        }`}
+                                                    >
+                                                        <span className="block font-bold">
+                                                            Kotak 1:1
+                                                        </span>
+                                                        <span className="text-[0.625rem] text-muted-foreground block">
+                                                            Standar lambang/ikon
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            updateLogo({ aspectRatio: 'wide' })
+                                                        }
+                                                        className={`p-2 text-xs rounded-sm border text-left transition-all ${
+                                                            logoAspectRatio === 'wide'
+                                                                ? 'border-primary ring-2 ring-primary/20 bg-primary/5 font-semibold'
+                                                                : 'border-border/60 bg-card hover:border-primary/40'
+                                                        }`}
+                                                    >
+                                                        <span className="block font-bold">
+                                                            Melebar (Wide)
+                                                        </span>
+                                                        <span className="text-[0.625rem] text-muted-foreground block">
+                                                            Cocok logo horizontal
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-1.5">
+                                                <span className="text-xs font-bold text-foreground block">
+                                                    Kesesuaian Gambar (Image Fit)
+                                                </span>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            updateLogo({ imageFit: 'contain' })
+                                                        }
+                                                        className={`p-2 text-xs rounded-sm border text-left transition-all ${
+                                                            logoImageFit === 'contain'
+                                                                ? 'border-primary ring-2 ring-primary/20 bg-primary/5 font-semibold'
+                                                                : 'border-border/60 bg-card hover:border-primary/40'
+                                                        }`}
+                                                    >
+                                                        <span className="block font-bold">
+                                                            Contain (Utuh)
+                                                        </span>
+                                                        <span className="text-[0.625rem] text-muted-foreground block">
+                                                            Proporsional tanpa potong
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            updateLogo({ imageFit: 'cover' })
+                                                        }
+                                                        className={`p-2 text-xs rounded-sm border text-left transition-all ${
+                                                            logoImageFit === 'cover'
+                                                                ? 'border-primary ring-2 ring-primary/20 bg-primary/5 font-semibold'
+                                                                : 'border-border/60 bg-card hover:border-primary/40'
+                                                        }`}
+                                                    >
+                                                        <span className="block font-bold">
+                                                            Cover (Penuh)
+                                                        </span>
+                                                        <span className="text-[0.625rem] text-muted-foreground block">
+                                                            Penuhi seluruh wadah
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -933,6 +2119,35 @@ export function ThemeSettingsView() {
                                     Header Sidebar / Navbar:
                                 </span>
                                 <AppLogo size="sm" />
+                            </div>
+
+                            {/* Active Font & Typography Preview */}
+                            <div className="p-3 border rounded-sm bg-muted/20 space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[0.6875rem] font-semibold text-muted-foreground flex items-center gap-1.5">
+                                        <Type className="size-3.5 text-primary" />
+                                        Font Antarmuka Aktif:
+                                    </span>
+                                    <Badge
+                                        variant="outline"
+                                        className="text-[0.625rem] py-0 px-1.5 bg-background font-mono"
+                                    >
+                                        {getFontConfig(theme.fontFamily).name}
+                                    </Badge>
+                                </div>
+                                <p
+                                    className="text-sm font-semibold text-foreground transition-all duration-150 leading-snug"
+                                    style={{
+                                        fontFamily: getFontConfig(theme.fontFamily).fontFamily,
+                                    }}
+                                >
+                                    {previewInputText ||
+                                        'Bimbel Mandiri — Masa Depan Gemilang 12345'}
+                                </p>
+                                <span className="text-[0.625rem] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
+                                    <Icon icon="mdi:check-circle-outline" className="size-3" />
+                                    Tersedia secara offline
+                                </span>
                             </div>
 
                             {/* Buttons Preview */}

@@ -259,9 +259,30 @@ export default function SessionForm({ type, classId, session, onSuccess }: Sessi
                 />
             </Field>
 
-            {type === 'create' && classId && members.length > 0 && (
+            {type === 'create' && (classId || selectedClassId) && members.length > 0 && (
                 <Field>
-                    <FieldLabel>Peserta Sesi</FieldLabel>
+                    <div className="flex items-center justify-between">
+                        <FieldLabel>Peserta Sesi</FieldLabel>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto p-0 text-xs text-primary hover:bg-transparent"
+                            onClick={() => {
+                                if (studentProgramIds.length > 0) {
+                                    setStudentProgramIds([]);
+                                } else {
+                                    setStudentProgramIds(
+                                        members
+                                            .filter((member: any) => member.can_join)
+                                            .map((member: any) => member.student_program_id),
+                                    );
+                                }
+                            }}
+                        >
+                            {studentProgramIds.length > 0 ? 'Kosongkan Semua' : 'Pilih Semua'}
+                        </Button>
+                    </div>
                     <div className="max-h-40 space-y-2 overflow-auto rounded-sm border p-2">
                         {members.map((member) => (
                             <div

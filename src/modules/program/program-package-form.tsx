@@ -42,6 +42,7 @@ const formSchema = z.object({
 type ProgramPackageFormProps = {
     type: 'create' | 'update';
     slug?: string;
+    programSlug?: string;
     initialData?: z.infer<typeof formSchema>;
     onSuccess: () => void;
 };
@@ -49,6 +50,7 @@ type ProgramPackageFormProps = {
 export default function ProgramPackageForm({
     type,
     slug,
+    programSlug,
     initialData,
     onSuccess,
 }: ProgramPackageFormProps) {
@@ -102,7 +104,8 @@ export default function ProgramPackageForm({
 
     const onUpdate = async (values: z.infer<typeof formSchema>) => {
         try {
-            const response = await http.patch(`/program-packages/${slug}`, values);
+            const payload = programSlug ? { ...values, program_slug: programSlug } : values;
+            const response = await http.patch(`/program-packages/${slug}`, payload);
             toast.add({
                 title: 'Success',
                 type: 'success',
